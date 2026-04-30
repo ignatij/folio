@@ -38,6 +38,9 @@ echo "==> Uploading binary to ${REMOTE_USER}@${HOST}:${REMOTE_BINARY} ..."
 scp "${SSH_OPTS[@]}" dist/folio-server "${REMOTE_USER}@${HOST}:${REMOTE_BINARY}"
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "chmod +x ${REMOTE_BINARY}"
 
+echo "==> Uploading config files..."
+scp "${SSH_OPTS[@]}" config.yaml theme.json "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/"
+
 echo "==> Uploading admin UI..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "rm -rf ${REMOTE_DIR}/admin/dist && mkdir -p ${REMOTE_DIR}/admin/dist"
 scp -r "${SSH_OPTS[@]}" admin/dist/. "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/admin/dist/"
@@ -47,6 +50,9 @@ ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "mkdir -p ${REMOTE_DIR}/site/src $
 scp "${SSH_OPTS[@]}" site/build.sh "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/build.sh"
 scp "${SSH_OPTS[@]}" site/package.json site/package-lock.json site/eleventy.config.js "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/"
 scp -r "${SSH_OPTS[@]}" site/src/. "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/src/"
+
+echo "==> Fixing ownership..."
+ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "chown -R folio:folio ${REMOTE_DIR}"
 
 echo "==> Installing site dependencies and building on server..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" \

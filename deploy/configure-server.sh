@@ -56,6 +56,9 @@ PORT=8082
 UPLOAD_DIR=/opt/folio/uploads
 DB_PATH=/opt/folio/data/blog.db
 JWT_SECRET=${JWT_SECRET}
+SITE_BUILD_SCRIPT=/opt/folio/site/build.sh
+SITE_DIST=/opt/folio/site/dist
+BACKEND_URL=http://localhost:8082
 EOF
 chmod 600 /etc/folio.env
 
