@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (Go)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: CGO_ENABLED=0 go build ./...
+
+      - name: Test
+        run: go test ./...
+
+  admin:
+    name: Admin (TypeScript)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check & build
+        run: npm run build
+
+  site:
+    name: Site (Eleventy)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          BACKEND_URL: http://localhost:8080
+          SITE_DIST: /tmp/site-dist
+        run: npx @11ty/eleventy --output=$SITE_DIST
