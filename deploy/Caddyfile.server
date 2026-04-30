@@ -1,0 +1,47 @@
+# Folio Blog — blocks to append to the server's /etc/caddy/Caddyfile
+#
+# Required: the `folio` service must be running and /etc/folio.env must set:
+#   PORT=8082
+#   UPLOAD_DIR=/opt/folio/uploads
+#   DB_PATH=/opt/folio/data/blog.db
+
+# Redirect www → apex
+www.folio.mk {
+    redir https://folio.mk{uri} permanent
+}
+
+folio.mk {
+    # ── API: proxy to Go backend ──────────────────────────────────────────
+    handle /api/* {
+        reverse_proxy localhost:8082
+    }
+
+    # ── Admin UI: proxy to Go backend ────────────────────────────────────
+    handle /admin/* {
+        reverse_proxy localhost:8082
+    }
+
+    # ── Uploads: served directly by Caddy (no backend hop) ───────────────
+    handle /uploads/* {
+        root * /opt/folio
+        file_server
+    }
+
+    # ── Static site: served directly by Caddy ────────────────────────────
+    handle {
+        root * /opt/folio/site/dist
+        try_files {path} {path}/index.html =404
+        file_server
+    }
+
+    # ── Gzip compression ──────────────────────────────────────────────────
+    encode gzip
+
+    # ── Security headers ──────────────────────────────────────────────────
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+}
