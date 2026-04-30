@@ -66,7 +66,7 @@ export default function ArticlesPage() {
   const columns = [
     ch.display({
       id: "title",
-      header: "Title",
+      header: `Title (${defaultLang.toUpperCase()})`,
       cell: ({ row }) => {
         const t = getDefaultTranslation(row.original);
         return <span className="font-medium">{t?.title ?? "—"}</span>;
@@ -98,12 +98,13 @@ export default function ArticlesPage() {
         const val = info.getValue();
         return (
           <button
-            onClick={() =>
+            onClick={(e) => {
+              e.stopPropagation();
               toggleMutation.mutate({
                 id,
                 published_at: val ? null : new Date().toISOString(),
-              })
-            }
+              });
+            }}
             title={val ? "Click to unpublish" : "Click to publish"}
             className={`text-xs px-2 py-1 rounded cursor-pointer select-none transition-colors ${
               val
@@ -126,7 +127,7 @@ export default function ArticlesPage() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="flex gap-3">
+        <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
           <button
             className="text-accent hover:underline text-sm"
             onClick={() => navigate(`/admin/articles/${row.original.id}`)}
@@ -241,7 +242,11 @@ export default function ArticlesPage() {
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:bg-(--color-bg)">
+                <tr
+                  key={row.id}
+                  className="hover:bg-(--color-bg) cursor-pointer"
+                  onClick={() => navigate(`/admin/articles/${row.original.id}`)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}

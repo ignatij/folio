@@ -1711,6 +1711,7 @@ const UI_STRING_GROUPS: {
     keys: [
       { key: "article_home", label: "Breadcrumb: Home" },
       { key: "article_read_more", label: "Read more (card link)" },
+      { key: "article_back", label: "Back to Articles (link)" },
       { key: "reading_time_suffix", label: "Reading time suffix" },
     ],
   },

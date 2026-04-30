@@ -71,6 +71,7 @@ export default function ArticleEditPage() {
       isNew={isNew}
       onSaved={(warning) => {
         qc.invalidateQueries({ queryKey: ["admin", "articles"] });
+        qc.invalidateQueries({ queryKey: ["admin", "article", id] });
         navigate("/admin/articles", { state: { rebuildWarning: warning } });
       }}
       onCancel={() => navigate("/admin/articles")}

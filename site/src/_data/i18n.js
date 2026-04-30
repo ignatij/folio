@@ -30,6 +30,7 @@ const EN_DEFAULTS = {
   articles_no_articles: "No articles published yet. Check back soon.",
   article_home: "Home",
   article_read_more: "Read more",
+  article_back: "Back to Articles",
   reading_time_suffix: "min read",
 };
 
