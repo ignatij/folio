@@ -81,7 +81,7 @@ export function InspectorPanel({
     block.type === "text"
       ? mode === "home"
         ? ((
-            (block as HomeBlock).translations[activeLang] as
+            (block as HomeBlock).translations?.[activeLang] as
               | Record<string, string>
               | undefined
           )?.content ?? "")

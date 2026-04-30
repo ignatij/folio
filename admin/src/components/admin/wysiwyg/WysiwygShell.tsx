@@ -1,4 +1,4 @@
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, useEffect, type ReactNode } from "react";
 import type {
   BlockType,
   HomeBlock,
@@ -14,10 +14,13 @@ import {
   findBlock,
   makeHomeBlock,
   makePageBlock,
+  moveInBlocks,
   patchBlocks,
   reorderInTree,
   removeFromBlocks,
   withNormalizedOrder,
+  withNormalizedOrderDeep,
+  flattenVisible,
   type AnyBlock,
 } from "./blockUtils";
 import { buildNavPreset, buildFooterPreset } from "./presets";
@@ -92,6 +95,16 @@ export function WysiwygShell({
   const [paletteDragType, setPaletteDragType] = useState<BlockType | null>(
     null,
   );
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+
+  function toggleCollapsed(id: string) {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   // ── Block tree helpers ───────────────────────────────────────────────────────
 
@@ -122,7 +135,7 @@ export function WysiwygShell({
       translations: {
         ...block.translations,
         [activeLang]: {
-          ...(block.translations[activeLang] ?? {}),
+          ...(block.translations?.[activeLang] ?? {}),
           [key]: value,
         },
       },
@@ -250,6 +263,68 @@ export function WysiwygShell({
     commit(withNormalizedOrder(removeFromBlocks(anyBlocks(), selectedBlockId)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBlockId, blocks]);
+
+  // Keyboard shortcuts for the layers panel
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      // Don't fire when focus is inside a text input / textarea / contenteditable
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      )
+        return;
+
+      // Alt+ArrowUp / Alt+ArrowDown — move selected block within its siblings
+      if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        if (!selectedBlockId) return;
+        e.preventDefault();
+        const dir = e.key === "ArrowUp" ? "up" : "down";
+        commit(
+          withNormalizedOrderDeep(
+            moveInBlocks(anyBlocks(), selectedBlockId, dir),
+          ),
+        );
+        return;
+      }
+
+      // ArrowUp / ArrowDown — navigate selection through visible layers
+      if (!e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        e.preventDefault();
+        const flat = flattenVisible(anyBlocks(), collapsedIds);
+        if (flat.length === 0) return;
+        const cur = selectedBlockId ? flat.indexOf(selectedBlockId) : -1;
+        const next =
+          e.key === "ArrowUp"
+            ? Math.max(0, cur - 1)
+            : Math.min(flat.length - 1, cur + 1);
+        setSelectedBlockId(flat[next]);
+        setLeftTab("layers");
+        return;
+      }
+
+      // ArrowLeft — collapse selected block; ArrowRight — expand
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        if (!selectedBlockId) return;
+        const block = findBlock(anyBlocks(), selectedBlockId);
+        if (!block?.children?.length) return;
+        e.preventDefault();
+        if (e.key === "ArrowLeft") {
+          setCollapsedIds((prev) => new Set([...prev, selectedBlockId]));
+        } else {
+          setCollapsedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(selectedBlockId);
+            return next;
+          });
+        }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBlockId, blocks, collapsedIds]);
 
   const handleMoveToContainer = useCallback(
     (fromId: string, containerId: string) => {
@@ -398,6 +473,8 @@ export function WysiwygShell({
           onEndDrag={() => setPaletteDragType(null)}
           onAddBlock={(type) => addBlock(type, null)}
           pageSettingsNode={pageSettingsNode}
+          collapsedIds={collapsedIds}
+          onToggleCollapsed={toggleCollapsed}
         />
 
         <Canvas

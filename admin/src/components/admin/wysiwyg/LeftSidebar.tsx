@@ -30,6 +30,8 @@ interface LeftSidebarProps {
   onAddBlock: (type: BlockType) => void;
   /** Page-mode only: metadata form rendered in the "page" tab */
   pageSettingsNode?: ReactNode;
+  collapsedIds: Set<string>;
+  onToggleCollapsed: (id: string) => void;
 }
 
 // ── Palette groups ────────────────────────────────────────────────────────────
@@ -127,6 +129,8 @@ export function LeftSidebar({
   onEndDrag,
   onAddBlock,
   pageSettingsNode,
+  collapsedIds,
+  onToggleCollapsed,
 }: LeftSidebarProps) {
   const tabs: { id: "add" | "layers" | "page"; label: string }[] = [
     { id: "add", label: "Add" },
@@ -209,6 +213,8 @@ export function LeftSidebar({
             onRemove={onRemoveBlock}
             onToggleVisibility={onToggleVisibility}
             onReorder={onReorder}
+            collapsedIds={collapsedIds}
+            onToggleCollapsed={onToggleCollapsed}
             depth={0}
           />
         )}
@@ -273,6 +279,8 @@ function LayersTab({
   onRemove,
   onToggleVisibility,
   onReorder,
+  collapsedIds,
+  onToggleCollapsed,
   depth,
 }: {
   blocks: AnyBlock[];
@@ -281,6 +289,8 @@ function LayersTab({
   onRemove: (id: string) => void;
   onToggleVisibility: (id: string) => void;
   onReorder: (fromId: string, toId: string, before: boolean) => void;
+  collapsedIds: Set<string>;
+  onToggleCollapsed: (id: string) => void;
   depth: number;
 }) {
   const sorted = [...blocks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -309,6 +319,8 @@ function LayersTab({
           onRemove={onRemove}
           onToggleVisibility={onToggleVisibility}
           onReorder={onReorder}
+          collapsedIds={collapsedIds}
+          onToggleCollapsed={onToggleCollapsed}
         />
       ))}
     </div>
@@ -324,6 +336,8 @@ function LayerRow({
   onRemove,
   onToggleVisibility,
   onReorder,
+  collapsedIds,
+  onToggleCollapsed,
 }: {
   block: AnyBlock;
   depth: number;
@@ -333,8 +347,11 @@ function LayerRow({
   onRemove: (id: string) => void;
   onToggleVisibility: (id: string) => void;
   onReorder: (fromId: string, toId: string, before: boolean) => void;
+  collapsedIds: Set<string>;
+  onToggleCollapsed: (id: string) => void;
 }) {
   const [dropPos, setDropPos] = useState<"before" | "after" | null>(null);
+  const collapsed = collapsedIds.has(block.id);
 
   const hasChildren =
     (block.type === "container" ||
@@ -368,7 +385,9 @@ function LayerRow({
             e.stopPropagation();
             e.dataTransfer.dropEffect = "move";
             const rect = e.currentTarget.getBoundingClientRect();
-            setDropPos(e.clientY < rect.top + rect.height / 2 ? "before" : "after");
+            setDropPos(
+              e.clientY < rect.top + rect.height / 2 ? "before" : "after",
+            );
           }}
           onDragLeave={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -386,6 +405,38 @@ function LayerRow({
           }}
           onDragEnd={() => setDropPos(null)}
         >
+          {/* Collapse/expand chevron (only for blocks with children) */}
+          <span className="shrink-0 w-4 flex items-center justify-center">
+            {hasChildren ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleCollapsed(block.id);
+                }}
+                title={collapsed ? "Expand" : "Collapse"}
+                className={`p-0.5 rounded transition-transform ${
+                  isSelected ? "text-white/80" : "text-(--color-muted)"
+                }`}
+              >
+                <svg
+                  viewBox="0 0 10 10"
+                  width={10}
+                  height={10}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  style={{
+                    transform: collapsed ? "rotate(-90deg)" : "rotate(0deg)",
+                    transition: "transform 150ms",
+                  }}
+                >
+                  <path d="M2 3.5 5 6.5 8 3.5" />
+                </svg>
+              </button>
+            ) : null}
+          </span>
+
           {/* Drag grip */}
           <span
             className={`opacity-0 group-hover:opacity-50 shrink-0 mr-1 cursor-grab ${
@@ -457,7 +508,7 @@ function LayerRow({
       </div>
 
       {/* Nested children */}
-      {hasChildren && block.children && (
+      {hasChildren && !collapsed && block.children && (
         <LayersTab
           blocks={block.children as AnyBlock[]}
           selectedBlockId={selectedBlockId}
@@ -465,6 +516,8 @@ function LayerRow({
           onRemove={onRemove}
           onToggleVisibility={onToggleVisibility}
           onReorder={onReorder}
+          collapsedIds={collapsedIds}
+          onToggleCollapsed={onToggleCollapsed}
           depth={depth + 1}
         />
       )}
@@ -950,12 +1003,7 @@ function EyeOffIcon({ size = 14 }: { size?: number }) {
 }
 function GripIcon({ size = 12 }: { size?: number }) {
   return (
-    <svg
-      viewBox="0 0 10 14"
-      width={size}
-      height={size}
-      fill="currentColor"
-    >
+    <svg viewBox="0 0 10 14" width={size} height={size} fill="currentColor">
       <circle cx="3" cy="2" r="1" />
       <circle cx="7" cy="2" r="1" />
       <circle cx="3" cy="6" r="1" />

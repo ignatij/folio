@@ -50,7 +50,7 @@ export function TemplateInspector({
   const t = (key: string): string => {
     if (mode === "home") {
       const hb = block as HomeBlock;
-      return (hb.translations[activeLang]?.[key] as string) ?? "";
+      return (hb.translations?.[activeLang]?.[key] as string) ?? "";
     }
     return (block.config[key] as string) ?? "";
   };

@@ -42,6 +42,36 @@ export function withNormalizedOrder<T extends AnyBlock>(blocks: T[]): T[] {
   return blocks.map((b, i) => ({ ...b, order: i }));
 }
 
+/** Recursively normalizes `order` at every level of the tree. */
+export function withNormalizedOrderDeep<T extends AnyBlock>(blocks: T[]): T[] {
+  return blocks.map((b, i) => ({
+    ...b,
+    order: i,
+    ...(b.children
+      ? { children: withNormalizedOrderDeep(b.children as T[]) }
+      : {}),
+  }));
+}
+
+/**
+ * Returns a flat ordered list of block IDs in display order.
+ * Children of collapsed blocks are omitted so keyboard navigation skips them.
+ */
+export function flattenVisible(
+  blocks: AnyBlock[],
+  collapsedIds: Set<string>,
+): string[] {
+  const sorted = [...blocks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const result: string[] = [];
+  for (const b of sorted) {
+    result.push(b.id);
+    if (!collapsedIds.has(b.id) && b.children?.length) {
+      result.push(...flattenVisible(b.children, collapsedIds));
+    }
+  }
+  return result;
+}
+
 export function findBlock<T extends AnyBlock>(
   blocks: T[],
   id: string,

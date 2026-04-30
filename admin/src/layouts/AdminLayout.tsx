@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { Navigate, Outlet, Link, NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { adminApi } from "../api/client";
+import { applyThemeToDocument } from "../utils/theme";
 
-/** Fetches the saved theme from the DB and writes it to the #folio-theme
- * style tag so the whole admin reflects the user's chosen theme. */
+/** Fetches the saved theme from the DB and applies it to the document on mount. */
 function useThemeSync() {
   useEffect(() => {
     adminApi
@@ -12,25 +12,7 @@ function useThemeSync() {
       .then((settings) => {
         const theme = settings?.theme;
         if (!theme?.colors) return;
-        let el = document.getElementById(
-          "folio-theme",
-        ) as HTMLStyleElement | null;
-        if (!el) {
-          el = document.createElement("style");
-          el.id = "folio-theme";
-          document.head.appendChild(el);
-        }
-        const vars = [
-          ...Object.entries(theme.colors).map(
-            ([k, v]) => `  --color-${k}: ${v};`,
-          ),
-          `  --font-body: ${theme.fonts?.body ?? "Inter"};`,
-          `  --font-fallback: ${theme.fonts?.fallback ?? "system-ui, sans-serif"};`,
-          `  --radius-button: ${theme.radius?.button ?? "8px"};`,
-          `  --radius-card: ${theme.radius?.card ?? "12px"};`,
-          `  --radius-input: ${theme.radius?.input ?? "6px"};`,
-        ].join("\n");
-        el.textContent = `:root {\n${vars}\n}`;
+        applyThemeToDocument(theme);
       })
       .catch(() => {
         /* ignore — fallback to CSS defaults */
