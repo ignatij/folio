@@ -58,12 +58,38 @@ jobs:
   site:
     name: Site (Eleventy)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: site
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Build backend
+        working-directory: backend
+        run: CGO_ENABLED=0 go build -o ../dist/folio-server ./cmd/server
+
+      - name: Start backend
+        env:
+          PORT: "8080"
+          DB_PATH: /tmp/folio-ci.db
+          JWT_SECRET: ci-secret
+          UPLOAD_DIR: /tmp/folio-uploads
+        run: |
+          mkdir -p /tmp/folio-uploads
+          ./dist/folio-server &
+          echo $! > /tmp/folio-server.pid
+          # Wait until the health endpoint responds (up to 15 s)
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/up > /dev/null 2>&1; then
+              echo "Backend is up"
+              break
+            fi
+            sleep 0.5
+          done
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -73,10 +99,16 @@ jobs:
           cache-dependency-path: site/package-lock.json
 
       - name: Install dependencies
+        working-directory: site
         run: npm ci
 
       - name: Build
+        working-directory: site
         env:
           BACKEND_URL: http://localhost:8080
           SITE_DIST: /tmp/site-dist
         run: npx @11ty/eleventy --output=$SITE_DIST
+
+      - name: Stop backend
+        if: always()
+        run: kill $(cat /tmp/folio-server.pid) 2>/dev/null || true
