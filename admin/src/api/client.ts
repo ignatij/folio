@@ -44,8 +44,12 @@ async function request<T>(
   }
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 401 && options?.auth) {
+      clearToken();
       window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+      // Return a never-resolving promise so the caller never sees an error —
+      // the redirect triggered above will unmount the component first.
+      return new Promise<never>(() => {});
     }
     const err = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error((err as { error?: string }).error ?? res.statusText);

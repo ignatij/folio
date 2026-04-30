@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Outlet, Link, NavLink } from "react-router-dom";
+import { Navigate, Outlet, Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { adminApi } from "../api/client";
 import { applyThemeToDocument } from "../utils/theme";
@@ -38,10 +38,17 @@ const links = [
 
 export default function AdminLayout() {
   const { isAuthenticated, logout } = useAuth();
+  const location = useLocation();
   useThemeSync();
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
+    const redirect = location.pathname + location.search;
+    return (
+      <Navigate
+        to={`/admin/login?redirect=${encodeURIComponent(redirect)}`}
+        replace
+      />
+    );
   }
 
   return (

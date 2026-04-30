@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +17,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(username, password);
-      navigate("/admin");
+      const redirect = searchParams.get("redirect");
+      navigate(redirect && redirect.startsWith("/admin") ? redirect : "/admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
