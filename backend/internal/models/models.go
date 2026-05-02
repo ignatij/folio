@@ -2,8 +2,13 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 )
+
+// ErrStaleWrite is returned when an update is rejected because the record was
+// modified by another request since the client loaded it.
+var ErrStaleWrite = errors.New("stale write: record was modified by another request")
 
 // AdminUser is an authenticated admin account.
 type AdminUser struct {
