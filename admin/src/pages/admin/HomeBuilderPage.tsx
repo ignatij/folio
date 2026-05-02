@@ -47,7 +47,7 @@ export default function HomeBuilderPage() {
 
   const saveMutation = useMutation({
     mutationFn: (home_sections: HomeBlock[]) =>
-      adminApi.saveSettings({ home_sections } as any),
+      adminApi.saveSettings({ home_sections, settings_updated_at: settings?.settings_updated_at } as any),
     onSuccess: () => {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

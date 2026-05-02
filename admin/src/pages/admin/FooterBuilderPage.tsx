@@ -64,7 +64,7 @@ export default function FooterBuilderPage() {
 
   const saveMutation = useMutation({
     mutationFn: (footer_sections: HomeBlock[]) =>
-      adminApi.saveSettings({ footer_sections } as any),
+      adminApi.saveSettings({ footer_sections, settings_updated_at: settings?.settings_updated_at } as any),
     onSuccess: () => {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

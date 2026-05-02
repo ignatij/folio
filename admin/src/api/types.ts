@@ -255,4 +255,6 @@ export interface AllSettings {
   languages: Language[] | null;
   ui_strings: Record<string, Record<string, string>> | null;
   email_status: { provider: string; configured: boolean } | null;
+  /** Global version stamp for optimistic concurrency. Returned by GET, sent back on PUT. */
+  settings_updated_at?: string;
 }

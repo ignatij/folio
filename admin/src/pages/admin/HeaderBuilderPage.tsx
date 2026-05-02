@@ -63,7 +63,7 @@ export default function HeaderBuilderPage() {
 
   const saveMutation = useMutation({
     mutationFn: (header_sections: HomeBlock[]) =>
-      adminApi.saveSettings({ header_sections } as any),
+      adminApi.saveSettings({ header_sections, settings_updated_at: settings?.settings_updated_at } as any),
     onSuccess: () => {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

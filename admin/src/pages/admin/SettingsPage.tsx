@@ -387,6 +387,7 @@ export default function SettingsPage() {
       social_links: socialLinks,
       languages: langs,
       ui_strings: uiStrings,
+      settings_updated_at: settings?.settings_updated_at,
     } as Partial<AllSettings>);
   }
 

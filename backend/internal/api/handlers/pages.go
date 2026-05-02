@@ -160,7 +160,7 @@ func (h *PagesHandler) UpdatePage(c echo.Context) error {
 		}
 	}
 
-	if err := h.repo.UpdatePage(c.Request().Context(), p, existing.UpdatedAt.UTC().Format("2006-01-02 15:04:05")); err != nil {
+	if err := h.repo.UpdatePage(c.Request().Context(), p, p.UpdatedAt.UTC().Format("2006-01-02 15:04:05")); err != nil {
 		if errors.Is(err, models.ErrStaleWrite) {
 			return respondError(c, http.StatusConflict, "This record was modified by someone else since you opened it. Reload to get the latest version.")
 		}

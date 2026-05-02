@@ -210,8 +210,9 @@ function PageForm({
     }
     saveMutation.mutate({
       is_published: isPublished,
+      updated_at: existing?.updated_at ?? "",
       translations: Object.values(translations),
-    });
+    } as any);
   }
 
   const t = translations[activeLang];
