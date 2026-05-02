@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -63,6 +64,16 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	esRaw, _ := json.Marshal(emailStatus{Provider: h.emailProvider, Configured: h.emailConfigured})
 	result["email_status"] = json.RawMessage(esRaw)
 
+	// Global version stamp for optimistic concurrency.
+	stamp, err := h.repo.GetSettingsMaxUpdatedAt(c.Request().Context())
+	if err != nil {
+		return respondError(c, http.StatusInternalServerError, "failed to load settings version")
+	}
+	if stamp != "" {
+		stampJSON, _ := json.Marshal(stamp)
+		result["settings_updated_at"] = json.RawMessage(stampJSON)
+	}
+
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -72,6 +83,13 @@ func (h *SettingsHandler) PutSettings(c echo.Context) error {
 	var raw map[string]json.RawMessage
 	if err := json.NewDecoder(c.Request().Body).Decode(&raw); err != nil {
 		return respondError(c, http.StatusBadRequest, "invalid JSON")
+	}
+
+	// Extract optional concurrency stamp — not a stored settings key.
+	var knownUpdatedAt string
+	if v, ok := raw["settings_updated_at"]; ok {
+		_ = json.Unmarshal(v, &knownUpdatedAt)
+		delete(raw, "settings_updated_at")
 	}
 
 	allowed := make(map[string]struct{}, len(settingsKeys))
@@ -84,9 +102,15 @@ func (h *SettingsHandler) PutSettings(c echo.Context) error {
 		if _, ok := allowed[k]; !ok {
 			continue
 		}
-		if err := h.repo.SetSetting(ctx, k, string(v)); err != nil {
+		if err := h.repo.SetSettingIfFresh(ctx, k, string(v), knownUpdatedAt); err != nil {
+			if errors.Is(err, models.ErrStaleWrite) {
+				return respondError(c, http.StatusConflict, "This record was modified by someone else since you opened it. Reload to get the latest version.")
+			}
 			return respondError(c, http.StatusInternalServerError, "failed to save setting: "+k)
 		}
+		// After first successful write the stamp is consumed — remaining keys in
+		// this same request are written unconditionally (same save operation).
+		knownUpdatedAt = ""
 	}
 
 	return msgResponse(c, http.StatusOK, "settings saved")
