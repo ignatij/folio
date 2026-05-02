@@ -334,14 +334,22 @@ func (r *Repository) CreateArticle(ctx context.Context, a Article) (int64, error
 }
 
 // UpdateArticle updates the shared fields and upserts all provided translations.
-func (r *Repository) UpdateArticle(ctx context.Context, a Article) error {
-	if _, err := r.db.ExecContext(ctx, `
+func (r *Repository) UpdateArticle(ctx context.Context, a Article, knownUpdatedAt string) error {
+	res, err := r.db.ExecContext(ctx, `
 		UPDATE articles
 		SET is_featured=?, cover_image_path=?, published_at=?, updated_at=CURRENT_TIMESTAMP
-		WHERE id=?`,
-		boolToInt(a.IsFeatured), a.CoverImagePath, timePtrToStr(a.PublishedAt), a.ID,
-	); err != nil {
+		WHERE id=? AND updated_at=?`,
+		boolToInt(a.IsFeatured), a.CoverImagePath, timePtrToStr(a.PublishedAt), a.ID, knownUpdatedAt,
+	)
+	if err != nil {
 		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return ErrStaleWrite
 	}
 
 	for _, t := range a.Translations {
@@ -565,6 +573,49 @@ func (r *Repository) SetSetting(ctx context.Context, key, value string) error {
 		key, value,
 	)
 	return err
+}
+
+// GetSettingsMaxUpdatedAt returns MAX(updated_at) across all site_settings rows
+// as a datetime string ("2006-01-02 15:04:05"). Returns "" if the table is empty.
+func (r *Repository) GetSettingsMaxUpdatedAt(ctx context.Context) (string, error) {
+	var ns sql.NullString
+	err := r.db.QueryRowContext(ctx, `SELECT MAX(updated_at) FROM site_settings`).Scan(&ns)
+	if err != nil {
+		return "", err
+	}
+	return ns.String, nil
+}
+
+// SetSettingIfFresh upserts a settings key only when MAX(updated_at) in site_settings
+// equals knownUpdatedAt, or when knownUpdatedAt is "" (first-ever write for any key).
+// Returns ErrStaleWrite when the check fails.
+func (r *Repository) SetSettingIfFresh(ctx context.Context, key, value, knownUpdatedAt string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if knownUpdatedAt != "" {
+		var ns sql.NullString
+		if err := tx.QueryRowContext(ctx, `SELECT MAX(updated_at) FROM site_settings`).Scan(&ns); err != nil {
+			return err
+		}
+		if ns.String != knownUpdatedAt {
+			return ErrStaleWrite
+		}
+	}
+
+	if _, err := tx.ExecContext(ctx,
+		`INSERT INTO site_settings (key, value, updated_at)
+		 VALUES (?, ?, CURRENT_TIMESTAMP)
+		 ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP`,
+		key, value,
+	); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 // GetAllSettings returns every settings row as a map[key]value.
@@ -802,12 +853,20 @@ func (r *Repository) CreatePage(ctx context.Context, p Page) (int64, error) {
 }
 
 // UpdatePage updates shared fields and upserts translations.
-func (r *Repository) UpdatePage(ctx context.Context, p Page) error {
-	if _, err := r.db.ExecContext(ctx,
-		`UPDATE pages SET is_published=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`,
-		boolToInt(p.IsPublished), p.ID,
-	); err != nil {
+func (r *Repository) UpdatePage(ctx context.Context, p Page, knownUpdatedAt string) error {
+	res, err := r.db.ExecContext(ctx,
+		`UPDATE pages SET is_published=?, updated_at=CURRENT_TIMESTAMP WHERE id=? AND updated_at=?`,
+		boolToInt(p.IsPublished), p.ID, knownUpdatedAt,
+	)
+	if err != nil {
 		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return ErrStaleWrite
 	}
 	for _, t := range p.Translations {
 		// Skip non-default translations that have no slug — nothing to persist.

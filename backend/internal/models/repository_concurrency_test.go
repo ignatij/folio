@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"testing"
+	"time"
 
 	"folio/internal/db"
 	"folio/internal/models"
@@ -42,6 +43,9 @@ func TestUpdateArticle_StaleWrite(t *testing.T) {
 		t.Fatalf("load: %v", err)
 	}
 	stamp := loaded.UpdatedAt.UTC().Format("2006-01-02 15:04:05")
+
+	// Sleep so CURRENT_TIMESTAMP advances before the first update.
+	time.Sleep(1100 * time.Millisecond)
 
 	// First update — should succeed
 	loaded.Translations[0].Title = "Updated by A"
@@ -106,6 +110,9 @@ func TestUpdatePage_StaleWrite(t *testing.T) {
 	}
 	stamp := loaded.UpdatedAt.UTC().Format("2006-01-02 15:04:05")
 
+	// Sleep so CURRENT_TIMESTAMP advances before the first update.
+	time.Sleep(1100 * time.Millisecond)
+
 	// First update — should succeed
 	if err := repo.UpdatePage(ctx, *loaded, stamp); err != nil {
 		t.Fatalf("first update: %v", err)
@@ -132,6 +139,9 @@ func TestSetSettingIfFresh_StaleWrite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get stamp: %v", err)
 	}
+
+	// Sleep so CURRENT_TIMESTAMP advances before the first write.
+	time.Sleep(1100 * time.Millisecond)
 
 	// First write — OK
 	if err := repo.SetSettingIfFresh(ctx, "site", `{"name":"updated"}`, stamp); err != nil {
