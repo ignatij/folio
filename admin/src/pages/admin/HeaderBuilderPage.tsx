@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "../../api/client";
 import type { HomeBlock, Language, NavLink, SocialLink } from "../../api/types";
 import { WysiwygShell } from "../../components/admin/wysiwyg/WysiwygShell";
@@ -13,6 +13,7 @@ export default function HeaderBuilderPage() {
   const [activeLang, setActiveLang] = useState("en");
   const [themeVars, setThemeVars] = useState<Record<string, string>>({});
   const [navSnapshot, setNavSnapshot] = useState<NavSnapshot>({});
+  const qc = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ["admin", "settings"],
@@ -63,10 +64,14 @@ export default function HeaderBuilderPage() {
 
   const saveMutation = useMutation({
     mutationFn: (header_sections: HomeBlock[]) =>
-      adminApi.saveSettings({ header_sections, settings_updated_at: settings?.settings_updated_at } as any),
+      adminApi.saveSettings({
+        header_sections,
+        settings_updated_at: settings?.settings_updated_at,
+      } as any),
     onSuccess: () => {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+      qc.invalidateQueries({ queryKey: ["admin", "settings"] });
       adminApi.triggerRebuild().catch(() => {});
     },
     onError: (e: Error) => setServerError(e.message),
