@@ -18,7 +18,7 @@
 {%- if _gSource === "featured" -%}
   {%- set _gridArticles = _allArticles | selectattr("is_featured") | list -%}
 {%- elif _gSource === "tag" and _gTagFilter -%}
-  {%- set _gridArticles = _allArticles | selectattr("tag", "equalto", _gTagFilter) | list -%}
+  {%- set _gridArticles = _allArticles | selectattr("tag", _gTagFilter) | list -%}
 {%- else -%}
   {%- set _gridArticles = _allArticles -%}
 {%- endif -%}

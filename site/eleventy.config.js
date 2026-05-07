@@ -95,6 +95,17 @@ export default function (eleventyConfig) {
     return arr.slice(0, n);
   });
 
+  // ── selectattr — override Nunjucks built-in which only checks truthiness.
+  // With one extra arg: returns items where item[attr] === val (equality).
+  // Without extra arg:  returns items where item[attr] is truthy (original behaviour).
+  eleventyConfig.addFilter("selectattr", (arr, attr, val) => {
+    if (!Array.isArray(arr)) return [];
+    if (val !== undefined) {
+      return arr.filter((item) => item[attr] === val);
+    }
+    return arr.filter((item) => !!item[attr]);
+  });
+
   // ── Merge filter — shallow-merge two objects (used in article field partials) ──
   eleventyConfig.addFilter("merge", (obj, overrides) => {
     if (!obj || typeof obj !== "object") return overrides ?? obj;
