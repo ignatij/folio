@@ -25,3 +25,8 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+
+# Testing
+.playwright/
+.playwright-test/
+.playwright-mcp/

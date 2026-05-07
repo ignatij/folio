@@ -201,7 +201,7 @@ function ArticleForm({
       is_featured: isFeatured,
       cover_image_path: coverImagePath,
       published_at: publishedAt,
-      updated_at: existing?.updated_at ?? "",
+      ...(existing ? { updated_at: existing.updated_at } : {}),
       translations: Object.values(translations),
     };
     mutation.mutate(payload);
