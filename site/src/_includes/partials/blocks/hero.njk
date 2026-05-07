@@ -1,6 +1,9 @@
 <section class="relative overflow-hidden"
+  {% if b.config.elementId %}id="{{ b.config.elementId }}"{% endif %}
   {% if b.config.bg_image %}
-    style="background: url('{{ b.config.bg_image }}') center/cover no-repeat;"
+    style="background: url('{{ b.config.bg_image }}') center/cover no-repeat;{{ b.config.customStyle or '' }}"
+  {% elif b.config.customStyle %}
+    style="{{ b.config.customStyle }}"
   {% endif %}>
   {% if b.config.bg_image %}
     <div class="absolute inset-0" style="background: rgba(0,0,0,0.45);"></div>

@@ -150,6 +150,13 @@ function BlockTypeFields({
               onClose={() => setMediaPicker(null)}
             />
           )}
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
         </>
       );
 
@@ -173,6 +180,13 @@ function BlockTypeFields({
                 onConfigChange("max_count", Number(e.target.value))
               }
               className="w-24 px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+            />
+          </div>
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
             />
           </div>
         </>
@@ -201,6 +215,13 @@ function BlockTypeFields({
             value={t("cta_url")}
             onChange={(v) => setT("cta_url", v)}
           />
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
         </>
       );
 
@@ -269,17 +290,33 @@ function BlockTypeFields({
               onClose={() => setMediaPicker(null)}
             />
           )}
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
         </>
       );
 
     case "testimonials":
       return (
-        <TestimonialsEditor
-          block={block}
-          t={t}
-          setT={setT}
-          onConfigChange={onConfigChange}
-        />
+        <>
+          <TestimonialsEditor
+            block={block}
+            t={t}
+            setT={setT}
+            onConfigChange={onConfigChange}
+          />
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
+        </>
       );
 
     case "newsletter":
@@ -310,6 +347,13 @@ function BlockTypeFields({
             value={t("success_message")}
             onChange={(v) => setT("success_message", v)}
           />
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
         </>
       );
 

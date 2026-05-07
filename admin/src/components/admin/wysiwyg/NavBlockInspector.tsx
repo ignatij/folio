@@ -259,6 +259,13 @@ export function NavBlockInspector({
             onChange={(v) => onConfigChange("link_color", v)}
             themeColors={themeColors}
           />
+          <ColorRow
+            label="Hover Color"
+            value={c.hover_color as string | null}
+            placeholder="var(--color-text)"
+            onChange={(v) => onConfigChange("hover_color", v)}
+            themeColors={themeColors}
+          />
           {socialSnapshot.length === 0 && (
             <p className="text-xs text-(--color-muted)">
               No social links configured. Add them in Settings → Footer &
@@ -300,6 +307,13 @@ export function NavBlockInspector({
             value={c.link_color as string | null}
             placeholder="inherit"
             onChange={(v) => onConfigChange("link_color", v)}
+            themeColors={themeColors}
+          />
+          <ColorRow
+            label="Hover Color"
+            value={c.hover_color as string | null}
+            placeholder="var(--color-text)"
+            onChange={(v) => onConfigChange("hover_color", v)}
             themeColors={themeColors}
           />
         </div>

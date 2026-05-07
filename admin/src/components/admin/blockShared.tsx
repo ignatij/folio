@@ -179,6 +179,7 @@ export function applySocialLinksDefaults(
   config.icon_style = "outline"; // "outline" | "filled"
   config.layout = "horizontal"; // "horizontal" | "vertical"
   config.link_color = null;
+  config.hover_color = null;
 }
 
 export function applySingleSocialLinkDefaults(
@@ -187,6 +188,7 @@ export function applySingleSocialLinkDefaults(
   config.platform = "";
   config.show_icon = true;
   config.link_color = null;
+  config.hover_color = null;
 }
 
 export function applyArticleGridDefaults(

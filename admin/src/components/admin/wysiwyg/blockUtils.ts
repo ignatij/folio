@@ -182,6 +182,20 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   if (type === "featured-articles" || type === "latest-articles")
     config.max_count = 6;
   if (type === "image-text") config.image_position = "left";
+  // Template blocks all support an HTML id anchor and raw inline CSS
+  if (
+    type === "hero" ||
+    type === "featured-articles" ||
+    type === "latest-articles" ||
+    type === "cta-band" ||
+    type === "rich-text" ||
+    type === "image-text" ||
+    type === "testimonials" ||
+    type === "newsletter"
+  ) {
+    config.elementId = null;
+    config.customStyle = null;
+  }
   if (type === "container") applyContainerDefaults(config);
   if (type === "text") applyTextDefaults(config);
   if (type === "image") applyImageDefaults(config);

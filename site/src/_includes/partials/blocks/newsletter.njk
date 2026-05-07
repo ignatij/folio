@@ -1,4 +1,4 @@
-{%- if _inContainer -%}<div class="text-center w-full">{%- else -%}<section class="max-w-2xl mx-auto px-6 py-16 text-center">{%- endif -%}
+{%- if _inContainer -%}<div class="text-center w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>{%- else -%}<section class="max-w-2xl mx-auto px-6 py-16 text-center"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>{%- endif -%}
   {% if b.config.headline %}
     <h2 class="text-3xl font-bold mb-3" style="color: var(--color-text);">{{ b.config.headline }}</h2>
   {% endif %}

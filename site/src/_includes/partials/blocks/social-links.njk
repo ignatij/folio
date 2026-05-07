@@ -2,6 +2,7 @@
 {%- set showIcons = cfg.show_icons !== false -%}
 {%- set layout = cfg.layout or "horizontal" -%}
 {%- set linkColor = cfg.link_color or "var(--color-muted)" -%}
+{%- set hoverColor = cfg.hover_color or "var(--color-text)" -%}
 {% if social | length %}
   <ul class="{% if layout === 'horizontal' %}flex flex-wrap gap-4{% else %}space-y-2{% endif %} text-sm">
     {% for s in social %}
@@ -9,7 +10,7 @@
         <li>
           <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer"
              style="color:{{ linkColor }};text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
-             onmouseover="this.style.color='var(--color-text)'" onmouseout="this.style.color='{{ linkColor }}'">
+             onmouseover="this.style.color='{{ hoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">
             {% if showIcons %}
               {{ s.platform | socialIcon | safe }}
             {% endif %}

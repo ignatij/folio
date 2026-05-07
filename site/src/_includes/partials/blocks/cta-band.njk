@@ -1,6 +1,6 @@
 {% if b.config.cta_url or site.bookingUrl %}
 {%- if _inContainer -%}
-<div class="text-center w-full">
+<div class="text-center w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
   <h2 class="text-3xl font-bold mb-4" style="color: var(--color-text);">{{ b.config.headline | default("Ready to get started?") }}</h2>
   {% if b.config.body %}
     <p class="mb-8" style="color: var(--color-muted);">{{ b.config.body }}</p>
@@ -14,7 +14,7 @@
   </div>
 </div>
 {%- else -%}
-<section class="py-16" style="background: var(--color-bg-surface); border-top: 1px solid var(--color-border);">
+<section class="py-16"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %} style="background: var(--color-bg-surface); border-top: 1px solid var(--color-border);{{ (' ' + b.config.customStyle) if b.config.customStyle else '' }}">
   <div class="max-w-2xl mx-auto px-6 text-center">
     <h2 class="text-3xl font-bold mb-4" style="color: var(--color-text);">{{ b.config.headline | default("Ready to get started?") }}</h2>
     {% if b.config.body %}
