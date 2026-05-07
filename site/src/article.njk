@@ -28,6 +28,7 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
   <!-- Cover image -->
   {% if article.cover_image_path %}
     <img
+      id="article-cover"
       src="/uploads/{{ article.cover_image_path }}"
       alt="{{ article.title }}"
       class="w-full rounded-xl object-cover mb-10"
@@ -65,4 +66,8 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
     </a>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/site-assets/gallery.js" defer></script>
 {% endblock %}
