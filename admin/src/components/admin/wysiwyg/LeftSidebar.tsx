@@ -1050,19 +1050,3 @@ function TrashIcon({ size = 12 }: { size?: number }) {
     </svg>
   );
 }
-
-function AnimationIcon() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      width={16}
-      height={16}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <circle cx="10" cy="10" r="7" />
-      <path d="M8 7l5 3-5 3V7z" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
