@@ -5,6 +5,7 @@ import {
   ElementIdSection,
   CustomStyleSection,
 } from "./InspectorShared";
+import { AnimationSection } from "./AnimationSection";
 
 interface ImageInspectorProps {
   config: Record<string, unknown>;
@@ -75,19 +76,44 @@ export function ImageInspector({
           />
         </div>
 
-        {/* Width */}
+        {/* Sizing */}
         <div className="py-3">
-          <p className={sLabel}>Width</p>
-          <select
-            value={(c.width as string) ?? "w-full"}
-            onChange={(e) => onConfigChange("width", e.target.value)}
-            className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
-          >
-            <option value="w-full">Fill (100%)</option>
-            <option value="w-1/2">Half (50%)</option>
-            <option value="w-1/3">Third (33%)</option>
-            <option value="w-auto">Auto</option>
-          </select>
+          <p className={sLabel}>Sizing</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-[11px] text-(--color-muted) mb-1">
+                Width
+              </label>
+              <select
+                value={(c.width as string) ?? "w-full"}
+                onChange={(e) => onConfigChange("width", e.target.value)}
+                className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+              >
+                <option value="w-full">Fill (100%)</option>
+                <option value="w-1/2">Half (50%)</option>
+                <option value="w-1/3">Third (33%)</option>
+                <option value="w-auto">Auto</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] text-(--color-muted) mb-1">
+                Height
+              </label>
+              <select
+                value={(c.height as string) ?? "h-auto"}
+                onChange={(e) => onConfigChange("height", e.target.value)}
+                className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+              >
+                <option value="h-auto">Auto</option>
+                <option value="h-32">128px</option>
+                <option value="h-48">192px</option>
+                <option value="h-64">256px</option>
+                <option value="h-80">320px</option>
+                <option value="h-96">384px</option>
+                <option value="h-screen">Full screen</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Object fit */}
@@ -132,6 +158,8 @@ export function ImageInspector({
         {/* Custom Style */}
         <CustomStyleSection config={c} onChange={onConfigChange} />
       </div>
+
+      <AnimationSection config={c} onConfigChange={onConfigChange} />
 
       {pickerOpen && (
         <MediaPickerModal

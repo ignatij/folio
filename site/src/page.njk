@@ -49,6 +49,8 @@ permalink: "/{{ item.lang.code }}/{{ item.page.slug }}/index.html"
         {% include "partials/blocks/article-grid.njk" %}
       {% elif block.type === "article-card" %}
         {% include "partials/blocks/article-card.njk" %}
+      {% elif block.type === "slideshow" %}
+        {% include "partials/blocks/slideshow.njk" %}
       {% endif %}
     {% endif %}
   {% endfor %}

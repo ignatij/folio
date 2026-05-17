@@ -26,6 +26,8 @@ import {
 import { buildNavPreset, buildFooterPreset } from "./presets";
 import type { NavSnapshot } from "./iframeRenderer";
 
+const EMPTY_NAV_SNAPSHOT: NavSnapshot = {};
+
 type ViewportMode = "desktop" | "tablet" | "mobile";
 
 export interface WysiwygShellProps {
@@ -76,14 +78,16 @@ export function WysiwygShell({
   pageSettingsNode,
   activeLeftTab,
   onLeftTabChange,
-  navSnapshot = {},
+  navSnapshot,
   themeColors: themeColorsProp,
   onLoadDefaultTemplate,
 }: WysiwygShellProps) {
   // Fall back to themeVars — they have the same `--color-*` key structure
   const themeColors = themeColorsProp ?? themeVars;
+  const stableNavSnapshot = navSnapshot ?? EMPTY_NAV_SNAPSHOT;
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [viewportMode, setViewportMode] = useState<ViewportMode>("desktop");
+  const [animating, setAnimating] = useState(false);
   const [leftTabInternal, setLeftTabInternal] = useState<
     "add" | "layers" | "page"
   >("add");
@@ -212,6 +216,7 @@ export function WysiwygShell({
       // container accepts anything
       const canReceive =
         target?.type === "container" ||
+        target?.type === "slideshow" ||
         target?.type === "article-card" ||
         (target?.type === "article-grid" && type === "article-card");
       if (canReceive) {
@@ -330,7 +335,12 @@ export function WysiwygShell({
     (fromId: string, containerId: string) => {
       const block = findBlock(anyBlocks(), fromId);
       const container = findBlock(anyBlocks(), containerId);
-      if (!block || !container || container.type !== "container") return;
+      if (
+        !block ||
+        !container ||
+        (container.type !== "container" && container.type !== "slideshow")
+      )
+        return;
       const without = removeFromBlocks(anyBlocks(), fromId);
       // Read existing children from the post-removal tree so a block nested
       // inside the target container is not reintroduced by stale data.
@@ -419,6 +429,17 @@ export function WysiwygShell({
 
         {/* Right: save */}
         <div className="flex items-center gap-3">
+          <button
+            title={animating ? "Stop preview" : "Play animations"}
+            onClick={() => setAnimating((a) => !a)}
+            className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+              animating
+                ? "border-blue-500 bg-blue-50 text-blue-600"
+                : "border-(--color-border) text-(--color-muted) hover:text-(--color-text)"
+            }`}
+          >
+            {animating ? "■ Stop" : "▶ Animate"}
+          </button>
           {serverError && (
             <span className="text-xs text-(--color-destructive) max-w-[200px] truncate">
               {serverError}
@@ -495,7 +516,8 @@ export function WysiwygShell({
           onDelete={handleDelete}
           onMoveToContainer={handleMoveToContainer}
           onMoveToRoot={handleMoveToRoot}
-          navSnapshot={navSnapshot}
+          navSnapshot={stableNavSnapshot}
+          animating={animating}
         />
 
         <InspectorPanel

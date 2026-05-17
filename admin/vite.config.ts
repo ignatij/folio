@@ -52,7 +52,57 @@ export default defineConfig({
   // base must match the path the admin is served from in production (/admin/)
   // so all asset references (JS, CSS) are prefixed correctly.
   base: "/admin/",
-  plugins: [react(), tailwindcss(), themeInjectPlugin()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    themeInjectPlugin(),
+    // Copy site-assets needed by the iframe canvas preview
+    {
+      name: "copy-site-assets",
+      configureServer(server) {
+        // Serve site-assets from the site source directory in dev mode
+        server.middlewares.use("/site-assets", (req, res, next) => {
+          const siteAssets = path.resolve(
+            __dirname,
+            "..",
+            "site",
+            "src",
+            "site-assets",
+          );
+          const file = path.join(
+            siteAssets,
+            (req as { url?: string }).url ?? "",
+          );
+          if (fs.existsSync(file) && fs.statSync(file).isFile()) {
+            res.setHeader(
+              "Content-Type",
+              file.endsWith(".css") ? "text/css" : "application/javascript",
+            );
+            fs.createReadStream(file).pipe(res);
+          } else {
+            next();
+          }
+        });
+      },
+      writeBundle(options) {
+        const outDir =
+          (options.dir as string) ?? path.resolve(__dirname, "dist");
+        const siteAssets = path.resolve(
+          __dirname,
+          "..",
+          "site",
+          "src",
+          "site-assets",
+        );
+        const dest = path.join(outDir, "site-assets");
+        fs.mkdirSync(dest, { recursive: true });
+        for (const file of ["tailwind.css", "animations.js", "slideshow.js"]) {
+          const src = path.join(siteAssets, file);
+          if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dest, file));
+        }
+      },
+    },
+  ],
   server: {
     proxy: {
       "/api": { target: "http://localhost:8080", changeOrigin: true },

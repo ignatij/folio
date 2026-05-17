@@ -4,6 +4,8 @@
 
 {# Width class — stored as Tailwind class directly #}
 {%- set _widthCls = cc.width if cc.width else "w-full" -%}
+{# Height class — stored as Tailwind class directly #}
+{%- set _heightCls = cc.height if cc.height else "h-auto" -%}
 
 {# Object fit → Tailwind class #}
 {%- set _fitCls = "object-cover" -%}
@@ -20,8 +22,8 @@
 {%- if cc.aspectRatio -%}{%- set _imgCls = ["w-full", "h-full", "block", _fitCls] -%}{%- endif -%}
 {%- if _br and not cc.aspectRatio -%}{%- set _imgCls = (_imgCls.push("rounded-[" + _br + "px]"), _imgCls) -%}{%- endif -%}
 
-{# Wrapper classes — width + spacing #}
-{%- set _wCls = [_widthCls] -%}
+{# Wrapper classes — width + height + spacing #}
+{%- set _wCls = [_widthCls, _heightCls] -%}
 {%- set _wCls = (_wCls.push("pt-" + (cc.paddingTop if cc.paddingTop else 0)), _wCls) -%}
 {%- set _wCls = (_wCls.push("pb-" + (cc.paddingBottom if cc.paddingBottom else 0)), _wCls) -%}
 {%- set _wCls = (_wCls.push("pl-" + (cc.paddingLeft if cc.paddingLeft else 0)), _wCls) -%}
@@ -39,7 +41,7 @@
 {%- if _mr is number and _mr < 0 -%}{%- set _wCls = (_wCls.push("-mr-" + (_mr | abs)), _wCls) -%}
 {%- else -%}{%- set _wCls = (_wCls.push("mr-" + _mr), _wCls) -%}{%- endif -%}
 
-<div class="{{ _wCls | join(' ') }}">
+<div class="{{ _wCls | join(' ') }}{%- if cc.animation and cc.animation !== 'none' %} anim-child animate-{{ cc.animation }}{%- endif %}"{% if cc.animation and cc.animation !== 'none' %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}" style="--anim-duration:{{ cc.animDuration if cc.animDuration else 600 }}ms;--anim-easing:{{ cc.animEasing if cc.animEasing else 'ease-out' }};--anim-delay:{{ cc.animDelay if cc.animDelay else 0 }}ms;"{% endif %}>
   {%- if cc.aspectRatio -%}
   <div style="aspect-ratio:{{ cc.aspectRatio }};overflow:hidden;border-radius:{{ _br }}px;">
     {%- if cc.linkUrl -%}<a href="{{ cc.linkUrl }}" tabindex="-1" aria-hidden="true">{%- endif -%}

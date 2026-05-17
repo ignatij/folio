@@ -59,7 +59,9 @@ export function buildSrcdoc(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="${location.origin}/site-assets/tailwind.css">
+  <script src="${location.origin}/site-assets/animations.js" defer></script>
+  <script src="${location.origin}/site-assets/slideshow.js" defer></script>
   <style>
     ${themeStyle}
     body { margin: 0; padding: 0; font-family: var(--font-body, system-ui, sans-serif); color: var(--color-text, #111); background-color: var(--color-bg, #fff); }
@@ -93,6 +95,36 @@ export function buildSrcdoc(
     .prose pre { background: #1f2937; color: #f9fafb; padding: 1em; border-radius: 8px; overflow-x: auto; }
     .prose a { color: var(--color-accent, #3b82f6); text-decoration: underline; }
     a:not([data-wysiwyg-id]), button:not([data-wysiwyg-id]) { pointer-events: none; }
+    .slideshow-arrow, .slideshow-dot { pointer-events: auto !important; }
+    /* Editor mode: keep animation children fully visible; only hide them during preview */
+    body:not([data-anim-preview]) .anim-child { opacity: 1 !important; animation: none !important; }
+    /* In editor preview h-screen would expand the iframe unboundedly; cap it */
+    .h-screen { height: 1080px !important; max-height: 1080px !important; }
+    /* Slideshow — embedded so the admin never depends on tailwind.css being rebuilt */
+    .slideshow-slide { position:absolute; inset:0; width:100%; height:100%; opacity:0; transition-property:opacity,transform; transition-duration:500ms; transition-timing-function:ease-in-out; }
+    .slideshow-slide.slide-active { opacity:1; transform:none; }
+    .slideshow-slide.slide-enter-right  { transform:translateX(100%);  opacity:0; }
+    .slideshow-slide.slide-enter-left   { transform:translateX(-100%); opacity:0; }
+    .slideshow-slide.slide-enter-bottom { transform:translateY(100%);  opacity:0; }
+    .slideshow-slide.slide-enter-top    { transform:translateY(-100%); opacity:0; }
+    .slideshow-slide.slide-enter-fade   { opacity:0; transform:none; }
+    .slideshow-slide.slide-enter-scale  { opacity:0; transform:scale(0.85); }
+    .slideshow-slide.slide-exit-right   { transform:translateX(100%);  opacity:0; }
+    .slideshow-slide.slide-exit-left    { transform:translateX(-100%); opacity:0; }
+    .slideshow-slide.slide-exit-bottom  { transform:translateY(100%);  opacity:0; }
+    .slideshow-slide.slide-exit-top     { transform:translateY(-100%); opacity:0; }
+    .slideshow-slide.slide-exit-fade    { opacity:0; transform:none; }
+    .slideshow-slide.slide-exit-scale   { opacity:0; transform:scale(1.15); }
+    .slideshow-arrow { position:absolute; z-index:10; background:rgba(0,0,0,.35); color:#fff; border:none; border-radius:50%; width:2.5rem; height:2.5rem; cursor:pointer; font-size:1.25rem; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .slideshow-arrow:hover { background:rgba(0,0,0,.6); }
+    .slideshow-prev { left:.75rem;  top:50%; transform:translateY(-50%); }
+    .slideshow-next { right:.75rem; top:50%; transform:translateY(-50%); }
+    [data-slideshow-direction="vertical"] .slideshow-prev { left:50%; top:.75rem;    right:auto; transform:translateX(-50%); }
+    [data-slideshow-direction="vertical"] .slideshow-next { left:50%; bottom:.75rem; top:auto;  right:auto; transform:translateX(-50%); }
+    .slideshow-dots { position:absolute; bottom:.75rem; left:50%; transform:translateX(-50%); display:flex; gap:.4rem; z-index:10; }
+    .slideshow-dots--vertical { flex-direction:column; bottom:auto; left:auto; right:.75rem; top:50%; transform:translateY(-50%); }
+    .slideshow-dot { width:.5rem; height:.5rem; border-radius:50%; background:rgba(255,255,255,.5); border:none; cursor:pointer; padding:0; }
+    .slideshow-dot.active { background:#fff; }
   </style>
 </head>
 <body>
@@ -153,6 +185,31 @@ const MOCK_ARTICLES: MockArticle[] = [
   },
 ];
 
+// ── Per-block animation helpers ───────────────────────────────────────────────
+
+/**
+ * Returns extra class string, style string, and data-attribute string for
+ * a block that has an animation configured directly in its config.
+ */
+function animAttrs(c: Record<string, unknown>): {
+  cls: string;
+  style: string;
+  data: string;
+} {
+  const anim = c.animation as string | null | undefined;
+  if (!anim || anim === "none") return { cls: "", style: "", data: "" };
+  const trigger = (c.animTrigger as string) ?? "scroll";
+  const duration = (c.animDuration as number) ?? 600;
+  const easing = (c.animEasing as string) ?? "ease-out";
+  const delay = (c.animDelay as number) ?? 0;
+  const once = (c.animOnce as boolean) ?? true;
+  return {
+    cls: `anim-child animate-${anim}`,
+    style: `--anim-duration:${duration}ms;--anim-easing:${easing};--anim-delay:${delay}ms;`,
+    data: `data-anim-trigger="${escAttr(trigger)}" data-anim-once="${once}"`,
+  };
+}
+
 // ── Block renderers ───────────────────────────────────────────────────────────
 
 function blockToHtml(
@@ -166,6 +223,8 @@ function blockToHtml(
   switch (block.type) {
     case "container":
       return containerToHtml(block, activeLang, mode, navSnapshot, articleCtx);
+    case "slideshow":
+      return slideshowToHtml(block, activeLang, mode, navSnapshot, articleCtx);
     case "text":
       return textToHtml(block, activeLang, mode);
     case "image":
@@ -219,10 +278,26 @@ function containerToHtml(
   const extraCls = containerExtraClasses(c);
   const cls = extraCls ? `${baseCls} ${extraCls}` : baseCls;
   const customStyle = (c.customStyle as string) || "";
-  const styleAttr = customStyle ? ` style="${escAttr(customStyle)}"` : "";
-  const label = `<span class="wysiwyg-label">▣ Container</span>`;
+  const bgImg = (c.backgroundImage as string) || "";
+  const bgSize = (c.backgroundSize as string) ?? "cover";
+  const bgPos = (c.backgroundPosition as string) ?? "center";
+  const overlayColor = (c.backgroundOverlay as string) || "";
+  const hasOverlay = !!(overlayColor && bgImg);
 
-  const hasOverlay = !!(c.backgroundOverlay && c.backgroundImage);
+  // Always render background-image as inline style (not Tailwind arbitrary class)
+  const bgStyle = bgImg
+    ? `background-image:url('${escAttr(bgImg)}');background-size:${bgSize};background-position:${bgPos};background-repeat:no-repeat;`
+    : "";
+  const cw = (c.width as string) ?? "w-full";
+  const ch = (c.height as string) ?? "h-auto";
+  const customWidthStyle  = !cw.startsWith("w-") ? `width:${cw};`  : "";
+  const customHeightStyle = !ch.startsWith("h-") ? `height:${ch};` : "";
+  const anim = animAttrs(c);
+  const fullStyle = [anim.style, customWidthStyle, customHeightStyle, bgStyle, customStyle].filter(Boolean).join("");
+  const styleAttr = fullStyle ? ` style="${escAttr(fullStyle)}"` : "";
+  const fullCls = [cls, anim.cls].filter(Boolean).join(" ");
+  const animData = anim.cls ? ` ${anim.data}` : "";
+  const label = `<span class="wysiwyg-label">▣ Container</span>`;
   let inner = [...(block.children ?? [])]
     .filter((ch) => ch.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -234,24 +309,101 @@ function containerToHtml(
   }
 
   if (hasOverlay) {
-    const overlayColor = c.backgroundOverlay as string;
-    const bgImg = c.backgroundImage as string;
-    const bgSize = (c.backgroundSize as string) ?? "cover";
-    const bgPos = (c.backgroundPosition as string) ?? "center";
-    const overlayStyle = [
-      `background-image:url('${escAttr(bgImg)}')`,
-      `background-size:${bgSize}`,
-      `background-position:${bgPos}`,
-      ...(customStyle ? [customStyle] : []),
-    ].join(";");
-    return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="container" class="${escAttr(cls)}" style="${escAttr(overlayStyle)}">
+    return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="container" class="${escAttr(fullCls)}" style="${escAttr(fullStyle)}"${animData}>
 ${label}
   <div style="position:absolute;inset:0;background:${escAttr(overlayColor)};pointer-events:none;"></div>
   <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:inherit;flex-wrap:inherit;justify-content:inherit;align-items:inherit;gap:inherit;">${inner}</div>
 </div>`;
   }
 
-  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="container" class="${escAttr(cls)}"${styleAttr}>${label}${inner}</div>`;
+  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="container" class="${escAttr(fullCls)}"${styleAttr}${animData}>${label}${inner}</div>`;
+}
+
+// ── Slideshow ─────────────────────────────────────────────────────────────────
+
+function slideshowToHtml(
+  block: RenderBlock,
+  activeLang: string,
+  mode: "home" | "page",
+  navSnapshot: NavSnapshot = {},
+  articleCtx?: MockArticle,
+): string {
+  const c = block.config;
+  const width = (c.width as string) ?? "w-full";
+  const height = (c.height as string) ?? "h-96";
+  const direction = (c.direction as string) ?? "horizontal";
+  const transition = (c.transition as string) ?? "slide";
+  const duration = (c.duration as number) ?? 500;
+  const easing = (c.easing as string) ?? "ease-in-out";
+  const autoAdvance = (c.autoAdvance as number) ?? 0;
+  const loop = (c.loop as boolean) !== false;
+  const showArrows = (c.showArrows as boolean) !== false;
+  const showDots = (c.showDots as boolean) !== false;
+  const swipe = (c.swipe as boolean) !== false;
+
+  const widthMap: Record<string, string> = {
+    "w-full": "100%", "w-1/2": "50%", "w-1/3": "33.333%",
+    "w-1/4": "25%", "w-page": "min(64rem,100%)", "w-screen": "100vw",
+  };
+  const heightMap: Record<string, string> = {
+    "h-auto": "auto", "h-48": "12rem", "h-64": "16rem",
+    "h-96": "24rem", "h-screen": "min(100vh,1080px)",
+  };
+  const touchAction = direction === "vertical" ? "pan-x" : "pan-y";
+  const wStyle = widthMap[width]   ?? width   ?? "100%";
+  const hStyle = heightMap[height] ?? height  ?? "24rem";
+
+  const slides = [...(block.children ?? [])]
+    .filter((ch) => ch.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  let slidesHtml: string;
+  if (slides.length === 0) {
+    slidesHtml = `<div style="min-height:80px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:12px;pointer-events:none;">Add blocks as slides</div>`;
+  } else {
+    slidesHtml = slides
+      .map((ch, i) => {
+        const isActive = i === 0;
+        const innerHtml = blockToHtml(ch, activeLang, mode, navSnapshot, articleCtx);
+        return `<div data-slide-index="${i}" class="slideshow-slide${isActive ? " slide-active" : ""}" style="transition-duration:${duration}ms;transition-timing-function:${easing};" aria-hidden="${isActive ? "false" : "true"}">${innerHtml}</div>`;
+      })
+      .join("\n");
+  }
+
+  const arrowsHtml =
+    showArrows && slides.length > 1
+      ? direction === "vertical"
+        ? `<button class="slideshow-arrow slideshow-prev" aria-label="Previous slide">↑</button>
+<button class="slideshow-arrow slideshow-next" aria-label="Next slide">↓</button>`
+        : `<button class="slideshow-arrow slideshow-prev" aria-label="Previous slide">←</button>
+<button class="slideshow-arrow slideshow-next" aria-label="Next slide">→</button>`
+      : "";
+
+  const dotsHtml =
+    showDots && slides.length > 1
+      ? `<div class="slideshow-dots${direction === "vertical" ? " slideshow-dots--vertical" : ""}">${slides.map((_, i) => `<button class="slideshow-dot${i === 0 ? " active" : ""}" data-dot-index="${i}" aria-label="Go to slide ${i + 1}"></button>`).join("")}</div>`
+      : "";
+
+  const label = `<span class="wysiwyg-label">⧉ Slideshow</span>`;
+
+  return `<div
+  data-wysiwyg-id="${escAttr(block.id)}"
+  data-wysiwyg-type="slideshow"
+  data-slideshow=""
+  data-slideshow-id="${escAttr(block.id)}"
+  data-slideshow-direction="${escAttr(direction)}"
+  data-slideshow-transition="${escAttr(transition)}"
+  data-slideshow-duration="${duration}"
+  data-slideshow-auto-advance="${autoAdvance}"
+  data-slideshow-loop="${loop}"
+  data-slideshow-swipe="${swipe}"
+  style="position:relative;overflow:hidden;width:${wStyle};height:${hStyle};touch-action:${touchAction};"
+>
+${label}
+${slidesHtml}
+${arrowsHtml}
+${dotsHtml}
+</div>`;
 }
 
 // ── Article grid (canvas preview) ────────────────────────────────────────────
@@ -410,7 +562,8 @@ function buildArticleTextCls(
   defaults: { fontSize?: string; fontWeight?: string; color?: string },
 ): { classAttr: string; styleAttr: string } {
   const fontSize = (c.fontSize as number | null) || null;
-  const fontWeight = (c.fontWeight as string) || defaults.fontWeight || "normal";
+  const fontWeight =
+    (c.fontWeight as string) || defaults.fontWeight || "normal";
   const textAlign = (c.textAlign as string) || "left";
   const color = (c.color as string) || defaults.color || null;
   const italic = !!c.italic;
@@ -423,7 +576,9 @@ function buildArticleTextCls(
   const customStyle = (c.customStyle as string) || "";
 
   const cls: string[] = [];
-  cls.push(fontSize ? `text-[${fontSize}px]` : (defaults.fontSize ?? "text-base"));
+  cls.push(
+    fontSize ? `text-[${fontSize}px]` : (defaults.fontSize ?? "text-base"),
+  );
   cls.push(twWeightMap[fontWeight] ?? "font-normal");
   cls.push(twAlignMap[textAlign] ?? "text-left");
   if (italic) cls.push("italic");
@@ -461,7 +616,11 @@ function articleTitleHtml(block: RenderBlock, ctx?: MockArticle): string {
   const id = escAttr(block.id);
   const tag = (c.tag as string) ?? "h3";
   const safeTag = ["h2", "h3", "h4"].includes(tag) ? tag : "h3";
-  const tagSizeMap: Record<string, string> = { h2: "text-2xl", h3: "text-xl", h4: "text-lg" };
+  const tagSizeMap: Record<string, string> = {
+    h2: "text-2xl",
+    h3: "text-xl",
+    h4: "text-lg",
+  };
   const { classAttr, styleAttr } = buildArticleTextCls(c, {
     fontSize: tagSizeMap[safeTag] ?? "text-xl",
     fontWeight: "bold",
@@ -556,19 +715,22 @@ function articleTagHtml(block: RenderBlock, ctx?: MockArticle): string {
     { normal: "400", medium: "500", semibold: "600", bold: "700" }[
       fontWeight
     ] ?? "600";
-  const badgeStyle = [
-    `display:inline-block`,
-    `padding:2px 8px`,
-    `border-radius:4px`,
-    `font-size:${fs}`,
-    `font-weight:${fw}`,
-    `color:${fgColor}`,
-    `background:${bgColor}`,
-    italic ? `font-style:italic` : "",
-    letterSpacing ? `letter-spacing:${letterSpacing / 100}em` : "",
-    textTransform !== "none" ? `text-transform:${textTransform}` : "",
-    textDecoration !== "none" ? `text-decoration:${textDecoration}` : "",
-  ].filter(Boolean).join(";") + ";";
+  const badgeStyle =
+    [
+      `display:inline-block`,
+      `padding:2px 8px`,
+      `border-radius:4px`,
+      `font-size:${fs}`,
+      `font-weight:${fw}`,
+      `color:${fgColor}`,
+      `background:${bgColor}`,
+      italic ? `font-style:italic` : "",
+      letterSpacing ? `letter-spacing:${letterSpacing / 100}em` : "",
+      textTransform !== "none" ? `text-transform:${textTransform}` : "",
+      textDecoration !== "none" ? `text-decoration:${textDecoration}` : "",
+    ]
+      .filter(Boolean)
+      .join(";") + ";";
 
   const tag = ctx?.tag ?? "Tag";
   return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-tag" class="${escAttr(wrapCls)}" style="${escAttr(wrapStyle)}">
@@ -645,15 +807,18 @@ function containerClassNames(c: Record<string, unknown>): string {
   else if (w === "w-1/3") cls.push("w-1/3");
   else if (w === "w-1/4") cls.push("w-1/4");
   else if (w === "w-page") {
+    cls.push("w-full");
     cls.push("max-w-5xl");
     cls.push("mx-auto");
   } else if (w === "w-auto") cls.push("w-auto");
   else if (w === "w-screen") cls.push("w-screen");
+  else if (!w.startsWith("w-")) { /* custom px — handled via inline style */ }
   else cls.push("w-full");
 
   const h = (c.height as string) ?? "h-auto";
   if (h === "h-full") cls.push("h-full");
   else if (h === "h-screen") cls.push("h-screen");
+  // custom px heights handled via inline style
 
   return cls.join(" ");
 }
@@ -661,22 +826,7 @@ function containerClassNames(c: Record<string, unknown>): string {
 function containerExtraClasses(c: Record<string, unknown>): string {
   const cls: string[] = [];
   if (c.backgroundColor) cls.push(`bg-[${c.backgroundColor}]`);
-  if (c.backgroundImage && !c.backgroundOverlay) {
-    cls.push(`bg-[url('${c.backgroundImage}')]`);
-    const bgSize = (c.backgroundSize as string) ?? "cover";
-    if (bgSize === "cover") cls.push("bg-cover");
-    else if (bgSize === "contain") cls.push("bg-contain");
-    else if (bgSize === "auto") cls.push("bg-auto");
-    else cls.push(`bg-[size:${bgSize}]`);
-    const bgPos = (c.backgroundPosition as string) ?? "center";
-    if (bgPos === "center") cls.push("bg-center");
-    else if (bgPos === "top") cls.push("bg-top");
-    else if (bgPos === "bottom") cls.push("bg-bottom");
-    else if (bgPos === "left") cls.push("bg-left");
-    else if (bgPos === "right") cls.push("bg-right");
-    else cls.push(`bg-[position:${bgPos}]`);
-    cls.push("bg-no-repeat");
-  }
+  // background-image is rendered as inline style, not a Tailwind class
   if (c.borderRadius && (c.borderRadius as number) > 0)
     cls.push(`rounded-[${c.borderRadius}px]`);
   if (c.textColor) cls.push(`text-[${c.textColor}]`);
@@ -782,6 +932,12 @@ function textToHtml(
   const classAttr = cls.filter(Boolean).join(" ");
   const styleAttr = customStyle ? ` style="${escAttr(customStyle)}"` : "";
   const idAttr = elementId ? ` id="${escAttr(elementId)}"` : "";
+  const anim = animAttrs(c);
+  const wrapStyle = anim.style
+    ? ` style="position:relative;${anim.style}"`
+    : ' style="position:relative"';
+  const wrapCls = anim.cls ? ` class="${escAttr(anim.cls)}"` : "";
+  const animData = anim.cls ? ` ${anim.data}` : "";
 
   const placeholder =
     safeTag === "p"
@@ -789,7 +945,7 @@ function textToHtml(
       : `Double-click to edit ${safeTag.toUpperCase()}…`;
   const labelText = safeTag === "p" ? "T Text" : `T ${safeTag.toUpperCase()}`;
 
-  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="text" style="position:relative"><span class="wysiwyg-label">${escHtml(labelText)}</span><${safeTag}${idAttr} contenteditable="false" data-wysiwyg-content-id="${escAttr(block.id)}" data-placeholder="${escAttr(placeholder)}" class="${escAttr(classAttr)}"${styleAttr}>${content}</${safeTag}></div>`;
+  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="text"${wrapCls}${wrapStyle}${animData}><span class="wysiwyg-label">${escHtml(labelText)}</span><${safeTag}${idAttr} contenteditable="false" data-wysiwyg-content-id="${escAttr(block.id)}" data-placeholder="${escAttr(placeholder)}" class="${escAttr(classAttr)}"${styleAttr}>${content}</${safeTag}></div>`;
 }
 
 // ── Button ─────────────────────────────────────────────────────────────────────
@@ -877,8 +1033,12 @@ function buttonToHtml(block: RenderBlock): string {
   wrapCls.push(spClass(c.marginBottom, "mb"));
   wrapCls.push(spClass(c.marginLeft, "ml"));
   wrapCls.push(spClass(c.marginRight, "mr"));
+  const anim = animAttrs(c);
+  if (anim.cls) wrapCls.push(anim.cls);
+  const animData = anim.cls ? ` ${anim.data}` : "";
+  const wrapStyle = anim.style ? ` style="${escAttr(anim.style)}"` : "";
 
-  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="button" class="${escAttr(wrapCls.join(" "))}"><span class="wysiwyg-label">⬤ Button</span><a${btnIdAttr} href="${escAttr(href)}" target="${escAttr(target)}" class="${escAttr(btnCls.join(" "))}"${btnStyleAttr}>${escHtml(label)}</a></div>`;
+  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="button" class="${escAttr(wrapCls.join(" "))}"${wrapStyle}${animData}><span class="wysiwyg-label">⬤ Button</span><a${btnIdAttr} href="${escAttr(href)}" target="${escAttr(target)}" class="${escAttr(btnCls.join(" "))}"${btnStyleAttr}>${escHtml(label)}</a></div>`;
 }
 
 // ── Image ─────────────────────────────────────────────────────────────────────
@@ -890,10 +1050,9 @@ function imageToHtml(block: RenderBlock): string {
   const objectFit = (c.objectFit as string) || "cover";
   const borderRadius = (c.borderRadius as number) || 0;
   const width = (c.width as string) || "w-full";
+  const height = (c.height as string) || "h-auto";
   const imgElementId = (c.elementId as string) || "";
   const imgCustomStyle = (c.customStyle as string) || "";
-
-  // objectFit → Tailwind class
   const twFit: Record<string, string> = {
     cover: "object-cover",
     contain: "object-contain",
@@ -915,7 +1074,7 @@ function imageToHtml(block: RenderBlock): string {
   const imgIdAttr = imgElementId ? ` id="${escAttr(imgElementId)}"` : "";
 
   // ── Wrapper classes ────────────────────────────────────────────────────────
-  const wrapCls: string[] = ["relative", width];
+  const wrapCls: string[] = ["relative", width, height];
   wrapCls.push(spClass(c.paddingTop, "pt"));
   wrapCls.push(spClass(c.paddingBottom, "pb"));
   wrapCls.push(spClass(c.paddingLeft, "pl"));
@@ -924,12 +1083,16 @@ function imageToHtml(block: RenderBlock): string {
   wrapCls.push(spClass(c.marginBottom, "mb"));
   wrapCls.push(spClass(c.marginLeft, "ml"));
   wrapCls.push(spClass(c.marginRight, "mr"));
+  const anim = animAttrs(c);
+  if (anim.cls) wrapCls.push(anim.cls);
+  const animData = anim.cls ? ` ${anim.data}` : "";
+  const animStyle = anim.style ? ` style="${escAttr(anim.style)}"` : "";
 
   if (!src) {
     return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="image" class="block-placeholder ${escAttr(wrapCls.join(" "))}"><span class="wysiwyg-label">⬛ Image</span><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Select an image in the inspector</span></div>`;
   }
 
-  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="image" class="${escAttr(wrapCls.join(" "))}"><span class="wysiwyg-label">⬛ Image</span><img${imgIdAttr} src="${escAttr(src)}" alt="${alt}" class="${escAttr(imgCls.join(" "))}"${imgStyleAttr} /></div>`;
+  return `<div data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="image" class="${escAttr(wrapCls.join(" "))}"${animStyle}${animData}><span class="wysiwyg-label">⬛ Image</span><img${imgIdAttr} src="${escAttr(src)}" alt="${alt}" class="${escAttr(imgCls.join(" "))}"${imgStyleAttr} /></div>`;
 }
 
 // ── Rich text inline renderer ────────────────────────────────────────────────
@@ -1209,7 +1372,7 @@ function buildInteractionScript(): string {
   function isParentRow(el){
     var p=el.parentElement;
     while(p){
-      if(p.dataset&&p.dataset.wysiwygType==='container'){
+      if(p.dataset&&(p.dataset.wysiwygType==='container')){
         return window.getComputedStyle(p).flexDirection==='row';
       }
       p=p.parentElement;
@@ -1249,7 +1412,7 @@ function buildInteractionScript(): string {
         showRootDropZone();
       });
       el.addEventListener('dragend',function(){el.removeAttribute('draggable');clearDropHints();hideRootDropZone();});
-      var isContainer=el.dataset.wysiwygType==='container';
+      var isContainer=el.dataset.wysiwygType==='container'||el.dataset.wysiwygType==='slideshow';
       if(isContainer){
         el.addEventListener('dragover',function(e){
           e.preventDefault();e.stopPropagation();
@@ -1367,6 +1530,9 @@ function buildInteractionScript(): string {
       if(activeContentId)return;
       document.getElementById('wysiwyg-root').innerHTML=msg.html;
       bindInteractions();
+      // Re-initialise animation triggers for newly inserted DOM nodes
+      if(typeof window.__animInitBlocks === 'function') window.__animInitBlocks();
+      if(typeof window.__slideshowInitAll === 'function') window.__slideshowInitAll();
       reportHeight();
     }
     if(msg.type==='setContent'){

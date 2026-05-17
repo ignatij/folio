@@ -59,6 +59,9 @@ permalink: "/{{ lang.code }}/index.html"
   {% elif block.type === "article-card" %}
     {% set b = block %}
     {% include "partials/blocks/article-card.njk" %}
+  {% elif block.type === "slideshow" %}
+    {% set b = block %}
+    {% include "partials/blocks/slideshow.njk" %}
   {% endif %}
 {% endfor %}
 {% endblock %}

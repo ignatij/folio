@@ -14,6 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { ColorRow } from "./wysiwyg/InspectorShared";
+import { MediaPickerModal } from "./MediaPickerModal";
 import type { BlockType } from "../../api/types";
 
 // ── Block labels ──────────────────────────────────────────────────────────────
@@ -28,6 +29,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   testimonials: "Testimonials",
   newsletter: "Newsletter Subscribe",
   container: "Container",
+  slideshow: "Slideshow",
   text: "Text",
   image: "Image",
   button: "Button",
@@ -71,8 +73,10 @@ export function applyTextDefaults(config: Record<string, unknown>): void {
   config.marginLeft = 0;
   config.marginRight = 0;
   config.maxWidth = "";
+  config.minHeight = 0;
   config.elementId = "";
   config.customStyle = "";
+  applyAnimationDefaults(config);
 }
 
 export function applyButtonDefaults(config: Record<string, unknown>): void {
@@ -97,12 +101,14 @@ export function applyButtonDefaults(config: Record<string, unknown>): void {
   config.marginRight = 0;
   config.elementId = "";
   config.customStyle = "";
+  applyAnimationDefaults(config);
 }
 
 export function applyImageDefaults(config: Record<string, unknown>): void {
   config.src = null;
   config.alt = "";
   config.width = "w-full";
+  config.height = "h-auto";
   config.objectFit = "cover";
   config.aspectRatio = "auto";
   config.borderRadius = 0;
@@ -116,6 +122,7 @@ export function applyImageDefaults(config: Record<string, unknown>): void {
   config.marginRight = 0;
   config.elementId = "";
   config.customStyle = "";
+  applyAnimationDefaults(config);
 }
 
 export function applyContainerDefaults(config: Record<string, unknown>): void {
@@ -144,7 +151,57 @@ export function applyContainerDefaults(config: Record<string, unknown>): void {
   config.textColor = null;
   config.customStyle = null;
   config.elementId = null;
+  applyAnimationDefaults(config);
 }
+
+export function applySlideshowDefaults(config: Record<string, unknown>): void {
+  config.width = "w-full";
+  config.height = "h-96";
+  config.direction = "horizontal";
+  config.transition = "slide";
+  config.duration = 500;
+  config.easing = "ease-in-out";
+  config.autoAdvance = 0;
+  config.loop = true;
+  config.showArrows = true;
+  config.showDots = true;
+  config.swipe = true;
+}
+
+/** Adds per-block animation fields to any config object. */
+export function applyAnimationDefaults(config: Record<string, unknown>): void {
+  config.animation = null; // null | AnimationType  (null = disabled)
+  config.animTrigger = "scroll"; // 'scroll' | 'load' | 'hover' | 'click'
+  config.animDuration = 600;
+  config.animEasing = "ease-out";
+  config.animDelay = 0;
+  config.animOnce = true;
+}
+
+/** All supported animation keyframe names (must match tailwind.config.js). */
+export const ANIMATION_TYPES = [
+  "none",
+  "fade-in",
+  "slide-up",
+  "slide-down",
+  "slide-left",
+  "slide-right",
+  "scale-in",
+  "scale-out",
+  "blur-in",
+] as const;
+
+export type AnimationType = (typeof ANIMATION_TYPES)[number];
+
+export const EASING_OPTIONS = [
+  "ease",
+  "ease-in",
+  "ease-out",
+  "ease-in-out",
+  "linear",
+] as const;
+
+export type EasingOption = (typeof EASING_OPTIONS)[number];
 
 export function applyNavLinksDefaults(config: Record<string, unknown>): void {
   config.dropdown_style = "simple"; // "simple" | "mega"
@@ -473,6 +530,20 @@ export function ContainerConfigPopover({
 
 // ── Container block editor ────────────────────────────────────────────────────
 
+const CONTAINER_PRESET_WIDTHS = [
+  "w-full",
+  "w-1/2",
+  "w-1/3",
+  "w-1/4",
+  "w-page",
+  "w-auto",
+  "w-screen",
+];
+const CONTAINER_PRESET_HEIGHTS = ["h-auto", "h-full", "h-screen"];
+function containerParsePx(v: string): number {
+  return Math.max(1, parseInt(v.replace("px", ""), 10) || 400);
+}
+
 export function ContainerBlockEditor({
   config: c,
   setConfig,
@@ -505,6 +576,12 @@ export function ContainerBlockEditor({
     "flex items-center gap-1.5 border border-(--color-border) rounded bg-(--color-bg) px-2 h-8";
   const btnGroup =
     "flex rounded border border-(--color-border) overflow-hidden divide-x divide-(--color-border)";
+  const [bgPickerOpen, setBgPickerOpen] = useState(false);
+
+  const cWidth = (c.width as string) ?? "w-full";
+  const cHeight = (c.height as string) ?? "h-auto";
+  const isCustomCWidth = !CONTAINER_PRESET_WIDTHS.includes(cWidth);
+  const isCustomCHeight = !CONTAINER_PRESET_HEIGHTS.includes(cHeight);
 
   return (
     <div className="divide-y divide-(--color-border)">
@@ -517,8 +594,12 @@ export function ContainerBlockEditor({
               Width (Fill)
             </label>
             <select
-              value={(c.width as string) ?? "w-full"}
-              onChange={(e) => setConfig("width", e.target.value)}
+              value={isCustomCWidth ? "__custom__" : cWidth}
+              onChange={(e) => {
+                if (e.target.value === "__custom__")
+                  setConfig("width", "400px");
+                else setConfig("width", e.target.value);
+              }}
               className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
             >
               <option value="w-full">Fill Container (100%)</option>
@@ -528,21 +609,49 @@ export function ContainerBlockEditor({
               <option value="w-page">Page width (max-w-5xl)</option>
               <option value="w-auto">Hug Contents (Auto)</option>
               <option value="w-screen">Full Screen (100vw)</option>
+              <option value="__custom__">Custom (px)…</option>
             </select>
+            {isCustomCWidth && (
+              <input
+                type="number"
+                min={1}
+                step={10}
+                placeholder="px"
+                className="mt-1 w-full text-sm border border-(--color-border) rounded px-2 py-1.5 bg-(--color-bg)"
+                value={containerParsePx(cWidth)}
+                onChange={(e) => setConfig("width", `${e.target.value}px`)}
+              />
+            )}
           </div>
           <div>
             <label className="block text-[11px] text-(--color-muted) mb-1">
               Height
             </label>
             <select
-              value={(c.height as string) ?? "h-auto"}
-              onChange={(e) => setConfig("height", e.target.value)}
+              value={isCustomCHeight ? "__custom__" : cHeight}
+              onChange={(e) => {
+                if (e.target.value === "__custom__")
+                  setConfig("height", "400px");
+                else setConfig("height", e.target.value);
+              }}
               className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
             >
               <option value="h-auto">Hug Contents (Auto)</option>
               <option value="h-full">Fill Container (100%)</option>
               <option value="h-screen">Full Screen (100vh)</option>
+              <option value="__custom__">Custom (px)…</option>
             </select>
+            {isCustomCHeight && (
+              <input
+                type="number"
+                min={1}
+                step={10}
+                placeholder="px"
+                className="mt-1 w-full text-sm border border-(--color-border) rounded px-2 py-1.5 bg-(--color-bg)"
+                value={containerParsePx(cHeight)}
+                onChange={(e) => setConfig("height", `${e.target.value}px`)}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -867,40 +976,42 @@ export function ContainerBlockEditor({
 
         {/* Background image URL */}
         <div>
-          <p className={subLabel}>Image URL</p>
-          <div className="flex items-center gap-1">
-            <input
-              type="text"
-              value={(c.backgroundImage as string) ?? ""}
-              placeholder="/uploads/photo.jpg or https://…"
-              onChange={(e) =>
-                setConfig(
-                  "backgroundImage",
-                  e.target.value === "" ? null : e.target.value,
-                )
-              }
-              className="flex-1 px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg) outline-none focus:ring-2 focus:ring-(--color-accent)"
+          <p className={subLabel}>Image</p>
+          {!!(c.backgroundImage as string) && (
+            <img
+              src={c.backgroundImage as string}
+              alt=""
+              className="w-full rounded border border-(--color-border) mb-2 object-cover"
+              style={{ maxHeight: 80 }}
             />
+          )}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setBgPickerOpen(true)}
+              className="flex-1 px-3 py-1.5 text-xs border border-(--color-border) rounded hover:bg-(--color-bg-surface) transition-colors"
+            >
+              {c.backgroundImage ? "Change image" : "Pick from library"}
+            </button>
             {!!(c.backgroundImage as string) && (
               <button
                 type="button"
                 onClick={() => setConfig("backgroundImage", null)}
-                className="text-(--color-muted) hover:text-red-400 transition-colors shrink-0 px-1"
-                title="Remove image"
+                className="px-2 py-1.5 text-xs text-(--color-destructive) border border-(--color-border) rounded hover:bg-(--color-bg-surface)"
               >
-                <svg
-                  viewBox="0 0 16 16"
-                  width={14}
-                  height={14}
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill="none"
-                >
-                  <path d="M4 4l8 8m0-8l-8 8" />
-                </svg>
+                Remove
               </button>
             )}
           </div>
+          {bgPickerOpen && (
+            <MediaPickerModal
+              onSelect={(file) => {
+                setConfig("backgroundImage", `/uploads/${file.filename}`);
+                setBgPickerOpen(false);
+              }}
+              onClose={() => setBgPickerOpen(false)}
+            />
+          )}
         </div>
 
         {/* Size + Position (only shown when an image is set) */}

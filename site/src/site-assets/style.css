@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ── Folio site styles ───────────────────────────────────────────────────── */
 
 /* Design tokens — overridden at build time by theme.json via Eleventy transform */
@@ -319,4 +323,188 @@ img {
     #gallery-next {
         right: 0.5rem;
     }
+}
+
+/* ── Animation block system ──────────────────────────────────────────────── */
+
+/* Children of animation-container start hidden and paused. */
+.anim-child {
+    opacity: 0;
+    animation-play-state: paused;
+}
+
+/* Trigger class added by animations.js when the animation should run. */
+.anim-child.anim-running {
+    animation-play-state: running;
+}
+
+/* If a child has no animate-* class, keep it visible. */
+.anim-child:not([class*="animate-"]) {
+    opacity: 1;
+}
+
+/* ── Slideshow block ─────────────────────────────────────────────────────── */
+
+.slideshow-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity var(--slide-duration, 500ms) var(--slide-easing, ease-in-out),
+        transform var(--slide-duration, 500ms) var(--slide-easing, ease-in-out);
+}
+
+.slideshow-slide.slide-active {
+    opacity: 1;
+    transform: none;
+}
+
+/* Enter states — applied by JS before adding slide-active */
+.slideshow-slide.slide-enter-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-enter-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-enter-bottom {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-enter-top {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-enter-fade {
+    opacity: 0;
+    transform: none;
+}
+
+.slideshow-slide.slide-enter-scale {
+    opacity: 0;
+    transform: scale(0.85);
+}
+
+/* Exit states — JS transitions away from slide-active to these */
+.slideshow-slide.slide-exit-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-exit-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-exit-bottom {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-exit-top {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.slideshow-slide.slide-exit-fade {
+    opacity: 0;
+    transform: none;
+}
+
+.slideshow-slide.slide-exit-scale {
+    opacity: 0;
+    transform: scale(1.15);
+}
+
+/* Arrow buttons */
+.slideshow-arrow {
+    position: absolute;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms;
+    line-height: 1;
+}
+
+.slideshow-arrow:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* Horizontal arrow positions */
+.slideshow-prev {
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.slideshow-next {
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Vertical arrow positions */
+[data-slideshow-direction="vertical"] .slideshow-prev {
+    left: 50%;
+    top: 0.75rem;
+    right: auto;
+    transform: translateX(-50%);
+}
+
+[data-slideshow-direction="vertical"] .slideshow-next {
+    left: 50%;
+    bottom: 0.75rem;
+    top: auto;
+    right: auto;
+    transform: translateX(-50%);
+}
+
+/* Dot indicators */
+.slideshow-dots {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.4rem;
+    z-index: 10;
+}
+
+.slideshow-dots--vertical {
+    flex-direction: column;
+    bottom: auto;
+    left: auto;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.slideshow-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 200ms;
+}
+
+.slideshow-dot.active {
+    background: #fff;
 }
