@@ -6,6 +6,7 @@ import type {
   BlockType,
 } from "../../../api/types";
 import { ContainerInspector } from "./ContainerInspector";
+import { SlideshowInspector } from "./SlideshowInspector";
 import { TextInspector } from "./TextInspector";
 import { ImageInspector } from "./ImageInspector";
 import { ButtonInspector } from "./ButtonInspector";
@@ -107,6 +108,13 @@ export function InspectorPanel({
           />
         )}
 
+        {block.type === "slideshow" && (
+          <SlideshowInspector
+            config={block.config}
+            onConfigChange={cfgChange}
+          />
+        )}
+
         {block.type === "text" && (
           <TextInspector
             config={block.config}
@@ -183,6 +191,7 @@ export function InspectorPanel({
 
         {![
           "container",
+          "slideshow",
           "text",
           "image",
           "button",

@@ -15,6 +15,9 @@ if [ -n "$SITE_DIST" ]; then
     cleanup() { rm -rf "$SITE_DIST_TMP"; }
     trap cleanup EXIT
 
+    echo "[folio] Building Tailwind CSS …"
+    npm run build:css
+
     echo "[folio] Building site into ${SITE_DIST_TMP} …"
     npx @11ty/eleventy --output "$SITE_DIST_TMP"
 

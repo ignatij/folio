@@ -212,6 +212,7 @@ export type BlockType =
   | "testimonials"
   | "newsletter"
   | "container"
+  | "slideshow"
   | "text"
   | "image"
   | "button"

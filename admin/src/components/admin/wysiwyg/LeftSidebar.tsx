@@ -43,8 +43,8 @@ const PALETTE: {
 }[] = [
   {
     label: "Layout",
-    types: ["container"],
-    icons: { container: <ContainerIcon /> },
+    types: ["container", "slideshow"],
+    icons: { container: <ContainerIcon />, slideshow: <SlideshowIcon /> },
   },
   {
     label: "Content",
@@ -355,6 +355,7 @@ function LayerRow({
 
   const hasChildren =
     (block.type === "container" ||
+      block.type === "slideshow" ||
       block.type === "article-grid" ||
       block.type === "article-card") &&
     (block.children?.length ?? 0) > 0;
@@ -569,12 +570,33 @@ function BlockTypeIcon({
       return <ArticleDateIcon size={size} />;
     case "article-tag":
       return <ArticleTagIcon size={size} />;
+    case "slideshow":
+      return <SlideshowIcon size={size} />;
     default:
       return <ArticlesIcon size={size} />;
   }
 }
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
+
+function SlideshowIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="1" y="3" width="14" height="10" rx="1.5" />
+      <line x1="5" y1="3" x2="5" y2="13" strokeWidth="1" />
+      <line x1="11" y1="3" x2="11" y2="13" strokeWidth="1" />
+      <polyline points="3,8 1.5,8" strokeWidth="1.5" />
+      <polyline points="13,8 14.5,8" strokeWidth="1.5" />
+    </svg>
+  );
+}
 
 function ContainerIcon({ size = 18 }: { size?: number }) {
   return (

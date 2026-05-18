@@ -3,8 +3,24 @@
 
 {%- set _dir = "flex-row" if cc.direction !== "col" else "flex-col" -%}
 {%- set _wrap = " flex-wrap" if cc.wrap === "wrap" else "" -%}
-{%- set _w = "w-full max-w-5xl mx-auto" if cc.width === "w-page" else (cc.width if cc.width else "w-full") -%}
-{%- set _h = (" " + cc.height) if cc.height and cc.height !== "h-auto" else "" -%}
+{%- set _wClass = "" -%}
+{%- set _wStyle = "" -%}
+{%- if cc.width === "w-page" -%}
+  {%- set _wClass = "w-full max-w-5xl mx-auto" -%}
+{%- elif not cc.width or cc.width.startsWith("w-") -%}
+  {%- set _wClass = cc.width if cc.width else "w-full" -%}
+{%- else -%}
+  {%- set _wStyle = "width:" + cc.width + ";" -%}
+{%- endif -%}
+{%- set _hClass = "" -%}
+{%- set _hStyle = "" -%}
+{%- if not cc.height or cc.height === "h-auto" -%}
+  {# no height class needed #}
+{%- elif cc.height.startsWith("h-") -%}
+  {%- set _hClass = " " + cc.height -%}
+{%- else -%}
+  {%- set _hStyle = "height:" + cc.height + ";" -%}
+{%- endif -%}
 
 {%- set _jus = "justify-start" -%}
 {%- if cc.justify === "center" %}{%- set _jus = "justify-center" -%}
@@ -46,31 +62,26 @@
   {%- set _mar = ("mt-" + _mt + " mb-" + _mb + " ml-" + _ml + " mr-" + _mr) -%}
 {%- endif -%}
 
-{# Extra Tailwind classes for visual properties #}
 {%- set _xCls = [] -%}
 {%- if cc.backgroundColor %}{%- set _xCls = (_xCls.push("bg-[" + cc.backgroundColor + "]"), _xCls) -%}{%- endif -%}
-{%- if cc.backgroundImage -%}
-  {%- set _xCls = (_xCls.push("bg-[url('" + cc.backgroundImage + "')]"), _xCls) -%}
-  {%- set _bgSize = cc.backgroundSize if cc.backgroundSize else "cover" -%}
-  {%- if _bgSize === "cover" %}{%- set _xCls = (_xCls.push("bg-cover"), _xCls) -%}
-  {%- elif _bgSize === "contain" %}{%- set _xCls = (_xCls.push("bg-contain"), _xCls) -%}
-  {%- elif _bgSize === "auto" %}{%- set _xCls = (_xCls.push("bg-auto"), _xCls) -%}
-  {%- else %}{%- set _xCls = (_xCls.push("bg-[size:" + _bgSize + "]"), _xCls) -%}{%- endif -%}
-  {%- set _bgPos = cc.backgroundPosition if cc.backgroundPosition else "center" -%}
-  {%- if _bgPos === "center" %}{%- set _xCls = (_xCls.push("bg-center"), _xCls) -%}
-  {%- elif _bgPos === "top" %}{%- set _xCls = (_xCls.push("bg-top"), _xCls) -%}
-  {%- elif _bgPos === "bottom" %}{%- set _xCls = (_xCls.push("bg-bottom"), _xCls) -%}
-  {%- elif _bgPos === "left" %}{%- set _xCls = (_xCls.push("bg-left"), _xCls) -%}
-  {%- elif _bgPos === "right" %}{%- set _xCls = (_xCls.push("bg-right"), _xCls) -%}
-  {%- else %}{%- set _xCls = (_xCls.push("bg-[position:" + _bgPos + "]"), _xCls) -%}{%- endif -%}
-  {%- set _xCls = (_xCls.push("bg-no-repeat"), _xCls) -%}
-{%- endif -%}
 {%- if cc.borderRadius and cc.borderRadius > 0 %}{%- set _xCls = (_xCls.push("rounded-[" + cc.borderRadius + "px]"), _xCls) -%}{%- endif -%}
 {%- if cc.textColor %}{%- set _xCls = (_xCls.push("text-[" + cc.textColor + "]"), _xCls) -%}{%- endif -%}
-{%- set _bgStyle = cc.customStyle if cc.customStyle else "" -%}
+{# Background image — rendered as inline style, not Tailwind arbitrary class #}
+{%- set _bgStyle = "" -%}
+{%- if cc.backgroundImage -%}
+  {%- set _bgSize = cc.backgroundSize if cc.backgroundSize else "cover" -%}
+  {%- set _bgPos = cc.backgroundPosition if cc.backgroundPosition else "center" -%}
+  {%- set _bgStyle = "background-image:url('" + cc.backgroundImage + "');background-size:" + _bgSize + ";background-position:" + _bgPos + ";background-repeat:no-repeat;" -%}
+{%- endif -%}
+{%- set _bgStyle = (_bgStyle + (cc.customStyle if cc.customStyle else "")) -%}
+{# Per-block animation #}
+{%- if cc.animation and cc.animation !== "none" -%}
+  {%- set _xCls = (_xCls.push("anim-child animate-" + cc.animation), _xCls) -%}
+{%- endif -%}
 
-<div {% if cc.elementId %}id="{{ cc.elementId }}"{% endif %} class="relative flex {{ _dir }}{{ _wrap }} {{ _w }}{{ _h }} {{ _jus }} {{ _ali }} {{ _gap }} {{ _pad }} {{ _mar }} {{ _xCls | join(' ') }}"
-     {% if _bgStyle %}style="{{ _bgStyle }}"{% endif %}>
+<div {% if cc.elementId %}id="{{ cc.elementId }}"{% endif %} class="relative flex {{ _dir }}{{ _wrap }} {{ _wClass }}{{ _hClass }} {{ _jus }} {{ _ali }} {{ _gap }} {{ _pad }} {{ _mar }} {{ _xCls | join(' ') }}"
+  {%- if cc.animation and cc.animation !== "none" %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}"{% endif %}
+  {% if _bgStyle or _wStyle or _hStyle or (cc.animation and cc.animation !== "none") %}style="{% if cc.animation and cc.animation !== "none" %}--anim-duration:{{ cc.animDuration if cc.animDuration else 600 }}ms;--anim-easing:{{ cc.animEasing if cc.animEasing else 'ease-out' }};--anim-delay:{{ cc.animDelay if cc.animDelay else 0 }}ms;{% endif %}{{ _wStyle }}{{ _hStyle }}{{ _bgStyle }}"{% endif %}>
   {%- if cc.backgroundImage and cc.backgroundOverlay %}
     <div class="absolute inset-0 pointer-events-none" style="background:{{ cc.backgroundOverlay }};{% if cc.borderRadius and cc.borderRadius > 0 %}border-radius:{{ cc.borderRadius }}px;{% endif %}" aria-hidden="true"></div>
   {%- endif %}
@@ -106,6 +117,7 @@
       {%- elif child.type === "article-excerpt" %}{%- include "partials/blocks/article-excerpt.njk" %}
       {%- elif child.type === "article-date" %}{%- include "partials/blocks/article-date.njk" %}
       {%- elif child.type === "article-tag" %}{%- include "partials/blocks/article-tag.njk" %}
+      {%- elif child.type === "slideshow" %}{%- include "partials/blocks/slideshow.njk" %}
       {%- endif %}
     {%- endif %}
   {%- endfor %}

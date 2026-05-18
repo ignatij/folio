@@ -495,20 +495,38 @@ export function SizingSection({
   return (
     <div className="py-3">
       <p className={sLabel}>Sizing</p>
-      <div>
-        <p className="text-[11px] text-(--color-muted) mb-1.5">Max Width</p>
-        <select
-          value={(c.maxWidth as string) ?? ""}
-          onChange={(e) => onChange("maxWidth", e.target.value)}
-          className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
-        >
-          <option value="">None (full width)</option>
-          <option value="480px">480px — SM</option>
-          <option value="640px">640px — MD</option>
-          <option value="768px">768px — LG</option>
-          <option value="1024px">1024px — XL</option>
-          <option value="65ch">65ch — Prose</option>
-        </select>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <p className="text-[11px] text-(--color-muted) mb-1.5">Max Width</p>
+          <select
+            value={(c.maxWidth as string) ?? ""}
+            onChange={(e) => onChange("maxWidth", e.target.value)}
+            className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+          >
+            <option value="">None (full width)</option>
+            <option value="480px">480px — SM</option>
+            <option value="640px">640px — MD</option>
+            <option value="768px">768px — LG</option>
+            <option value="1024px">1024px — XL</option>
+            <option value="65ch">65ch — Prose</option>
+          </select>
+        </div>
+        <div>
+          <p className="text-[11px] text-(--color-muted) mb-1.5">Min Height</p>
+          <div className="flex items-center gap-1.5 border border-(--color-border) rounded bg-(--color-bg) px-2 h-8">
+            <input
+              type="number"
+              min={0}
+              step={10}
+              value={(c.minHeight as number) ?? 0}
+              onChange={(e) => onChange("minHeight", Number(e.target.value))}
+              className="flex-1 min-w-0 bg-transparent border-none text-sm outline-none"
+            />
+            <span className="text-[11px] text-(--color-muted) shrink-0">
+              px
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

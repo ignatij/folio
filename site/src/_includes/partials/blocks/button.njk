@@ -65,7 +65,8 @@
 {%- if _mr is number and _mr < 0 -%}{%- set _wCls = (_wCls.push("-mr-" + (_mr | abs)), _wCls) -%}
 {%- else -%}{%- set _wCls = (_wCls.push("mr-" + _mr), _wCls) -%}{%- endif -%}
 
-<div class="{{ _wCls | join(' ') }}">
+<div class="{{ _wCls | join(' ') }}{%- if cc.animation and cc.animation !== 'none' %} anim-child animate-{{ cc.animation }}{%- endif %}"
+{%- if cc.animation and cc.animation !== 'none' %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}" style="--anim-duration:{{ cc.animDuration if cc.animDuration else 600 }}ms;--anim-easing:{{ cc.animEasing if cc.animEasing else 'ease-out' }};--anim-delay:{{ cc.animDelay if cc.animDelay else 0 }}ms;"{% endif %}>
   <a{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}
      href="{{ cc.href if cc.href else '#' }}"
      target="{{ cc.target if cc.target else '_self' }}"

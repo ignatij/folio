@@ -1,4 +1,5 @@
 import { ContainerBlockEditor } from "../blockShared";
+import { AnimationSection } from "./AnimationSection";
 
 interface ContainerInspectorProps {
   config: Record<string, unknown>;
@@ -25,6 +26,7 @@ export function ContainerInspector({
           themeColors={themeColors}
         />
       </div>
+      <AnimationSection config={config} onConfigChange={onConfigChange} />
     </div>
   );
 }

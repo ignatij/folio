@@ -61,6 +61,8 @@
 
 {# Max width — stored as CSS value (e.g. "480px"), wrap in arbitrary bracket #}
 {%- if cc.maxWidth -%}{%- set _cls = (_cls.push("max-w-[" + cc.maxWidth + "]"), _cls) -%}{%- endif -%}
+{# Min height — stored as integer px #}
+{%- if cc.minHeight and cc.minHeight > 0 -%}{%- set _cls = (_cls.push("min-h-[" + cc.minHeight + "px]"), _cls) -%}{%- endif -%}
 
 {# Padding (always >= 0) — concatenate with stored value directly #}
 {%- set _cls = (_cls.push("pt-" + (cc.paddingTop if cc.paddingTop else 0)), _cls) -%}
@@ -82,4 +84,12 @@
 {%- if _mr is number and _mr < 0 -%}{%- set _cls = (_cls.push("-mr-" + (_mr | abs)), _cls) -%}
 {%- else -%}{%- set _cls = (_cls.push("mr-" + _mr), _cls) -%}{%- endif -%}
 
-<{{ tag }}{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %} class="{{ _cls | join(' ') }}"{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %}>{{ cc.content | safe }}</{{ tag }}>
+{# Animation #}
+{%- set _animStyle = "" -%}
+{%- if cc.animation and cc.animation !== "none" -%}
+  {%- set _cls = (_cls.push("anim-child"), _cls) -%}
+  {%- set _cls = (_cls.push("animate-" + cc.animation), _cls) -%}
+  {%- set _animStyle = "--anim-duration:" + (cc.animDuration if cc.animDuration else 600) + "ms;--anim-easing:" + (cc.animEasing if cc.animEasing else "ease-out") + ";--anim-delay:" + (cc.animDelay if cc.animDelay else 0) + "ms;" -%}
+{%- endif -%}
+
+<{{ tag }}{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %} class="{{ _cls | join(' ') }}"{% if cc.customStyle or _animStyle %} style="{{ _animStyle }}{{ cc.customStyle }}"{% endif %}{% if cc.animation and cc.animation !== "none" %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}"{% endif %}>{{ cc.content | safe }}</{{ tag }}>

@@ -23,6 +23,7 @@ import {
   applyArticleExcerptDefaults,
   applyArticleDateDefaults,
   applyArticleTagDefaults,
+  applySlideshowDefaults,
 } from "../blockShared";
 
 // ── Shared structural interface ────────────────────────────────────────────────
@@ -197,6 +198,7 @@ function baseConfig(type: BlockType): Record<string, unknown> {
     config.customStyle = null;
   }
   if (type === "container") applyContainerDefaults(config);
+  if (type === "slideshow") applySlideshowDefaults(config);
   if (type === "text") applyTextDefaults(config);
   if (type === "image") applyImageDefaults(config);
   if (type === "button") applyButtonDefaults(config);
@@ -274,9 +276,11 @@ export function makePageBlock(type: BlockType, order: number): PageBlock {
     children:
       type === "container"
         ? []
-        : type === "article-grid"
-          ? (buildDefaultArticleGridChildren() as unknown as PageBlock[])
-          : undefined,
+        : type === "slideshow"
+          ? []
+          : type === "article-grid"
+            ? (buildDefaultArticleGridChildren() as unknown as PageBlock[])
+            : undefined,
   };
 }
 
@@ -291,8 +295,10 @@ export function makeHomeBlock(type: BlockType, order: number): HomeBlock {
     children:
       type === "container"
         ? []
-        : type === "article-grid"
-          ? buildDefaultArticleGridChildren()
-          : undefined,
+        : type === "slideshow"
+          ? []
+          : type === "article-grid"
+            ? buildDefaultArticleGridChildren()
+            : undefined,
   };
 }

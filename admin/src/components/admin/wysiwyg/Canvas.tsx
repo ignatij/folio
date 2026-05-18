@@ -26,6 +26,7 @@ interface CanvasProps {
   onMoveToContainer: (fromId: string, containerId: string) => void;
   onMoveToRoot: (fromId: string) => void;
   navSnapshot?: NavSnapshot;
+  animating?: boolean;
 }
 
 export function Canvas({
@@ -44,6 +45,7 @@ export function Canvas({
   onMoveToContainer,
   onMoveToRoot,
   navSnapshot = {},
+  animating = false,
 }: CanvasProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const initialSrcdocRef = useRef<string | null>(null);
@@ -74,6 +76,30 @@ export function Canvas({
       if (b.id === id) return b;
       if (b.children) {
         const found = findRenderBlock(b.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * If `targetId` is a direct child of a slideshow block, return
+   * { slideshowId, index } so the canvas can navigate to that slide.
+   */
+  function findSlideshowParent(
+    list: RenderBlock[],
+    targetId: string,
+  ): { slideshowId: string; index: number } | null {
+    for (const b of list) {
+      if (b.type === "slideshow" && b.children) {
+        const visible = b.children
+          .filter((ch) => ch.visible !== false)
+          .sort((a, d) => (a.order ?? 0) - (d.order ?? 0));
+        const idx = visible.findIndex((ch) => ch.id === targetId);
+        if (idx !== -1) return { slideshowId: b.id, index: idx };
+      }
+      if (b.children) {
+        const found = findSlideshowParent(b.children, targetId);
         if (found) return found;
       }
     }
@@ -120,7 +146,31 @@ export function Canvas({
       { type: "select", id: selectedBlockId },
       "*",
     );
+    // If the selected block is inside a slideshow, navigate the slideshow to it
+    if (selectedBlockId) {
+      const parent = findSlideshowParent(blocks, selectedBlockId);
+      if (parent) {
+        iframe.contentWindow.postMessage(
+          {
+            type: "slideshow-goto",
+            slideshowId: parent.slideshowId,
+            index: parent.index,
+          },
+          "*",
+        );
+      }
+    }
   }, [selectedBlockId]);
+
+  // Send animation preview toggle to iframe
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe?.contentWindow) return;
+    iframe.contentWindow.postMessage(
+      { type: animating ? "anim-preview-start" : "anim-preview-stop" },
+      "*",
+    );
+  }, [animating]);
 
   // Receive postMessages from iframe
   useEffect(() => {

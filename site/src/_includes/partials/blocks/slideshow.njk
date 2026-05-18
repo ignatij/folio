@@ -1,0 +1,99 @@
+{%- set cc = b.config -%}
+{%- set _transition = cc.transition if cc.transition else "slide" -%}
+{%- set _direction = cc.direction if cc.direction else "horizontal" -%}
+{%- set _duration = cc.duration if cc.duration else 500 -%}
+{%- set _easing = cc.easing if cc.easing else "ease-in-out" -%}
+{%- set _autoAdvance = cc.autoAdvance if cc.autoAdvance else 0 -%}
+{%- set _loop = "false" if cc.loop === false else "true" -%}
+{%- set _showArrows = "false" if cc.showArrows === false else "true" -%}
+{%- set _showDots = "false" if cc.showDots === false else "true" -%}
+{%- set _swipe = "false" if cc.swipe === false else "true" -%}
+{%- set _touchAction = "pan-x" if _direction === "vertical" else "pan-y" -%}
+
+{#- Width: Tailwind preset or arbitrary CSS value -#}
+{%- set _wClass = "" -%}
+{%- set _wStyle = "" -%}
+{%- if cc.width === "w-page" -%}
+  {%- set _wClass = "w-full max-w-5xl mx-auto" -%}
+{%- elif not cc.width or cc.width.startsWith("w-") -%}
+  {%- set _wClass = cc.width if cc.width else "w-full" -%}
+{%- else -%}
+  {%- set _wStyle = "width:" + cc.width + ";" -%}
+{%- endif -%}
+
+{#- Height: Tailwind preset or arbitrary CSS value -#}
+{%- set _hClass = "" -%}
+{%- set _hStyle = "" -%}
+{%- if not cc.height or cc.height.startsWith("h-") -%}
+  {%- set _hClass = cc.height if cc.height else "h-96" -%}
+{%- else -%}
+  {%- set _hStyle = "height:" + cc.height + ";" -%}
+{%- endif -%}
+
+{%- set visibleSlides = [] -%}
+{%- for child in b.children %}
+  {%- if child.visible !== false %}{%- set visibleSlides = (visibleSlides.push(child), visibleSlides) -%}{%- endif %}
+{%- endfor -%}
+
+<div {% if cc.elementId %}id="{{ cc.elementId }}"{% endif %}
+     class="relative overflow-hidden {{ _wClass }} {{ _hClass }}"
+     data-slideshow
+     data-slideshow-id="{{ b.id }}"
+     data-slideshow-transition="{{ _transition }}"
+     data-slideshow-direction="{{ _direction }}"
+     data-slideshow-duration="{{ _duration }}"
+     data-slideshow-easing="{{ _easing }}"
+     data-slideshow-auto-advance="{{ _autoAdvance }}"
+     data-slideshow-loop="{{ _loop }}"
+     data-slideshow-swipe="{{ _swipe }}"
+     style="{{ _wStyle }}{{ _hStyle }}touch-action:{{ _touchAction }}">
+
+  {%- for child in visibleSlides %}
+    <div class="slideshow-slide{% if loop.first %} slide-active{% endif %} absolute inset-0 w-full h-full"
+         data-slide-index="{{ loop.index0 }}"
+         style="--slide-duration:{{ _duration }}ms;--slide-easing:{{ _easing }};">
+      {%- set b = child -%}
+      {%- set block = child -%}
+      {%- if child.type === "hero" %}{%- include "partials/blocks/hero.njk" %}
+      {%- elif child.type === "featured-articles" %}{%- include "partials/blocks/featured-articles.njk" %}
+      {%- elif child.type === "latest-articles" %}{%- include "partials/blocks/latest-articles.njk" %}
+      {%- elif child.type === "cta-band" %}{%- include "partials/blocks/cta-band.njk" %}
+      {%- elif child.type === "rich-text" %}{%- include "partials/blocks/rich-text.njk" %}
+      {%- elif child.type === "image-text" %}{%- include "partials/blocks/image-text.njk" %}
+      {%- elif child.type === "testimonials" %}{%- include "partials/blocks/testimonials.njk" %}
+      {%- elif child.type === "newsletter" %}{%- include "partials/blocks/newsletter.njk" %}
+      {%- elif child.type === "container" %}{%- include "partials/blocks/container.njk" %}
+      {%- elif child.type === "text" %}{%- include "partials/blocks/text.njk" %}
+      {%- elif child.type === "image" %}{%- include "partials/blocks/image.njk" %}
+      {%- elif child.type === "button" %}{%- include "partials/blocks/button.njk" %}
+      {%- elif child.type === "article-grid" %}{%- include "partials/blocks/article-grid.njk" %}
+      {%- elif child.type === "article-card" %}{%- include "partials/blocks/article-card.njk" %}
+      {%- elif child.type === "article-image" %}{%- include "partials/blocks/article-image.njk" %}
+      {%- elif child.type === "article-title" %}{%- include "partials/blocks/article-title.njk" %}
+      {%- elif child.type === "article-excerpt" %}{%- include "partials/blocks/article-excerpt.njk" %}
+      {%- elif child.type === "article-date" %}{%- include "partials/blocks/article-date.njk" %}
+      {%- elif child.type === "article-tag" %}{%- include "partials/blocks/article-tag.njk" %}
+      {%- endif %}
+    </div>
+  {%- endfor %}
+
+  {%- if _showArrows === "true" %}
+  <button class="slideshow-prev slideshow-arrow" aria-label="Previous slide">
+    {%- if _direction === "vertical" %}↑{%- else %}←{%- endif %}
+  </button>
+  <button class="slideshow-next slideshow-arrow" aria-label="Next slide">
+    {%- if _direction === "vertical" %}↓{%- else %}→{%- endif %}
+  </button>
+  {%- endif %}
+
+  {%- if _showDots === "true" %}
+  <div class="slideshow-dots{{ ' slideshow-dots--vertical' if _direction === 'vertical' else '' }}">
+    {%- for child in visibleSlides %}
+    <button class="slideshow-dot{% if loop.first %} active{% endif %}"
+            data-dot-index="{{ loop.index0 }}"
+            aria-label="Go to slide {{ loop.index }}"></button>
+    {%- endfor %}
+  </div>
+  {%- endif %}
+
+</div>

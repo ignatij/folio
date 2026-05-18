@@ -11,6 +11,7 @@ import {
   AlignCenterIcon,
   AlignRightIcon,
 } from "./InspectorShared";
+import { AnimationSection } from "./AnimationSection";
 
 interface ButtonInspectorProps {
   config: Record<string, unknown>;
@@ -258,6 +259,7 @@ export function ButtonInspector({
         {/* Custom Style */}
         <CustomStyleSection config={c} onChange={onConfigChange} />
       </div>
+      <AnimationSection config={c} onConfigChange={onConfigChange} />
     </div>
   );
 }

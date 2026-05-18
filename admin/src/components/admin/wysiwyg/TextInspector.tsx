@@ -7,6 +7,7 @@ import {
   ElementIdSection,
   CustomStyleSection,
 } from "./InspectorShared";
+import { AnimationSection } from "./AnimationSection";
 
 interface TextInspectorProps {
   config: Record<string, unknown>;
@@ -149,6 +150,7 @@ export function TextInspector({
         {/* Custom Style */}
         <CustomStyleSection config={c} onChange={onConfigChange} />
       </div>
+      <AnimationSection config={c} onConfigChange={onConfigChange} />
     </div>
   );
 }
