@@ -7,10 +7,11 @@
 
 {# Build Tailwind class list #}
 {%- set _cls = [] -%}
+{%- set _dynStyle = "" -%}
 
 {# Font size: explicit px OR tag-based heading class #}
 {%- if cc.fontSize -%}
-  {%- set _cls = (_cls.push("text-[" + cc.fontSize + "px]"), _cls) -%}
+  {%- set _dynStyle = _dynStyle + "font-size:" + cc.fontSize + "px;" -%}
 {%- elif tag === "h1" -%}{%- set _cls = (_cls.push("text-4xl"), _cls) -%}
 {%- elif tag === "h2" -%}{%- set _cls = (_cls.push("text-3xl"), _cls) -%}
 {%- elif tag === "h3" -%}{%- set _cls = (_cls.push("text-2xl"), _cls) -%}
@@ -36,14 +37,14 @@
 {%- if cc.italic -%}{%- set _cls = (_cls.push("italic"), _cls) -%}{%- endif -%}
 
 {# Text color #}
-{%- if cc.color -%}{%- set _cls = (_cls.push("text-[" + cc.color + "]"), _cls) -%}{%- endif -%}
+{%- if cc.color -%}{%- set _dynStyle = _dynStyle + "color:" + cc.color + ";" -%}{%- endif -%}
 
 {# Letter spacing — stored as hundredths of em (e.g. 50 → 0.5em) #}
 {%- set _lts = cc.letterSpacing if cc.letterSpacing else 0 -%}
-{%- if _lts -%}{%- set _cls = (_cls.push("tracking-[" + (_lts / 100) + "em]"), _cls) -%}{%- endif -%}
+{%- if _lts -%}{%- set _dynStyle = _dynStyle + "letter-spacing:" + (_lts / 100) + "em;" -%}{%- endif -%}
 
 {# Line height #}
-{%- if cc.lineHeight -%}{%- set _cls = (_cls.push("leading-[" + cc.lineHeight + "]"), _cls) -%}{%- endif -%}
+{%- if cc.lineHeight -%}{%- set _dynStyle = _dynStyle + "line-height:" + cc.lineHeight + ";" -%}{%- endif -%}
 
 {# Text transform #}
 {%- if cc.textTransform === "uppercase" -%}{%- set _cls = (_cls.push("uppercase"), _cls) -%}
@@ -57,12 +58,11 @@
 {%- endif -%}
 
 {# Background color #}
-{%- if cc.bgColor -%}{%- set _cls = (_cls.push("bg-[" + cc.bgColor + "]"), _cls) -%}{%- endif -%}
+{%- if cc.bgColor -%}{%- set _dynStyle = _dynStyle + "background-color:" + cc.bgColor + ";" -%}{%- endif -%}
 
-{# Max width — stored as CSS value (e.g. "480px"), wrap in arbitrary bracket #}
-{%- if cc.maxWidth -%}{%- set _cls = (_cls.push("max-w-[" + cc.maxWidth + "]"), _cls) -%}{%- endif -%}
-{# Min height — stored as integer px #}
-{%- if cc.minHeight and cc.minHeight > 0 -%}{%- set _cls = (_cls.push("min-h-[" + cc.minHeight + "px]"), _cls) -%}{%- endif -%}
+{# Max width / min height — stored as CSS values, set as inline styles #}
+{%- if cc.maxWidth -%}{%- set _dynStyle = _dynStyle + "max-width:" + cc.maxWidth + ";" -%}{%- endif -%}
+{%- if cc.minHeight and cc.minHeight > 0 -%}{%- set _dynStyle = _dynStyle + "min-height:" + cc.minHeight + "px;" -%}{%- endif -%}
 
 {# Padding (always >= 0) — concatenate with stored value directly #}
 {%- set _cls = (_cls.push("pt-" + (cc.paddingTop if cc.paddingTop else 0)), _cls) -%}
@@ -92,4 +92,4 @@
   {%- set _animStyle = "--anim-duration:" + (cc.animDuration if cc.animDuration else 600) + "ms;--anim-easing:" + (cc.animEasing if cc.animEasing else "ease-out") + ";--anim-delay:" + (cc.animDelay if cc.animDelay else 0) + "ms;" -%}
 {%- endif -%}
 
-<{{ tag }}{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %} class="{{ _cls | join(' ') }}"{% if cc.customStyle or _animStyle %} style="{{ _animStyle }}{{ cc.customStyle }}"{% endif %}{% if cc.animation and cc.animation !== "none" %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}"{% endif %}>{{ cc.content | safe }}</{{ tag }}>
+<{{ tag }}{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %} class="{{ _cls | join(' ') }}"{% if cc.customStyle or _animStyle or _dynStyle %} style="{{ _animStyle }}{{ _dynStyle }}{{ cc.customStyle }}"{% endif %}{% if cc.animation and cc.animation !== "none" %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}"{% endif %}>{{ cc.content | safe }}</{{ tag }}>

@@ -2,24 +2,18 @@
 export default {
   content: ["./src/**/*.njk", "./src/**/*.html", "./src/**/*.js"],
   safelist: [
-    // Animation classes are built dynamically (animate-{{ anim }}) so static
-    // scanning would silently strip them — safelist all animate-* variants.
-    "animate-fade-in",
-    "animate-slide-up",
-    "animate-slide-down",
-    "animate-slide-left",
-    "animate-slide-right",
-    "animate-scale-in",
-    "animate-scale-out",
-    "animate-blur-in",
-    // Image height classes set via inspector (dynamic, not in templates)
-    "h-auto",
-    "h-32",
-    "h-48",
-    "h-64",
-    "h-80",
-    "h-96",
-    "h-screen",
+    // Animation classes built dynamically (animate-{{ anim }})
+    { pattern: /^animate-/ },
+    // Height/width classes set dynamically via inspector
+    { pattern: /^(h|w|max-w|min-w|max-h|min-h)-/ },
+    // Spacing set dynamically via inspector
+    { pattern: /^(p|m|gap|pt|pb|pl|pr|mt|mb|ml|mr|px|py|mx|my|gap-x|gap-y)-/ },
+    // Flex/grid layout
+    { pattern: /^(flex|grid|justify|items|self|order|col|row)-/ },
+    // Typography set dynamically
+    { pattern: /^(text|font|leading|tracking|prose)/ },
+    // Rounded set dynamically
+    { pattern: /^rounded/ },
   ],
   theme: {
     extend: {

@@ -10,7 +10,7 @@ import { BLOCK_LABELS } from "../blockShared";
 type AnyBlock = (HomeBlock | PageBlock) & { children?: AnyBlock[] };
 
 interface LeftSidebarProps {
-  mode: "home" | "page";
+  mode: "home" | "page" | "article";
   blocks: AnyBlock[];
   selectedBlockId: string | null;
   languages: Language[];
@@ -40,6 +40,7 @@ const PALETTE: {
   label: string;
   types: BlockType[];
   icons: Record<string, ReactNode>;
+  articleOnly?: boolean;
 }[] = [
   {
     label: "Layout",
@@ -106,6 +107,26 @@ const PALETTE: {
       "preset-nav": <PresetNavIcon />,
       "preset-footer": <PresetFooterIcon />,
     },
+  },
+  {
+    label: "Article",
+    types: [
+      "article-image",
+      "article-title",
+      "article-excerpt",
+      "article-date",
+      "article-tag",
+      "article-body",
+    ] as BlockType[],
+    icons: {
+      "article-image": <ArticleImageIcon />,
+      "article-title": <ArticleTitleIcon />,
+      "article-excerpt": <ArticleExcerptIcon />,
+      "article-date": <ArticleDateIcon />,
+      "article-tag": <ArticleTagIcon />,
+      "article-body": <ArticleBodyIcon />,
+    },
+    articleOnly: true,
   },
 ];
 
@@ -200,6 +221,7 @@ export function LeftSidebar({
       <div className="flex-1 overflow-y-auto">
         {activeTab === "add" && (
           <AddTab
+            mode={mode}
             onStartDrag={onStartDrag}
             onEndDrag={onEndDrag}
             onAddBlock={onAddBlock}
@@ -229,17 +251,22 @@ export function LeftSidebar({
 // ── Add tab (palette) ─────────────────────────────────────────────────────────
 
 function AddTab({
+  mode,
   onStartDrag,
   onEndDrag,
   onAddBlock,
 }: {
+  mode: "home" | "page" | "article";
   onStartDrag: (type: BlockType) => void;
   onEndDrag: () => void;
   onAddBlock: (type: BlockType) => void;
 }) {
+  const visibleGroups = PALETTE.filter((g) =>
+    g.articleOnly ? mode === "article" : true,
+  );
   return (
     <div className="p-3 space-y-5">
-      {PALETTE.map((group) => (
+      {visibleGroups.map((group) => (
         <div key={group.label}>
           <p className="text-[10px] font-semibold uppercase tracking-wider text-(--color-muted) mb-2">
             {group.label}
@@ -572,6 +599,8 @@ function BlockTypeIcon({
       return <ArticleTagIcon size={size} />;
     case "slideshow":
       return <SlideshowIcon size={size} />;
+    case "article-body":
+      return <ArticleBodyIcon size={size} />;
     default:
       return <ArticlesIcon size={size} />;
   }
@@ -990,6 +1019,22 @@ function ArticleTagIcon({ size = 16 }: { size?: number }) {
     >
       <rect x="1" y="4" width="9" height="8" rx="2" />
       <path d="M10 6l4 2-4 2" />
+    </svg>
+  );
+}
+
+function ArticleBodyIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="1" y="2" width="14" height="12" rx="2" />
+      <path d="M4 5h8M4 8h8M4 11h5" />
     </svg>
   );
 }

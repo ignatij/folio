@@ -20,7 +20,8 @@
 {# Image classes #}
 {%- set _imgCls = ["w-full", "block", _fitCls] -%}
 {%- if cc.aspectRatio -%}{%- set _imgCls = ["w-full", "h-full", "block", _fitCls] -%}{%- endif -%}
-{%- if _br and not cc.aspectRatio -%}{%- set _imgCls = (_imgCls.push("rounded-[" + _br + "px]"), _imgCls) -%}{%- endif -%}
+{%- set _imgStyle = "" -%}
+{%- if _br and _br > 0 and not cc.aspectRatio -%}{%- set _imgStyle = "border-radius:" + _br + "px;" -%}{%- endif -%}
 
 {# Wrapper classes — width + height + spacing #}
 {%- set _wCls = [_widthCls, _heightCls] -%}
@@ -57,7 +58,7 @@
   <img{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}
        src="{{ cc.src }}"
        alt="{{ cc.alt if cc.alt else '' }}"
-       class="{{ _imgCls | join(' ') }}"{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %} />
+       class="{{ _imgCls | join(' ') }}"{% if _imgStyle or cc.customStyle %} style="{{ _imgStyle }}{{ cc.customStyle }}"{% endif %} />
   {%- if cc.linkUrl -%}</a>{%- endif -%}
   {%- endif -%}
 </div>

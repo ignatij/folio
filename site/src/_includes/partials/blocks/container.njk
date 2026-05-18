@@ -7,6 +7,8 @@
 {%- set _wStyle = "" -%}
 {%- if cc.width === "w-page" -%}
   {%- set _wClass = "w-full max-w-5xl mx-auto" -%}
+{%- elif cc.width === "w-prose" -%}
+  {%- set _wClass = "w-full max-w-prose mx-auto" -%}
 {%- elif not cc.width or cc.width.startsWith("w-") -%}
   {%- set _wClass = cc.width if cc.width else "w-full" -%}
 {%- else -%}
@@ -63,21 +65,20 @@
 {%- endif -%}
 
 {%- set _xCls = [] -%}
-{%- if cc.backgroundColor %}{%- set _xCls = (_xCls.push("bg-[" + cc.backgroundColor + "]"), _xCls) -%}{%- endif -%}
-{%- if cc.borderRadius and cc.borderRadius > 0 %}{%- set _xCls = (_xCls.push("rounded-[" + cc.borderRadius + "px]"), _xCls) -%}{%- endif -%}
-{%- if cc.textColor %}{%- set _xCls = (_xCls.push("text-[" + cc.textColor + "]"), _xCls) -%}{%- endif -%}
-{# Background image — rendered as inline style, not Tailwind arbitrary class #}
-{%- set _bgStyle = "" -%}
-{%- if cc.backgroundImage -%}
-  {%- set _bgSize = cc.backgroundSize if cc.backgroundSize else "cover" -%}
-  {%- set _bgPos = cc.backgroundPosition if cc.backgroundPosition else "center" -%}
-  {%- set _bgStyle = "background-image:url('" + cc.backgroundImage + "');background-size:" + _bgSize + ";background-position:" + _bgPos + ";background-repeat:no-repeat;" -%}
-{%- endif -%}
-{%- set _bgStyle = (_bgStyle + (cc.customStyle if cc.customStyle else "")) -%}
-{# Per-block animation #}
 {%- if cc.animation and cc.animation !== "none" -%}
   {%- set _xCls = (_xCls.push("anim-child animate-" + cc.animation), _xCls) -%}
 {%- endif -%}
+{# Dynamic colors / radius — inline styles so arbitrary values work on the built site #}
+{%- set _bgStyle = "" -%}
+{%- if cc.backgroundColor %}{%- set _bgStyle = _bgStyle + "background-color:" + cc.backgroundColor + ";" -%}{%- endif -%}
+{%- if cc.textColor %}{%- set _bgStyle = _bgStyle + "color:" + cc.textColor + ";" -%}{%- endif -%}
+{%- if cc.borderRadius and cc.borderRadius > 0 %}{%- set _bgStyle = _bgStyle + "border-radius:" + cc.borderRadius + "px;" -%}{%- endif -%}
+{%- if cc.backgroundImage -%}
+  {%- set _bgSize = cc.backgroundSize if cc.backgroundSize else "cover" -%}
+  {%- set _bgPos = cc.backgroundPosition if cc.backgroundPosition else "center" -%}
+  {%- set _bgStyle = _bgStyle + "background-image:url('" + cc.backgroundImage + "');background-size:" + _bgSize + ";background-position:" + _bgPos + ";background-repeat:no-repeat;" -%}
+{%- endif -%}
+{%- set _bgStyle = (_bgStyle + (cc.customStyle if cc.customStyle else "")) -%}
 
 <div {% if cc.elementId %}id="{{ cc.elementId }}"{% endif %} class="relative flex {{ _dir }}{{ _wrap }} {{ _wClass }}{{ _hClass }} {{ _jus }} {{ _ali }} {{ _gap }} {{ _pad }} {{ _mar }} {{ _xCls | join(' ') }}"
   {%- if cc.animation and cc.animation !== "none" %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}"{% endif %}
@@ -118,6 +119,7 @@
       {%- elif child.type === "article-date" %}{%- include "partials/blocks/article-date.njk" %}
       {%- elif child.type === "article-tag" %}{%- include "partials/blocks/article-tag.njk" %}
       {%- elif child.type === "slideshow" %}{%- include "partials/blocks/slideshow.njk" %}
+      {%- elif child.type === "article-body" %}{%- include "partials/blocks/article-body.njk" %}
       {%- endif %}
     {%- endif %}
   {%- endfor %}

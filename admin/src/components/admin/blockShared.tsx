@@ -47,6 +47,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   "article-excerpt": "Article Excerpt",
   "article-date": "Article Date",
   "article-tag": "Article Tag",
+  "article-body": "Article Body",
 };
 
 // ── Default configs ───────────────────────────────────────────────────────────
@@ -365,6 +366,34 @@ export function applyArticleDateDefaults(
   config.marginRight = 0;
 }
 
+export function applyArticleBodyDefaults(
+  config: Record<string, unknown>,
+): void {
+  // Container-style layout for the article body content area
+  config.direction = "col";
+  config.wrap = "nowrap";
+  config.justify = "start";
+  config.align = "start";
+  config.width = "w-full";
+  config.height = "h-auto";
+  config.gapX = 0;
+  config.gapY = 0;
+  config.paddingTop = 6;
+  config.paddingBottom = 6;
+  config.paddingLeft = 0;
+  config.paddingRight = 0;
+  config.marginTop = 0;
+  config.marginBottom = 0;
+  config.marginLeft = 0;
+  config.marginRight = 0;
+  config.backgroundColor = null;
+  config.borderRadius = 0;
+  config.textColor = null;
+  config.customStyle = null;
+  config.elementId = null;
+  config.prose = true;
+}
+
 export function applyArticleTagDefaults(config: Record<string, unknown>): void {
   // Extends text block config + tag display style
   config.tag = "p";
@@ -536,6 +565,7 @@ const CONTAINER_PRESET_WIDTHS = [
   "w-1/3",
   "w-1/4",
   "w-page",
+  "w-prose",
   "w-auto",
   "w-screen",
 ];
@@ -607,6 +637,7 @@ export function ContainerBlockEditor({
               <option value="w-1/3">Third Width (33%)</option>
               <option value="w-1/4">Quarter Width (25%)</option>
               <option value="w-page">Page width (max-w-5xl)</option>
+              <option value="w-prose">Reading width (max-w-prose)</option>
               <option value="w-auto">Hug Contents (Auto)</option>
               <option value="w-screen">Full Screen (100vw)</option>
               <option value="__custom__">Custom (px)…</option>

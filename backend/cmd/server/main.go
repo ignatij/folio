@@ -270,6 +270,7 @@ func main() {
 	api.GET("/config/home", publicH.GetHomeSections)
 	api.GET("/config/header", publicH.GetHeaderSections)
 	api.GET("/config/footer-sections", publicH.GetFooterSections)
+	api.GET("/config/article-layout", publicH.GetArticleLayoutConfig)
 	api.GET("/config/ui-strings", publicH.GetUIStrings)
 
 	// Public articles

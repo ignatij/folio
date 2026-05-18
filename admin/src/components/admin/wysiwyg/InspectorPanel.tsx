@@ -14,10 +14,11 @@ import { TemplateInspector } from "./TemplateInspector";
 import { ArticlesInspector } from "./ArticlesInspector";
 import { ArticleFieldInspector } from "./ArticleFieldInspector";
 import { ArticleCardInspector } from "./ArticleCardInspector";
+import { ArticleBodyInspector } from "./ArticleBodyInspector";
 
 interface InspectorPanelProps {
   block: HomeBlock | PageBlock | null;
-  mode: "home" | "page";
+  mode: "home" | "page" | "article";
   activeLang: string;
   onConfigChange: (id: string, key: string, value: unknown) => void;
   onTransChange: (id: string, key: string, value: string) => void;
@@ -189,6 +190,15 @@ export function InspectorPanel({
           />
         )}
 
+        {block.type === "article-body" && (
+          <ArticleBodyInspector
+            blockId={block.id}
+            config={block.config}
+            onConfigChange={cfgChange}
+            themeColors={themeColors}
+          />
+        )}
+
         {![
           "container",
           "slideshow",
@@ -202,6 +212,7 @@ export function InspectorPanel({
           "article-excerpt",
           "article-date",
           "article-tag",
+          "article-body",
         ].includes(block.type) && (
           <TemplateInspector
             block={block}

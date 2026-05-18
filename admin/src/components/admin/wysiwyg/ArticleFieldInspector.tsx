@@ -1,5 +1,11 @@
 import { TextInspector } from "./TextInspector";
-import { SpacingSection, sLabel } from "./InspectorShared";
+import {
+  SpacingSection,
+  ElementIdSection,
+  CustomStyleSection,
+  sLabel,
+} from "./InspectorShared";
+import { AnimationSection } from "./AnimationSection";
 
 type ArticleFieldType =
   | "article-image"
@@ -134,7 +140,10 @@ function ArticleImageSettings({
           />
         </div>
         <SpacingSection config={c} onChange={onConfigChange} />
+        <ElementIdSection config={c} onChange={onConfigChange} />
+        <CustomStyleSection config={c} onChange={onConfigChange} />
       </div>
+      <AnimationSection config={c} onConfigChange={onConfigChange} />
     </div>
   );
 }

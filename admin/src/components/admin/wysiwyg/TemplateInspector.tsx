@@ -23,7 +23,7 @@ import {
 
 interface TemplateInspectorProps {
   block: HomeBlock | PageBlock;
-  mode: "home" | "page";
+  mode: "home" | "page" | "article";
   activeLang: string;
   onConfigChange: (key: string, value: unknown) => void;
   onTransChange: (key: string, value: string) => void;
