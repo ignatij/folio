@@ -3,7 +3,6 @@
 
 {%- set _dir = "flex-row" if cc.direction !== "col" else "flex-col" -%}
 {%- set _wrap = " flex-wrap" if cc.wrap === "wrap" else "" -%}{%- set _wClass = "" -%}
-{%- set _wClass = "" -%}
 {%- set _wStyle = "" -%}
 {%- if cc.width === "w-page" -%}
   {%- set _wClass = "w-full max-w-5xl mx-auto" -%}

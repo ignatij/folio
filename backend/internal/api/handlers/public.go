@@ -311,9 +311,30 @@ func (h *PublicHandler) GetFooterSections(c echo.Context) error {
 }
 
 // GetArticleLayoutConfig returns the article page section builder config.
-// GET /api/v1/config/article-layout
+// GET /api/v1/config/article-layout?lang=en
 func (h *PublicHandler) GetArticleLayoutConfig(c echo.Context) error {
-	return h.getSettingOrDefault(c, "article_sections", "[]")
+	lang := c.QueryParam("lang")
+	if lang == "" {
+		lang = h.cfg.DefaultLanguage().Code
+	}
+
+	raw, err := h.repo.GetSetting(c.Request().Context(), "article_sections")
+	if err != nil {
+		return respondError(c, http.StatusInternalServerError, "failed to load article sections")
+	}
+	if raw == "" {
+		return c.JSONBlob(http.StatusOK, []byte("[]"))
+	}
+
+	var blocks []map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(raw), &blocks); err != nil {
+		return c.JSONBlob(http.StatusOK, []byte(raw))
+	}
+
+	resolveBlockTranslations(blocks, lang)
+
+	out, _ := json.Marshal(blocks)
+	return c.JSONBlob(http.StatusOK, out)
 }
 
 // getSettingOrDefault returns a DB setting value as raw JSON, or a default blob.

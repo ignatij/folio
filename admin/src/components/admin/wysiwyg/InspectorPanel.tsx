@@ -213,7 +213,6 @@ export function InspectorPanel({
           "article-date",
           "article-tag",
           "article-body",
-          "article-body",
         ].includes(block.type) && (
           <TemplateInspector
             block={block}

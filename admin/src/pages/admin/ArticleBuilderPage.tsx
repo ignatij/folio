@@ -119,6 +119,24 @@ export default function ArticleBuilderPage() {
 
   const articles = articlesData?.items ?? [];
 
+  function handleCopyBlocksFrom(fromLang: string) {
+    setBlocks((prev) =>
+      prev.map((block) => ({
+        ...block,
+        translations: {
+          ...block.translations,
+          [activeLang]: JSON.parse(
+            JSON.stringify(
+              block.translations?.[fromLang] ??
+                block.translations?.[activeLang] ??
+                {},
+            ),
+          ),
+        },
+      })),
+    );
+  }
+
   if (settingsLoading)
     return <div className="p-6 text-(--color-muted)">Loading…</div>;
 
@@ -151,6 +169,7 @@ export default function ArticleBuilderPage() {
       languages={languages}
       activeLang={activeLang}
       onActiveLangChange={setActiveLang}
+      onCopyBlocksFrom={languages.length > 1 ? handleCopyBlocksFrom : undefined}
       blocks={blocks}
       onBlocksChange={(updated) => setBlocks(updated as HomeBlock[])}
       onSave={() => saveMutation.mutate(blocks)}

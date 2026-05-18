@@ -15,9 +15,10 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
 {% block description %}{{ article.meta_description or article.excerpt }}{% endblock %}
 
 {% block content %}
-{% if article_layout.sections | length %}
+{% set _articleSections = article_layout.byLang[lang] %}
+{% if _articleSections | length %}
   {%- set _articleCtx = article -%}
-  {% for block in article_layout.sections %}
+  {% for block in _articleSections %}
     {% if block.type === "hero" %}
       {% set b = block %}
       {% include "partials/blocks/hero.njk" %}
