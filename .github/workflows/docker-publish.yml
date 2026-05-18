@@ -5,6 +5,12 @@ on:
     tags:
       - "v*.*.*"
 
+# Ensure GITHUB_TOKEN can write releases and packages regardless of
+# the repository's default workflow-permission setting.
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   # ── 1. Generate changelog & create GitHub Release ─────────────────────────
   release:
