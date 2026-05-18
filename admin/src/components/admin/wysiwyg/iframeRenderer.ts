@@ -297,8 +297,8 @@ function containerToHtml(
 ): string {
   const c = block.config;
   const baseCls = containerClassNames(c);
-  const extraCls = containerExtraClasses(c);
-  const cls = extraCls ? `${baseCls} ${extraCls}` : baseCls;
+  const extraStyle = containerExtraStyle(c);
+  const cls = baseCls;
   const customStyle = (c.customStyle as string) || "";
   const bgImg = (c.backgroundImage as string) || "";
   const bgSize = (c.backgroundSize as string) ?? "cover";
@@ -312,10 +312,19 @@ function containerToHtml(
     : "";
   const cw = (c.width as string) ?? "w-full";
   const ch = (c.height as string) ?? "h-auto";
-  const customWidthStyle  = !cw.startsWith("w-") ? `width:${cw};`  : "";
+  const customWidthStyle = !cw.startsWith("w-") ? `width:${cw};` : "";
   const customHeightStyle = !ch.startsWith("h-") ? `height:${ch};` : "";
   const anim = animAttrs(c);
-  const fullStyle = [anim.style, customWidthStyle, customHeightStyle, bgStyle, customStyle].filter(Boolean).join("");
+  const fullStyle = [
+    anim.style,
+    customWidthStyle,
+    customHeightStyle,
+    extraStyle,
+    bgStyle,
+    customStyle,
+  ]
+    .filter(Boolean)
+    .join("");
   const styleAttr = fullStyle ? ` style="${escAttr(fullStyle)}"` : "";
   const fullCls = [cls, anim.cls].filter(Boolean).join(" ");
   const animData = anim.cls ? ` ${anim.data}` : "";
@@ -346,7 +355,7 @@ ${label}
 function slideshowToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
   navSnapshot: NavSnapshot = {},
   articleCtx?: MockArticle,
 ): string {
@@ -364,16 +373,24 @@ function slideshowToHtml(
   const swipe = (c.swipe as boolean) !== false;
 
   const widthMap: Record<string, string> = {
-    "w-full": "100%", "w-1/2": "50%", "w-1/3": "33.333%",
-    "w-1/4": "25%", "w-page": "min(64rem,100%)", "w-screen": "100vw",
+    "w-full": "100%",
+    "w-1/2": "50%",
+    "w-1/3": "33.333%",
+    "w-1/4": "25%",
+    "w-page": "min(64rem,100%)",
+    "w-prose": "min(65ch,100%)",
+    "w-screen": "100vw",
   };
   const heightMap: Record<string, string> = {
-    "h-auto": "auto", "h-48": "12rem", "h-64": "16rem",
-    "h-96": "24rem", "h-screen": "min(100vh,1080px)",
+    "h-auto": "auto",
+    "h-48": "12rem",
+    "h-64": "16rem",
+    "h-96": "24rem",
+    "h-screen": "min(100vh,1080px)",
   };
   const touchAction = direction === "vertical" ? "pan-x" : "pan-y";
-  const wStyle = widthMap[width]   ?? width   ?? "100%";
-  const hStyle = heightMap[height] ?? height  ?? "24rem";
+  const wStyle = widthMap[width] ?? width ?? "100%";
+  const hStyle = heightMap[height] ?? height ?? "24rem";
 
   const slides = [...(block.children ?? [])]
     .filter((ch) => ch.visible !== false)
@@ -386,7 +403,13 @@ function slideshowToHtml(
     slidesHtml = slides
       .map((ch, i) => {
         const isActive = i === 0;
-        const innerHtml = blockToHtml(ch, activeLang, mode, navSnapshot, articleCtx);
+        const innerHtml = blockToHtml(
+          ch,
+          activeLang,
+          mode,
+          navSnapshot,
+          articleCtx,
+        );
         return `<div data-slide-index="${i}" class="slideshow-slide${isActive ? " slide-active" : ""}" style="transition-duration:${duration}ms;transition-timing-function:${easing};" aria-hidden="${isActive ? "false" : "true"}">${innerHtml}</div>`;
       })
       .join("\n");
@@ -442,8 +465,8 @@ function articleCardToHtml(
   // Standalone cards use the first mock article for preview
   const ctx = articleCtx ?? MOCK_ARTICLES[0];
   const baseCls = containerClassNames(c);
-  const extraCls = containerExtraClasses(c);
-  const cls = extraCls ? `${baseCls} ${extraCls}` : baseCls;
+  const extraStyle = containerExtraStyle(c);
+  const cls = baseCls;
   const label = `<span class="wysiwyg-label">⧫ Article Card</span>`;
 
   const children = [...(block.children ?? [])]
@@ -461,7 +484,8 @@ function articleCardToHtml(
     ? `<span style="position:absolute;top:2px;right:2px;background:#8b5cf6;color:#fff;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;pointer-events:none;">standalone</span>`
     : "";
 
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-card" class="${escAttr(cls)}" style="position:relative;">${label}${standaloneBadge}${inner}</div>`;
+  const cardStyle = `position:relative;${extraStyle}`;
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-card" class="${escAttr(cls)}" style="${escAttr(cardStyle)}">${label}${standaloneBadge}${inner}</div>`;
 }
 
 function articleGridToHtml(
@@ -541,15 +565,23 @@ function articleImageHtml(block: RenderBlock, ctx?: MockArticle): string {
     .filter(Boolean)
     .join(" ");
 
+  const anim = animAttrs(c);
+  const elementId = (c.elementId as string) || "";
+  const customStyle = (c.customStyle as string) || "";
+  const idAttr = elementId ? ` id="${escAttr(elementId)}"` : "";
+  const allWrapCls = [wrapCls, anim.cls].filter(Boolean).join(" ");
+  const imgWrapStyle = `position:relative;width:100%;${anim.style}${customStyle}`;
+  const animDataAttr = anim.data ? ` ${anim.data}` : "";
+
   if (ctx?.cover) {
-    return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-image" class="${wrapCls}" style="position:relative;width:100%;">
+    return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-image"${idAttr} class="${escAttr(allWrapCls)}" style="${escAttr(imgWrapStyle)}"${animDataAttr}>
       <span class="wysiwyg-label">↗ Article Image</span>
       <div style="position:relative;width:100%;padding-bottom:${pct}%;overflow:hidden;border-radius:${br}px;">
         <img src="${escAttr(ctx.cover)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:${escAttr(fit)};" />
       </div>
     </div>`;
   }
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-image" class="${wrapCls}" style="position:relative;width:100%;">
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-image"${idAttr} class="${escAttr(allWrapCls)}" style="${escAttr(imgWrapStyle)}"${animDataAttr}>
     <span class="wysiwyg-label">↗ Article Image</span>
     <div style="position:relative;width:100%;padding-bottom:${pct}%;overflow:hidden;background:#e5e7eb;border-radius:${br}px;">
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9ca3af;">
@@ -598,15 +630,18 @@ function buildArticleTextCls(
   const customStyle = (c.customStyle as string) || "";
 
   const cls: string[] = [];
-  cls.push(
-    fontSize ? `text-[${fontSize}px]` : (defaults.fontSize ?? "text-base"),
-  );
+  const dynStyle: string[] = [];
+  if (fontSize) {
+    dynStyle.push(`font-size:${fontSize}px;`);
+  } else {
+    cls.push(defaults.fontSize ?? "text-base");
+  }
   cls.push(twWeightMap[fontWeight] ?? "font-normal");
   cls.push(twAlignMap[textAlign] ?? "text-left");
   if (italic) cls.push("italic");
-  if (color) cls.push(`text-[${color}]`);
-  if (letterSpacing) cls.push(`tracking-[${letterSpacing / 100}em]`);
-  if (lineHeight) cls.push(`leading-[${lineHeight}]`);
+  if (color) dynStyle.push(`color:${color};`);
+  if (letterSpacing) dynStyle.push(`letter-spacing:${letterSpacing / 100}em;`);
+  if (lineHeight) dynStyle.push(`line-height:${lineHeight};`);
   const twTransform: Record<string, string> = {
     uppercase: "uppercase",
     lowercase: "lowercase",
@@ -616,7 +651,7 @@ function buildArticleTextCls(
     cls.push(twTransform[textTransform] ?? "");
   if (textDecoration === "underline") cls.push("underline");
   else if (textDecoration === "line-through") cls.push("line-through");
-  if (bgColor) cls.push(`bg-[${bgColor}]`);
+  if (bgColor) dynStyle.push(`background-color:${bgColor};`);
   cls.push(spClass(c.paddingTop, "pt"));
   cls.push(spClass(c.paddingBottom, "pb"));
   cls.push(spClass(c.paddingLeft, "pl"));
@@ -625,11 +660,12 @@ function buildArticleTextCls(
   cls.push(spClass(c.marginBottom, "mb"));
   cls.push(spClass(c.marginLeft, "ml"));
   cls.push(spClass(c.marginRight, "mr"));
-  if (maxWidth) cls.push(`max-w-[${maxWidth}]`);
+  if (maxWidth) dynStyle.push(`max-width:${maxWidth};`);
 
+  const allStyle = dynStyle.join("") + customStyle;
   return {
     classAttr: cls.filter(Boolean).join(" "),
-    styleAttr: customStyle ? ` style="${escAttr(customStyle)}"` : "",
+    styleAttr: allStyle ? ` style="${escAttr(allStyle)}"` : "",
   };
 }
 
@@ -653,7 +689,11 @@ function articleTitleHtml(block: RenderBlock, ctx?: MockArticle): string {
   const headingStyle = styleAttr
     ? styleAttr.replace(' style="', ' style="margin:0;')
     : ' style="margin:0;"';
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-title" style="position:relative;display:block;">
+  const anim = animAttrs(c);
+  const wrapClass = anim.cls ? ` class="${escAttr(anim.cls)}"` : "";
+  const animDataAttr = anim.data ? ` ${anim.data}` : "";
+  const titleWrapStyle = `position:relative;display:block;${anim.style}`;
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-title"${wrapClass} style="${escAttr(titleWrapStyle)}"${animDataAttr}>
     <span class="wysiwyg-label">↗ Article Title</span>
     <${safeTag} class="${escAttr(classAttr)}"${headingStyle}><a href="#" style="color:inherit;text-decoration:none;">${escHtml(title)}</a></${safeTag}>
   </div>`;
@@ -680,7 +720,11 @@ function articleExcerptHtml(block: RenderBlock, ctx?: MockArticle): string {
   const pStyle = styleAttr
     ? styleAttr.replace(' style="', ` style="${baseStyle}`)
     : ` style="${baseStyle}"`;
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-excerpt" style="position:relative;display:block;">
+  const anim = animAttrs(c);
+  const wrapClass = anim.cls ? ` class="${escAttr(anim.cls)}"` : "";
+  const animDataAttr = anim.data ? ` ${anim.data}` : "";
+  const excerptWrapStyle = `position:relative;display:block;${anim.style}`;
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-excerpt"${wrapClass} style="${escAttr(excerptWrapStyle)}"${animDataAttr}>
     <span class="wysiwyg-label">↗ Article Excerpt</span>
     <p class="${escAttr(classAttr)}"${pStyle}>${escHtml(text)}</p>
   </div>`;
@@ -695,7 +739,11 @@ function articleDateHtml(block: RenderBlock, ctx?: MockArticle): string {
     color: "var(--color-muted,#6b7280)",
   });
   const date = ctx?.date ?? "Jan 1, 2025";
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-date" style="position:relative;display:inline-block;">
+  const anim = animAttrs(c);
+  const wrapClass = anim.cls ? ` class="${escAttr(anim.cls)}"` : "";
+  const animDataAttr = anim.data ? ` ${anim.data}` : "";
+  const dateWrapStyle = `position:relative;display:inline-block;${anim.style}`;
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-date"${wrapClass} style="${escAttr(dateWrapStyle)}"${animDataAttr}>
     <span class="wysiwyg-label">↗ Article Date</span>
     <time class="${escAttr(classAttr)}"${styleAttr}>${escHtml(date)}</time>
   </div>`;
@@ -730,7 +778,10 @@ function articleTagHtml(block: RenderBlock, ctx?: MockArticle): string {
     .filter(Boolean)
     .join(" ");
 
-  const wrapStyle = `position:relative;display:inline-block;${customStyle ? customStyle : ""}`;
+  const anim = animAttrs(c);
+  const allWrapCls = [wrapCls, anim.cls].filter(Boolean).join(" ");
+  const tagWrapStyle = `position:relative;display:inline-block;${anim.style}${customStyle}`;
+  const animDataAttr = anim.data ? ` ${anim.data}` : "";
 
   const fs = fontSize ? `${fontSize}px` : "11px";
   const fw =
@@ -755,7 +806,7 @@ function articleTagHtml(block: RenderBlock, ctx?: MockArticle): string {
       .join(";") + ";";
 
   const tag = ctx?.tag ?? "Tag";
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-tag" class="${escAttr(wrapCls)}" style="${escAttr(wrapStyle)}">
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-tag" class="${escAttr(allWrapCls)}" style="${escAttr(tagWrapStyle)}"${animDataAttr}>
     <span class="wysiwyg-label">↗ Article Tag</span>
     <span style="${escAttr(badgeStyle)}">${escHtml(tag)}</span>
   </div>`;
@@ -768,16 +819,43 @@ function articleBodyHtml(
   const c = block.config;
   const id = escAttr(block.id);
   const baseCls = containerClassNames(c);
-  const extraCls = containerExtraClasses(c);
-  const proseCls = c.prose !== false ? "prose max-w-none" : "";
-  const cls = [baseCls, extraCls, proseCls].filter(Boolean).join(" ");
+  const extraStyle = containerExtraStyle(c);
+  const proseCls =
+    c.prose !== false
+      ? c.width === "w-prose"
+        ? "prose"
+        : "prose max-w-none"
+      : "";
+  const anim = animAttrs(c);
+  const cls = [baseCls, anim.cls, proseCls].filter(Boolean).join(" ");
   const customStyle = (c.customStyle as string) || "";
-  const styleAttr = customStyle ? ` style="${escAttr(customStyle)}"` : "";
+  const cw = (c.width as string) ?? "w-full";
+  const ch = (c.height as string) ?? "h-auto";
+  const bgImg = (c.backgroundImage as string) || "";
+  const bgSize = (c.backgroundSize as string) ?? "cover";
+  const bgPos = (c.backgroundPosition as string) ?? "center";
+  const bgStyle = bgImg
+    ? `background-image:url('${escAttr(bgImg)}');background-size:${bgSize};background-position:${bgPos};background-repeat:no-repeat;`
+    : "";
+  const customWidthStyle = !cw.startsWith("w-") ? `width:${cw};` : "";
+  const customHeightStyle = !ch.startsWith("h-") ? `height:${ch};` : "";
+  const fullStyle = [
+    anim.style,
+    customWidthStyle,
+    customHeightStyle,
+    extraStyle,
+    bgStyle,
+    customStyle,
+  ]
+    .filter(Boolean)
+    .join("");
+  const styleAttr = fullStyle ? ` style="${escAttr(fullStyle)}"` : "";
+  const animDataAttr = anim.data ? ` ${anim.data}` : "";
   const label = `<span class="wysiwyg-label">↗ Article Body</span>`;
   const bodyHtml =
     (ctx as ArticleCtx | undefined)?.body ??
     `<p style="color:#9ca3af;font-size:13px;text-align:center;padding:24px;">Article body will appear here</p>`;
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-body" class="${escAttr(cls)}"${styleAttr}>
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-body" class="${escAttr(cls)}"${styleAttr}${animDataAttr}>
   ${label}
   ${bodyHtml}
 </div>`;
@@ -855,12 +933,14 @@ function containerClassNames(c: Record<string, unknown>): string {
     cls.push("max-w-5xl");
     cls.push("mx-auto");
   } else if (w === "w-prose") {
+    cls.push("w-full");
     cls.push("max-w-prose");
     cls.push("mx-auto");
   } else if (w === "w-auto") cls.push("w-auto");
   else if (w === "w-screen") cls.push("w-screen");
-  else if (!w.startsWith("w-")) { /* custom px — handled via inline style */ }
-  else cls.push("w-full");
+  else if (!w.startsWith("w-")) {
+    /* custom px — handled via inline style */
+  } else cls.push("w-full");
 
   const h = (c.height as string) ?? "h-auto";
   if (h === "h-full") cls.push("h-full");
@@ -870,14 +950,14 @@ function containerClassNames(c: Record<string, unknown>): string {
   return cls.join(" ");
 }
 
-function containerExtraClasses(c: Record<string, unknown>): string {
-  const cls: string[] = [];
-  if (c.backgroundColor) cls.push(`bg-[${c.backgroundColor}]`);
+function containerExtraStyle(c: Record<string, unknown>): string {
+  const parts: string[] = [];
+  if (c.backgroundColor) parts.push(`background-color:${c.backgroundColor};`);
   // background-image is rendered as inline style, not a Tailwind class
   if (c.borderRadius && (c.borderRadius as number) > 0)
-    cls.push(`rounded-[${c.borderRadius}px]`);
-  if (c.textColor) cls.push(`text-[${c.textColor}]`);
-  return cls.join(" ");
+    parts.push(`border-radius:${c.borderRadius}px;`);
+  if (c.textColor) parts.push(`color:${c.textColor};`);
+  return parts.join("");
 }
 
 // ── Text ──────────────────────────────────────────────────────────────────────
@@ -918,6 +998,7 @@ function textToHtml(
 
   // ── Build Tailwind class list ──────────────────────────────────────────────
   const cls: string[] = [];
+  const dynStyle: string[] = [];
 
   // Font size: explicit px OR tag-based heading class
   const tagSizeMap: Record<string, string> = {
@@ -926,9 +1007,11 @@ function textToHtml(
     h3: "text-2xl",
     h4: "text-xl",
   };
-  cls.push(
-    fontSize ? `text-[${fontSize}px]` : (tagSizeMap[safeTag] ?? "text-base"),
-  );
+  if (fontSize) {
+    dynStyle.push(`font-size:${fontSize}px;`);
+  } else {
+    cls.push(tagSizeMap[safeTag] ?? "text-base");
+  }
 
   const twWeight: Record<string, string> = {
     normal: "font-normal",
@@ -947,9 +1030,9 @@ function textToHtml(
   cls.push(twAlign[textAlign] ?? "text-left");
 
   if (italic) cls.push("italic");
-  if (color) cls.push(`text-[${color}]`);
-  if (letterSpacing) cls.push(`tracking-[${letterSpacing / 100}em]`);
-  if (lineHeight) cls.push(`leading-[${lineHeight}]`);
+  if (color) dynStyle.push(`color:${color};`);
+  if (letterSpacing) dynStyle.push(`letter-spacing:${letterSpacing / 100}em;`);
+  if (lineHeight) dynStyle.push(`line-height:${lineHeight};`);
 
   const twTransform: Record<string, string> = {
     uppercase: "uppercase",
@@ -962,7 +1045,7 @@ function textToHtml(
   if (textDecoration === "underline") cls.push("underline");
   else if (textDecoration === "line-through") cls.push("line-through");
 
-  if (bgColor) cls.push(`bg-[${bgColor}]`);
+  if (bgColor) dynStyle.push(`background-color:${bgColor};`);
 
   // Always set all 4 padding/margin sides to prevent browser default margins
   cls.push(spClass(c.paddingTop, "pt"));
@@ -974,10 +1057,11 @@ function textToHtml(
   cls.push(spClass(c.marginLeft, "ml"));
   cls.push(spClass(c.marginRight, "mr"));
 
-  if (maxWidth) cls.push(`max-w-[${maxWidth}]`);
+  if (maxWidth) dynStyle.push(`max-width:${maxWidth};`);
 
   const classAttr = cls.filter(Boolean).join(" ");
-  const styleAttr = customStyle ? ` style="${escAttr(customStyle)}"` : "";
+  const allStyle = dynStyle.join("") + customStyle;
+  const styleAttr = allStyle ? ` style="${escAttr(allStyle)}"` : "";
   const idAttr = elementId ? ` id="${escAttr(elementId)}"` : "";
   const anim = animAttrs(c);
   const wrapStyle = anim.style
@@ -1034,7 +1118,6 @@ function buttonToHtml(block: RenderBlock): string {
     sz.px,
     sz.text,
     twWeight[fontWeight] ?? "font-semibold",
-    `rounded-[${borderRadius}px]`,
     "cursor-pointer",
     "no-underline",
     "leading-[1.25]",
@@ -1045,24 +1128,23 @@ function buttonToHtml(block: RenderBlock): string {
   ];
 
   const accent = "var(--color-accent,#3b82f6)";
+  const btnStyleParts: string[] = [`border-radius:${borderRadius}px;`];
   if (variant === "filled") {
-    btnCls.push(`bg-[${bgColor ?? accent}]`);
-    btnCls.push(`text-[${textColor ?? "#fff"}]`);
+    btnStyleParts.push(`background-color:${bgColor ?? accent};`);
+    btnStyleParts.push(`color:${textColor ?? "#fff"};`);
     btnCls.push("border-transparent");
   } else if (variant === "outline") {
     btnCls.push("bg-transparent");
-    btnCls.push(`text-[${textColor ?? bgColor ?? accent}]`);
-    btnCls.push(`border-[${borderColor ?? bgColor ?? accent}]`);
+    btnStyleParts.push(`color:${textColor ?? bgColor ?? accent};`);
+    btnStyleParts.push(`border-color:${borderColor ?? bgColor ?? accent};`);
   } else {
     // ghost
     btnCls.push("bg-transparent");
-    btnCls.push(`text-[${textColor ?? bgColor ?? accent}]`);
+    btnStyleParts.push(`color:${textColor ?? bgColor ?? accent};`);
     btnCls.push("border-transparent");
   }
 
-  const btnStyleAttr = btnCustomStyle
-    ? ` style="${escAttr(btnCustomStyle)}"`
-    : "";
+  const btnStyleAttr = ` style="${escAttr(btnStyleParts.join("") + btnCustomStyle)}"`;
   const btnIdAttr = btnElementId ? ` id="${escAttr(btnElementId)}"` : "";
 
   // ── Wrapper classes ────────────────────────────────────────────────────────

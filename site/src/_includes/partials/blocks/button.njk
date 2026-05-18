@@ -23,20 +23,19 @@
 {%- set _accent = "var(--color-accent)" -%}
 
 {# Button anchor classes #}
-{%- set _btnCls = ["inline-block", _py, _px, _fs, _fw, "rounded-[" + _br + "px]", "cursor-pointer", "no-underline", "leading-[1.25]", "transition-opacity", "duration-150", "border-2", "border-solid"] -%}
+{%- set _btnCls = ["inline-block", _py, _px, _fs, _fw, "cursor-pointer", "no-underline", "leading-[1.25]", "transition-opacity", "duration-150", "border-2", "border-solid"] -%}
+{%- set _btnStyle = "border-radius:" + _br + "px;" -%}
 {%- set _variant = cc.variant if cc.variant else "filled" -%}
 {%- if _variant === "outline" -%}
   {%- set _btnCls = (_btnCls.push("bg-transparent"), _btnCls) -%}
-  {%- set _btnCls = (_btnCls.push("text-[" + (cc.textColor if cc.textColor else (cc.bgColor if cc.bgColor else _accent)) + "]"), _btnCls) -%}
-  {%- set _btnCls = (_btnCls.push("border-[" + (cc.borderColor if cc.borderColor else (cc.bgColor if cc.bgColor else _accent)) + "]"), _btnCls) -%}
+  {%- set _btnStyle = _btnStyle + "color:" + (cc.textColor if cc.textColor else (cc.bgColor if cc.bgColor else _accent)) + ";border-color:" + (cc.borderColor if cc.borderColor else (cc.bgColor if cc.bgColor else _accent)) + ";" -%}
 {%- elif _variant === "ghost" -%}
   {%- set _btnCls = (_btnCls.push("bg-transparent"), _btnCls) -%}
-  {%- set _btnCls = (_btnCls.push("text-[" + (cc.textColor if cc.textColor else (cc.bgColor if cc.bgColor else _accent)) + "]"), _btnCls) -%}
   {%- set _btnCls = (_btnCls.push("border-transparent"), _btnCls) -%}
+  {%- set _btnStyle = _btnStyle + "color:" + (cc.textColor if cc.textColor else (cc.bgColor if cc.bgColor else _accent)) + ";" -%}
 {%- else -%}
-  {%- set _btnCls = (_btnCls.push("bg-[" + (cc.bgColor if cc.bgColor else _accent) + "]"), _btnCls) -%}
-  {%- set _btnCls = (_btnCls.push("text-[" + (cc.textColor if cc.textColor else "#fff") + "]"), _btnCls) -%}
   {%- set _btnCls = (_btnCls.push("border-transparent"), _btnCls) -%}
+  {%- set _btnStyle = _btnStyle + "background-color:" + (cc.bgColor if cc.bgColor else _accent) + ";color:" + (cc.textColor if cc.textColor else "#fff") + ";" -%}
 {%- endif -%}
 
 {# Text align on wrapper #}
@@ -70,5 +69,5 @@
   <a{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}
      href="{{ cc.href if cc.href else '#' }}"
      target="{{ cc.target if cc.target else '_self' }}"
-     class="{{ _btnCls | join(' ') }}"{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %}>{{ cc.label if cc.label else "Button" }}</a>
+     class="{{ _btnCls | join(' ') }}" style="{{ _btnStyle }}{{ cc.customStyle }}">{{ cc.label if cc.label else "Button" }}</a>
 </div>

@@ -1,4 +1,5 @@
 import { ContainerBlockEditor, BLOCK_LABELS } from "../blockShared";
+import { AnimationSection } from "./AnimationSection";
 
 interface ArticleBodyInspectorProps {
   blockId: string;
@@ -48,6 +49,8 @@ export function ArticleBodyInspector({
           themeColors={themeColors}
         />
       </div>
+
+      <AnimationSection config={c} onConfigChange={onConfigChange} />
     </div>
   );
 }

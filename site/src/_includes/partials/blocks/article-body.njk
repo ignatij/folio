@@ -1,6 +1,8 @@
 {%- if _articleCtx -%}
 {%- set cc = b.config -%}
 
+{%- set _dir = "flex-row" if cc.direction !== "col" else "flex-col" -%}
+{%- set _wrap = " flex-wrap" if cc.wrap === "wrap" else "" -%}{%- set _wClass = "" -%}
 {%- set _wClass = "" -%}
 {%- set _wStyle = "" -%}
 {%- if cc.width === "w-page" -%}
@@ -12,10 +14,15 @@
 {%- else -%}
   {%- set _wStyle = "width:" + cc.width + ";" -%}
 {%- endif -%}
-
-{%- set _dir = "flex-row" if cc.direction !== "col" else "flex-col" -%}
-{%- set _wrap = " flex-wrap" if cc.wrap === "wrap" else "" -%}
-{%- set _h = (" " + cc.height) if cc.height and cc.height !== "h-auto" else "" -%}
+{%- set _hClass = "" -%}
+{%- set _hStyle = "" -%}
+{%- if not cc.height or cc.height === "h-auto" -%}
+  {# no height class needed #}
+{%- elif cc.height.startsWith("h-") -%}
+  {%- set _hClass = " " + cc.height -%}
+{%- else -%}
+  {%- set _hStyle = "height:" + cc.height + ";" -%}
+{%- endif -%}
 
 {%- set _jus = "justify-start" -%}
 {%- if cc.justify === "center" %}{%- set _jus = "justify-center" -%}
@@ -58,20 +65,24 @@
 {%- endif -%}
 
 {%- set _xCls = [] -%}
-{%- if cc.backgroundColor %}{%- set _xCls = (_xCls.push("bg-[" + cc.backgroundColor + "]"), _xCls) -%}{%- endif -%}
-{%- if cc.borderRadius and cc.borderRadius > 0 %}{%- set _xCls = (_xCls.push("rounded-[" + cc.borderRadius + "px]"), _xCls) -%}{%- endif -%}
-{%- if cc.textColor %}{%- set _xCls = (_xCls.push("text-[" + cc.textColor + "]"), _xCls) -%}{%- endif -%}
-{%- set _proseCls = "prose max-w-none" if cc.prose !== false else "" -%}
+{%- if cc.animation and cc.animation !== "none" -%}{%- set _xCls = (_xCls.push("anim-child animate-" + cc.animation), _xCls) -%}{%- endif -%}
+{%- if cc.prose !== false -%}
+{%- set _proseCls = "prose" if cc.width === "w-prose" else "prose max-w-none" -%}
+{%- else -%}{%- set _proseCls = "" -%}{%- endif -%}
 {%- set _bgStyle = "" -%}
+{%- if cc.backgroundColor %}{%- set _bgStyle = _bgStyle + "background-color:" + cc.backgroundColor + ";" -%}{%- endif -%}
+{%- if cc.textColor %}{%- set _bgStyle = _bgStyle + "color:" + cc.textColor + ";" -%}{%- endif -%}
+{%- if cc.borderRadius and cc.borderRadius > 0 %}{%- set _bgStyle = _bgStyle + "border-radius:" + cc.borderRadius + "px;" -%}{%- endif -%}
 {%- if cc.backgroundImage -%}
   {%- set _bgSize = cc.backgroundSize if cc.backgroundSize else "cover" -%}
   {%- set _bgPos = cc.backgroundPosition if cc.backgroundPosition else "center" -%}
-  {%- set _bgStyle = "background-image:url('" + cc.backgroundImage + "');background-size:" + _bgSize + ";background-position:" + _bgPos + ";background-repeat:no-repeat;" -%}
+  {%- set _bgStyle = _bgStyle + "background-image:url('" + cc.backgroundImage + "');background-size:" + _bgSize + ";background-position:" + _bgPos + ";background-repeat:no-repeat;" -%}
 {%- endif -%}
 {%- set _bgStyle = (_bgStyle + (cc.customStyle if cc.customStyle else "")) -%}
 
-<div {% if cc.elementId %}id="{{ cc.elementId }}"{% endif %} class="flex {{ _dir }}{{ _wrap }} {{ _wClass }} {{ _jus }} {{ _ali }} {{ _gap }} {{ _pad }} {{ _mar }} {{ _xCls | join(' ') }} {{ _proseCls }}"
-     {% if _bgStyle or _wStyle %}style="{{ _wStyle }}{{ _bgStyle }}"{% endif %}>
+<div {% if cc.elementId %}id="{{ cc.elementId }}"{% endif %} class="flex {{ _dir }}{{ _wrap }} {{ _wClass }}{{ _hClass }} {{ _jus }} {{ _ali }} {{ _gap }} {{ _pad }} {{ _mar }} {{ _xCls | join(' ') }} {{ _proseCls }}"
+  {%- if cc.animation and cc.animation !== "none" %} data-anim-trigger="{{ cc.animTrigger if cc.animTrigger else 'scroll' }}" data-anim-once="{{ 'false' if cc.animOnce === false else 'true' }}"{% endif %}
+  style="{% if cc.animation and cc.animation !== 'none' %}--anim-duration:{{ cc.animDuration if cc.animDuration else 600 }}ms;--anim-easing:{{ cc.animEasing if cc.animEasing else 'ease-out' }};--anim-delay:{{ cc.animDelay if cc.animDelay else 0 }}ms;{% endif %}{{ _wStyle }}{{ _hStyle }}{{ _bgStyle }}">
   {{ _articleCtx.body | safe }}
 </div>
 {%- endif -%}

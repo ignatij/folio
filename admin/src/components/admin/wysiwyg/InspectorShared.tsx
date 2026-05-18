@@ -93,12 +93,14 @@ export function ColorRow({
           className="relative w-5 h-5 rounded shrink-0 overflow-hidden"
           style={{
             border: "1px solid rgba(0,0,0,0.1)",
-            background: displayColor ?? undefined,
+            backgroundColor: displayColor ?? undefined,
             backgroundImage: !displayColor
               ? "linear-gradient(45deg,#aaa 25%,transparent 25%),linear-gradient(-45deg,#aaa 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#aaa 75%),linear-gradient(-45deg,transparent 75%,#aaa 75%)"
               : undefined,
-            backgroundSize: "8px 8px",
-            backgroundPosition: "0 0,0 4px,4px -4px,-4px 0",
+            backgroundSize: !displayColor ? "8px 8px" : undefined,
+            backgroundPosition: !displayColor
+              ? "0 0,0 4px,4px -4px,-4px 0"
+              : undefined,
           }}
         >
           {!isCssVar && (
