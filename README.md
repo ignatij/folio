@@ -5,11 +5,23 @@ A self-hostable, multilingual blog platform you can deploy in minutes.
 ## Features
 
 ### Content management
-- **Articles** — create and publish posts with a rich-text editor (bold, italic, headings, links, images, lists, tables); per-language translations, custom slugs, tags, author, and publish date
-- **Media library** — upload images and files; pick them directly inside the article editor or from any image field in Settings
-- **Tags** — manage content tags in Settings → General; tags are reflected live in the article editor and public tag filter
+- **Articles** — create and publish posts with a rich-text editor (bold, italic, headings, links, images, lists, tables); cover image, per-language translations, custom slugs, tags, author, and publish date
+- **Custom pages** — build free-form pages with the visual block editor and link them in the navigation
+- **Media library** — upload images and files; pick them directly inside the article editor or from any block inspector
+- **Tags** — manage content tags in Settings → General; reflected live in the article editor and public tag filter
 - **Contact submissions** — view and manage enquiries submitted through the public contact form
-- **Newsletter** — view subscriber list; subscribers added via the public unsubscribe page
+- **Newsletter** — view and export the subscriber list; subscribers opt in via the public unsubscribe page
+
+### Visual page builder
+- **WYSIWYG block editor** — drag-and-drop canvas with real-time theme preview; used for the Home page, Header, Footer, and all custom pages
+- **Block palette** — three categories of blocks:
+  - *Layout:* Container, Slideshow
+  - *Content:* Text, Image, Button
+  - *Templates:* Hero, CTA Band, Rich Text, Image + Text, Testimonials, Newsletter Subscribe, Featured Articles, Latest Articles
+- **Article blocks** — Article Grid and Article Card blocks with configurable field slots (image, title, excerpt, date, tag) for embedding article lists anywhere on a page
+- **Header & footer builders** — dedicated builders with Nav Links, Sub-navigation, Social Links, and preset blocks; live preview with your active theme applied
+- **Layers panel** — tree view of all blocks with reorder (drag or arrow buttons), hide/show toggle, and delete
+- **Per-language content** — every block's text fields are independently translated; copy all translations from another language in one click
 
 ### Multilingual
 - **N languages** — add any number of languages (BCP-47 codes, LTR/RTL) in Settings → Languages
@@ -19,21 +31,18 @@ A self-hostable, multilingual blog platform you can deploy in minutes.
 
 ### Public site (Eleventy SSG)
 - **Static output** — Eleventy generates a fast, SEO-friendly static site, rebuilt after every admin save
-- **Built-in pages** — Home (with configurable hero, CTA band), Articles (with tag filter), Contact form, Unsubscribe page
-- **Custom pages** — create additional free-form pages from the admin and link to them in the navigation
-- **Hero background image** — set a cover image on the Home page hero block via the admin page builder
+- **Built-in pages** — Home, Articles (with tag filter), Contact form, Unsubscribe
 - **Favicon & logo** — configure a browser tab favicon and a header logo image that replaces the site name in the nav
 
 ### Theming
 - **4 bundled presets** — `default`, `dark`, `minimal`, `warm`; swap instantly from Settings → Theme
 - **Live preview** — colour and font changes are previewed in the admin UI before saving
-- **Full customisation** — 15 colour tokens, body font + fallback stack, button / card / input border radii
-- **Template overrides** — drop `.njk` files into `site/src/user-theme/` to shadow any built-in partial
+- **Full customisation** — 15 colour tokens, body font + heading font + fallback stack, button / card / input border radii
 
 ### Infrastructure
-- **Go backend** — Echo v4, SQLite (WAL mode via `modernc.org/sqlite`), JWT authentication
+- **Go backend** — Echo v4, SQLite (WAL mode via `modernc.org/sqlite`), JWT authentication, optimistic concurrency
 - **React admin UI** — Vite + React 18 + TanStack Query v5 + Tailwind v4
-- **Docker-ready** — single `docker compose up` with Caddy reverse proxy and automatic HTTPS
+- **Docker-ready** — single image published to GitHub Container Registry; deploy with `docker compose` or the ONCE app server
 
 ---
 
@@ -96,9 +105,13 @@ Log in at `/admin`. The sidebar gives access to:
 |---|---|
 | **Dashboard** | Recent activity overview |
 | **Articles** | Create, edit, and publish posts |
+| **Pages** | Manage custom pages built with the block editor |
 | **Media** | Upload and browse images/files |
 | **Contacts** | View contact form submissions |
 | **Newsletter** | View and export subscriber list |
+| **Home Layout** | Design the home page with the visual block editor |
+| **Header Layout** | Build the site header with nav and branding blocks |
+| **Footer Layout** | Build the site footer with links and social blocks |
 | **Settings** | Site-wide configuration (see below) |
 
 ### Settings tabs
@@ -175,11 +188,17 @@ curl https://get.once.com | sh
 
 ### 1. Push the folio image
 
-Build and push to any public Docker registry (Docker Hub, GitHub Container Registry, etc.):
+The official image is published to GitHub Container Registry on every tagged release:
 
 ```bash
-docker build -t youruser/folio:latest .
-docker push youruser/folio:latest
+docker pull ghcr.io/vl4d1m1r4/folio:latest
+```
+
+Or build and push your own image:
+
+```bash
+docker build -t ghcr.io/vl4d1m1r4/folio:latest .
+docker push ghcr.io/vl4d1m1r4/folio:latest
 ```
 
 ### 2. Install via ONCE
@@ -187,7 +206,7 @@ docker push youruser/folio:latest
 Run `once` on your server, choose **Custom Docker image**, and enter:
 
 ```
-Image URL:  youruser/folio:latest
+Image URL:  ghcr.io/vl4d1m1r4/folio:latest
 Hostname:   blog.example.com
 ```
 
@@ -357,22 +376,6 @@ MS_GRAPH_SENDER=notifications@yourcompany.com
 ```
 
 Requires an Azure AD app registration with the `Mail.Send` application permission granted and admin-consented.
-
----
-
-## Customizing templates
-
-Drop `.njk` files into `site/src/user-theme/` to shadow the corresponding built-in partial:
-
-```
-site/src/user-theme/
-  nav.njk          ← overrides _includes/partials/nav.njk
-  footer.njk       ← overrides _includes/partials/footer.njk
-  cta-band.njk
-  article-card.njk
-```
-
-These files are gitignored so your customizations survive updates.
 
 ---
 

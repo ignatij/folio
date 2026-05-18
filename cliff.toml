@@ -1,0 +1,62 @@
+[changelog]
+header = """# Changelog
+
+All notable changes are documented here, grouped by module.\n
+"""
+body = """
+{% if version %}\
+## [{{ version | trim_start_matches(pat="v") }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [Unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group }}
+{% for commit in commits %}\
+- {% if commit.breaking %}**BREAKING** {% endif %}{{ commit.message | upper_first }}
+{% endfor %}\
+{% endfor %}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+split_commits = false
+
+commit_preprocessors = []
+
+commit_parsers = [
+  # ── Per-module scopes ─────────────────────────────────────────────────────
+  { message = "^feat\\(backend\\)", group = "Backend — Features" },
+  { message = "^fix\\(backend\\)",  group = "Backend — Bug Fixes" },
+  { message = "^perf\\(backend\\)", group = "Backend — Performance" },
+
+  { message = "^feat\\(admin\\)",   group = "Admin — Features" },
+  { message = "^fix\\(admin\\)",    group = "Admin — Bug Fixes" },
+  { message = "^perf\\(admin\\)",   group = "Admin — Performance" },
+
+  { message = "^feat\\(site\\)",    group = "Site — Features" },
+  { message = "^fix\\(site\\)",     group = "Site — Bug Fixes" },
+  { message = "^perf\\(site\\)",    group = "Site — Performance" },
+
+  # ── Unscoped / cross-cutting changes ─────────────────────────────────────
+  { message = "^feat",              group = "Features" },
+  { message = "^fix",               group = "Bug Fixes" },
+  { message = "^perf",              group = "Performance" },
+
+  # ── Skip housekeeping ─────────────────────────────────────────────────────
+  { message = "^refactor", skip = true },
+  { message = "^docs",     skip = true },
+  { message = "^chore",    skip = true },
+  { message = "^ci",       skip = true },
+  { message = "^test",     skip = true },
+  { message = "^style",    skip = true },
+  { message = "^build",    skip = true },
+]
+
+protect_breaking_commits = false
+filter_commits = true
+tag_pattern = "v[0-9].*"
+topo_order = false
+sort_commits = "newest"
