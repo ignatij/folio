@@ -5,6 +5,7 @@ import {
   renderBlocksHtml,
   type RenderBlock,
   type NavSnapshot,
+  type ArticleCtx,
 } from "./iframeRenderer";
 import { RichTextEditor } from "../RichTextEditor";
 
@@ -14,7 +15,7 @@ interface CanvasProps {
   blocks: RenderBlock[];
   selectedBlockId: string | null;
   activeLang: string;
-  mode: "home" | "page";
+  mode: "home" | "page" | "article";
   themeVars: Record<string, string>;
   viewportMode: ViewportMode;
   onSelect: (id: string | null) => void;
@@ -25,6 +26,7 @@ interface CanvasProps {
   onDelete: () => void;
   onMoveToContainer: (fromId: string, containerId: string) => void;
   onMoveToRoot: (fromId: string) => void;
+  articleCtx?: ArticleCtx;
   navSnapshot?: NavSnapshot;
   animating?: boolean;
 }
@@ -44,6 +46,7 @@ export function Canvas({
   onDelete,
   onMoveToContainer,
   onMoveToRoot,
+  articleCtx,
   navSnapshot = {},
   animating = false,
 }: CanvasProps) {
@@ -122,6 +125,7 @@ export function Canvas({
       activeLang,
       mode,
       navSnapshot,
+      articleCtx,
     );
   }
 
@@ -131,12 +135,18 @@ export function Canvas({
       skipUpdateRef.current = false;
       return;
     }
-    const html = renderBlocksHtml(blocks, activeLang, mode, navSnapshot);
+    const html = renderBlocksHtml(
+      blocks,
+      activeLang,
+      mode,
+      navSnapshot,
+      articleCtx,
+    );
     latestHtmlRef.current = html;
     const iframe = iframeRef.current;
     if (!iframe?.contentWindow) return;
     iframe.contentWindow.postMessage({ type: "updateBlocks", html }, "*");
-  }, [blocks, activeLang, mode, navSnapshot]);
+  }, [blocks, activeLang, mode, navSnapshot, articleCtx]);
 
   // Mirror selectedBlockId into iframe
   useEffect(() => {

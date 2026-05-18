@@ -33,6 +33,7 @@ const links = [
   { label: "Home Layout", to: "/admin/home-builder", section: false },
   { label: "Header Layout", to: "/admin/header-builder", section: false },
   { label: "Footer Layout", to: "/admin/footer-builder", section: false },
+  { label: "Article Layout", to: "/admin/article-builder", section: false },
   { label: "Settings", to: "/admin/settings", section: false },
 ] as const;
 

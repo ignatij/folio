@@ -48,11 +48,18 @@ export function buildSrcdoc(
   blocks: RenderBlock[],
   themeVars: Record<string, string>,
   activeLang = "en",
-  mode: "home" | "page" = "page",
+  mode: "home" | "page" | "article" = "page",
   navSnapshot: NavSnapshot = {},
+  articleCtx?: ArticleCtx,
 ): string {
   const themeStyle = buildThemeStyle(themeVars);
-  const blocksHtml = renderBlocksHtml(blocks, activeLang, mode, navSnapshot);
+  const blocksHtml = renderBlocksHtml(
+    blocks,
+    activeLang,
+    mode,
+    navSnapshot,
+    articleCtx,
+  );
 
   return `<!DOCTYPE html>
 <html lang="${esc(activeLang)}">
@@ -138,14 +145,27 @@ export function buildSrcdoc(
 export function renderBlocksHtml(
   blocks: RenderBlock[],
   activeLang = "en",
-  mode: "home" | "page" = "page",
+  mode: "home" | "page" | "article" = "page",
   navSnapshot: NavSnapshot = {},
+  articleCtx?: ArticleCtx,
 ): string {
   return [...blocks]
     .filter((b) => b.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    .map((b) => blockToHtml(b, activeLang, mode, navSnapshot))
+    .map((b) => blockToHtml(b, activeLang, mode, navSnapshot, articleCtx))
     .join("\n");
+}
+
+// ── Article ctx ──────────────────────────────────────────────────────────────
+
+/** Article context passed from the admin builder for live preview rendering. */
+export interface ArticleCtx {
+  title: string;
+  excerpt: string;
+  tag: string;
+  date: string;
+  cover: string;
+  body?: string;
 }
 
 // ── Article grid mock data ────────────────────────────────────────────────────
@@ -215,9 +235,9 @@ function animAttrs(c: Record<string, unknown>): {
 function blockToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
   navSnapshot: NavSnapshot = {},
-  articleCtx?: MockArticle,
+  articleCtx?: MockArticle | ArticleCtx,
 ): string {
   if (block.visible === false) return "";
   switch (block.type) {
@@ -259,6 +279,8 @@ function blockToHtml(
       return articleDateHtml(block, articleCtx);
     case "article-tag":
       return articleTagHtml(block, articleCtx);
+    case "article-body":
+      return articleBodyHtml(block, articleCtx);
     default:
       return templatePlaceholderHtml(block);
   }
@@ -269,7 +291,7 @@ function blockToHtml(
 function containerToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
   navSnapshot: NavSnapshot = {},
   articleCtx?: MockArticle,
 ): string {
@@ -411,7 +433,7 @@ ${dotsHtml}
 function articleCardToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
   navSnapshot: NavSnapshot,
   articleCtx?: MockArticle,
 ): string {
@@ -445,7 +467,7 @@ function articleCardToHtml(
 function articleGridToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
   navSnapshot: NavSnapshot,
 ): string {
   const c = block.config;
@@ -631,7 +653,7 @@ function articleTitleHtml(block: RenderBlock, ctx?: MockArticle): string {
   const headingStyle = styleAttr
     ? styleAttr.replace(' style="', ' style="margin:0;')
     : ' style="margin:0;"';
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-title" style="position:relative;width:100%;">
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-title" style="position:relative;display:block;">
     <span class="wysiwyg-label">↗ Article Title</span>
     <${safeTag} class="${escAttr(classAttr)}"${headingStyle}><a href="#" style="color:inherit;text-decoration:none;">${escHtml(title)}</a></${safeTag}>
   </div>`;
@@ -658,7 +680,7 @@ function articleExcerptHtml(block: RenderBlock, ctx?: MockArticle): string {
   const pStyle = styleAttr
     ? styleAttr.replace(' style="', ` style="${baseStyle}`)
     : ` style="${baseStyle}"`;
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-excerpt" style="position:relative;width:100%;">
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-excerpt" style="position:relative;display:block;">
     <span class="wysiwyg-label">↗ Article Excerpt</span>
     <p class="${escAttr(classAttr)}"${pStyle}>${escHtml(text)}</p>
   </div>`;
@@ -673,7 +695,7 @@ function articleDateHtml(block: RenderBlock, ctx?: MockArticle): string {
     color: "var(--color-muted,#6b7280)",
   });
   const date = ctx?.date ?? "Jan 1, 2025";
-  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-date" style="position:relative;width:100%;">
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-date" style="position:relative;display:inline-block;">
     <span class="wysiwyg-label">↗ Article Date</span>
     <time class="${escAttr(classAttr)}"${styleAttr}>${escHtml(date)}</time>
   </div>`;
@@ -708,7 +730,7 @@ function articleTagHtml(block: RenderBlock, ctx?: MockArticle): string {
     .filter(Boolean)
     .join(" ");
 
-  const wrapStyle = `position:relative;width:100%;${customStyle ? customStyle : ""}`;
+  const wrapStyle = `position:relative;display:inline-block;${customStyle ? customStyle : ""}`;
 
   const fs = fontSize ? `${fontSize}px` : "11px";
   const fw =
@@ -737,6 +759,28 @@ function articleTagHtml(block: RenderBlock, ctx?: MockArticle): string {
     <span class="wysiwyg-label">↗ Article Tag</span>
     <span style="${escAttr(badgeStyle)}">${escHtml(tag)}</span>
   </div>`;
+}
+
+function articleBodyHtml(
+  block: RenderBlock,
+  ctx?: MockArticle | ArticleCtx,
+): string {
+  const c = block.config;
+  const id = escAttr(block.id);
+  const baseCls = containerClassNames(c);
+  const extraCls = containerExtraClasses(c);
+  const proseCls = c.prose !== false ? "prose max-w-none" : "";
+  const cls = [baseCls, extraCls, proseCls].filter(Boolean).join(" ");
+  const customStyle = (c.customStyle as string) || "";
+  const styleAttr = customStyle ? ` style="${escAttr(customStyle)}"` : "";
+  const label = `<span class="wysiwyg-label">↗ Article Body</span>`;
+  const bodyHtml =
+    (ctx as ArticleCtx | undefined)?.body ??
+    `<p style="color:#9ca3af;font-size:13px;text-align:center;padding:24px;">Article body will appear here</p>`;
+  return `<div data-wysiwyg-id="${id}" data-wysiwyg-type="article-body" class="${escAttr(cls)}"${styleAttr}>
+  ${label}
+  ${bodyHtml}
+</div>`;
 }
 
 function containerClassNames(c: Record<string, unknown>): string {
@@ -810,6 +854,9 @@ function containerClassNames(c: Record<string, unknown>): string {
     cls.push("w-full");
     cls.push("max-w-5xl");
     cls.push("mx-auto");
+  } else if (w === "w-prose") {
+    cls.push("max-w-prose");
+    cls.push("mx-auto");
   } else if (w === "w-auto") cls.push("w-auto");
   else if (w === "w-screen") cls.push("w-screen");
   else if (!w.startsWith("w-")) { /* custom px — handled via inline style */ }
@@ -838,7 +885,7 @@ function containerExtraClasses(c: Record<string, unknown>): string {
 function textToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
 ): string {
   const c = block.config;
 
@@ -1100,7 +1147,7 @@ function imageToHtml(block: RenderBlock): string {
 function richTextToHtml(
   block: RenderBlock,
   activeLang: string,
-  mode: "home" | "page",
+  mode: "home" | "page" | "article",
 ): string {
   const c = block.config;
   const content =

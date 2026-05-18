@@ -23,6 +23,7 @@ import {
   applyArticleExcerptDefaults,
   applyArticleDateDefaults,
   applyArticleTagDefaults,
+  applyArticleBodyDefaults,
   applySlideshowDefaults,
 } from "../blockShared";
 
@@ -214,6 +215,7 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   if (type === "article-excerpt") applyArticleExcerptDefaults(config);
   if (type === "article-date") applyArticleDateDefaults(config);
   if (type === "article-tag") applyArticleTagDefaults(config);
+  if (type === "article-body") applyArticleBodyDefaults(config);
   return config;
 }
 

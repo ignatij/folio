@@ -7,6 +7,8 @@
 {%- set _wStyle = "" -%}
 {%- if cc.width === "w-page" -%}
   {%- set _wClass = "w-full max-w-5xl mx-auto" -%}
+{%- elif cc.width === "w-prose" -%}
+  {%- set _wClass = "w-full max-w-prose mx-auto" -%}
 {%- elif not cc.width or cc.width.startsWith("w-") -%}
   {%- set _wClass = cc.width if cc.width else "w-full" -%}
 {%- else -%}
@@ -118,6 +120,7 @@
       {%- elif child.type === "article-date" %}{%- include "partials/blocks/article-date.njk" %}
       {%- elif child.type === "article-tag" %}{%- include "partials/blocks/article-tag.njk" %}
       {%- elif child.type === "slideshow" %}{%- include "partials/blocks/slideshow.njk" %}
+      {%- elif child.type === "article-body" %}{%- include "partials/blocks/article-body.njk" %}
       {%- endif %}
     {%- endif %}
   {%- endfor %}

@@ -15,6 +15,72 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
 {% block description %}{{ article.meta_description or article.excerpt }}{% endblock %}
 
 {% block content %}
+{% if article_layout.sections | length %}
+  {%- set _articleCtx = article -%}
+  {% for block in article_layout.sections %}
+    {% if block.type === "hero" %}
+      {% set b = block %}
+      {% include "partials/blocks/hero.njk" %}
+    {% elif block.type === "featured-articles" %}
+      {% set b = block %}
+      {% include "partials/blocks/featured-articles.njk" %}
+    {% elif block.type === "latest-articles" %}
+      {% set b = block %}
+      {% include "partials/blocks/latest-articles.njk" %}
+    {% elif block.type === "cta-band" %}
+      {% set b = block %}
+      {% include "partials/blocks/cta-band.njk" %}
+    {% elif block.type === "rich-text" %}
+      {% set b = block %}
+      {% include "partials/blocks/rich-text.njk" %}
+    {% elif block.type === "image-text" %}
+      {% set b = block %}
+      {% include "partials/blocks/image-text.njk" %}
+    {% elif block.type === "testimonials" %}
+      {% set b = block %}
+      {% include "partials/blocks/testimonials.njk" %}
+    {% elif block.type === "newsletter" %}
+      {% set b = block %}
+      {% include "partials/blocks/newsletter.njk" %}
+    {% elif block.type === "container" %}
+      {% set b = block %}
+      {% include "partials/blocks/container.njk" %}
+    {% elif block.type === "text" %}
+      {% set b = block %}
+      {% include "partials/blocks/text.njk" %}
+    {% elif block.type === "image" %}
+      {% set b = block %}
+      {% include "partials/blocks/image.njk" %}
+    {% elif block.type === "button" %}
+      {% set b = block %}
+      {% include "partials/blocks/button.njk" %}
+    {% elif block.type === "article-grid" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-grid.njk" %}
+    {% elif block.type === "article-card" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-card.njk" %}
+    {% elif block.type === "article-image" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-image.njk" %}
+    {% elif block.type === "article-title" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-title.njk" %}
+    {% elif block.type === "article-excerpt" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-excerpt.njk" %}
+    {% elif block.type === "article-date" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-date.njk" %}
+    {% elif block.type === "article-tag" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-tag.njk" %}
+    {% elif block.type === "article-body" %}
+      {% set b = block %}
+      {% include "partials/blocks/article-body.njk" %}
+    {% endif %}
+  {% endfor %}
+{% else %}
 <div class="max-w-3xl mx-auto px-6 py-12">
   <!-- Breadcrumb -->
   <nav class="text-xs mb-8" style="color: var(--color-muted);">
@@ -66,6 +132,7 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
     </a>
   </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

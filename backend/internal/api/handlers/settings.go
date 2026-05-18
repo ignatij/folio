@@ -35,6 +35,7 @@ var settingsKeys = []string{
 	"home_sections",
 	"header_sections",
 	"footer_sections",
+	"article_sections",
 	"languages",
 	"ui_strings",
 }

@@ -24,16 +24,16 @@ import {
   type AnyBlock,
 } from "./blockUtils";
 import { buildNavPreset, buildFooterPreset } from "./presets";
-import type { NavSnapshot } from "./iframeRenderer";
+import type { NavSnapshot, ArticleCtx } from "./iframeRenderer";
 
 const EMPTY_NAV_SNAPSHOT: NavSnapshot = {};
 
 type ViewportMode = "desktop" | "tablet" | "mobile";
 
 export interface WysiwygShellProps {
-  mode: "home" | "page";
+  mode: "home" | "page" | "article";
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   themeVars: Record<string, string>;
   languages: Language[];
   activeLang: string;
@@ -58,6 +58,8 @@ export interface WysiwygShellProps {
   themeColors?: Record<string, string>;
   /** If provided, shows a "Load default template" button in the top bar */
   onLoadDefaultTemplate?: () => void;
+  /** Article mode only: article data for live canvas preview */
+  articleCtx?: ArticleCtx | null;
 }
 
 export function WysiwygShell({
@@ -81,6 +83,7 @@ export function WysiwygShell({
   navSnapshot,
   themeColors: themeColorsProp,
   onLoadDefaultTemplate,
+  articleCtx,
 }: WysiwygShellProps) {
   // Fall back to themeVars — they have the same `--color-*` key structure
   const themeColors = themeColorsProp ?? themeVars;
@@ -131,7 +134,7 @@ export function WysiwygShell({
   }
 
   function updateBlockTranslation(blockId: string, key: string, value: string) {
-    if (mode !== "home") return;
+    if (mode !== "home" && mode !== "article") return;
     const homeBlocks = blocks as HomeBlock[];
     const block = findBlock(homeBlocks, blockId);
     if (!block) return;
@@ -172,7 +175,7 @@ export function WysiwygShell({
     const parent = findBlock(anyBlocks(), parentId);
     if (!parent) return;
     const child =
-      mode === "home"
+      mode === "home" || mode === "article"
         ? makeHomeBlock(type, parent.children?.length ?? 0)
         : makePageBlock(type, parent.children?.length ?? 0);
     const existing = parent.children ?? [];
@@ -205,24 +208,24 @@ export function WysiwygShell({
     }
 
     const newBlock =
-      mode === "home"
+      mode === "home" || mode === "article"
         ? makeHomeBlock(type, blocks.length)
         : makePageBlock(type, blocks.length);
 
     if (targetId) {
       // Try to add as child of the target container
       const target = findBlock(anyBlocks(), targetId);
-      // article-card accepts article-* children; article-grid accepts article-card;
+      // article-card accepts article-* children (except article-body); article-grid accepts article-card;
       // container accepts anything
       const canReceive =
         target?.type === "container" ||
         target?.type === "slideshow" ||
-        target?.type === "article-card" ||
+        (target?.type === "article-card" && type !== "article-body") ||
         (target?.type === "article-grid" && type === "article-card");
       if (canReceive) {
         const childCount = target.children?.length ?? 0;
         const child =
-          mode === "home"
+          mode === "home" || mode === "article"
             ? makeHomeBlock(type, childCount)
             : makePageBlock(type, childCount);
         commit(
@@ -252,7 +255,7 @@ export function WysiwygShell({
 
   const handleContentChange = useCallback(
     (blockId: string, html: string) => {
-      if (mode === "home") {
+      if (mode === "home" || mode === "article") {
         updateBlockTranslation(blockId, "content", html);
       } else {
         updateBlockConfig(blockId, "content", html);
@@ -456,7 +459,11 @@ export function WysiwygShell({
             className="px-4 py-1.5 text-sm text-white rounded disabled:opacity-50 transition-opacity"
             style={{ background: "var(--color-accent)" }}
           >
-            {saving ? "Saving…" : mode === "home" ? "Save & Rebuild" : "Save"}
+            {saving
+              ? "Saving…"
+              : mode === "home" || mode === "article"
+                ? "Save & Rebuild"
+                : "Save"}
           </button>
           {onLoadDefaultTemplate && (
             <button
@@ -518,6 +525,7 @@ export function WysiwygShell({
           onMoveToRoot={handleMoveToRoot}
           navSnapshot={stableNavSnapshot}
           animating={animating}
+          articleCtx={articleCtx ?? undefined}
         />
 
         <InspectorPanel

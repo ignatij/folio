@@ -229,7 +229,8 @@ export type BlockType =
   | "article-title"
   | "article-excerpt"
   | "article-date"
-  | "article-tag";
+  | "article-tag"
+  | "article-body";
 
 export interface HomeBlock {
   id: string;
@@ -253,6 +254,7 @@ export interface AllSettings {
   home_sections: HomeBlock[] | null;
   header_sections: HomeBlock[] | null;
   footer_sections: HomeBlock[] | null;
+  article_sections: HomeBlock[] | null;
   languages: Language[] | null;
   ui_strings: Record<string, Record<string, string>> | null;
   email_status: { provider: string; configured: boolean } | null;

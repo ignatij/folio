@@ -310,6 +310,12 @@ func (h *PublicHandler) GetFooterSections(c echo.Context) error {
 	return c.JSONBlob(http.StatusOK, out)
 }
 
+// GetArticleLayoutConfig returns the article page section builder config.
+// GET /api/v1/config/article-layout
+func (h *PublicHandler) GetArticleLayoutConfig(c echo.Context) error {
+	return h.getSettingOrDefault(c, "article_sections", "[]")
+}
+
 // getSettingOrDefault returns a DB setting value as raw JSON, or a default blob.
 func (h *PublicHandler) getSettingOrDefault(c echo.Context, key, defaultJSON string) error {
 	v, err := h.repo.GetSetting(c.Request().Context(), key)
