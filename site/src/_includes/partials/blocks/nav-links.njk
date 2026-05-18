@@ -135,9 +135,9 @@
             </div>
           </div>
         {% elif link.type === "builtin" or link.type === "page" %}
-          <a href="/{{ lang }}{{ link.url }}" class="block" style="color:var(--color-text);">{{ link.label }}</a>
+          <a href="/{{ lang }}{{ link.url }}" class="block" style="color:{{ linkColor }};">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
         {% else %}
-          <a href="{{ link.url }}" class="block" style="color:var(--color-text);" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+          <a href="{{ link.url }}" class="block" style="color:{{ linkColor }};" target="_blank" rel="noopener noreferrer">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
         {% endif %}
       {% endfor %}
     </div>

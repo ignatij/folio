@@ -8,8 +8,11 @@ export default {
     { pattern: /^(h|w|max-w|min-w|max-h|min-h)-/ },
     // Spacing set dynamically via inspector
     { pattern: /^(p|m|gap|pt|pb|pl|pr|mt|mb|ml|mr|px|py|mx|my|gap-x|gap-y)-/ },
-    // Flex/grid layout
-    { pattern: /^(flex|grid|justify|items|self|order|col|row)-/ },
+    // Flex/grid layout (with responsive variants for dynamic md:grid-cols-N in templates)
+    {
+      pattern: /^(flex|grid|justify|items|self|order|col|row)-/,
+      variants: ["sm", "md", "lg", "xl"],
+    },
     // Typography set dynamically
     { pattern: /^(text|font|leading|tracking|prose)/ },
     // Rounded set dynamically
