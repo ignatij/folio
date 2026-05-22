@@ -48,7 +48,7 @@ scp -r "${SSH_OPTS[@]}" admin/dist/. "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/admin
 echo "==> Uploading site source..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "mkdir -p ${REMOTE_DIR}/site/src ${REMOTE_DIR}/site/dist"
 scp "${SSH_OPTS[@]}" site/build.sh "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/build.sh"
-scp "${SSH_OPTS[@]}" site/package.json site/package-lock.json site/eleventy.config.js "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/"
+scp "${SSH_OPTS[@]}" site/package.json site/package-lock.json site/eleventy.config.js site/tailwind.config.js "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/"
 scp -r "${SSH_OPTS[@]}" site/src/. "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/site/src/"
 
 echo "==> Fixing ownership..."
