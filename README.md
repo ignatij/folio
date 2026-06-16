@@ -83,6 +83,8 @@ make setup
 
 This runs `go mod tidy`, `npm install`, database migrations, and prompts you to create an admin account.
 
+The local database is SQLite and is created at `data/blog.db` during setup.
+
 ### 4. Start development servers
 
 ```bash
@@ -382,4 +384,3 @@ Requires an Azure AD app registration with the `Mail.Send` application permissio
 ## License
 
 AGPL-3.0 license
-

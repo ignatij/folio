@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -133,8 +134,13 @@ func seedSettings(repo *models.Repository, cfg *config.Config, themePath string)
 }
 
 func main() {
-	// 1. Load .env (ignored if absent)
-	_ = godotenv.Load()
+	migrateOnly := flag.Bool("migrate-only", false, "apply DB migrations and exit")
+	flag.Parse()
+
+	// 1. Load .env (ignored if absent). In local dev we usually run from
+	// backend/, while the shared .env lives at the repo root.
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../.env")
 
 	// 2. Load config.yaml
 	// CONFIG_PATH env var wins; otherwise auto-detect (Docker: ./config.yaml, dev: ../config.yaml).
@@ -156,11 +162,6 @@ func main() {
 	themePath := filepath.Join(themeDir, "theme.json")
 
 	// 3. Read env vars
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET environment variable is required")
-	}
-
 	dbPath := getEnv("DB_PATH", "./blog.db")
 	port := getEnv("PORT", "8080")
 	uploadDir := getEnv("UPLOAD_DIR", "./uploads")
@@ -192,6 +193,16 @@ func main() {
 		log.Fatalf("failed to open database: %v", err)
 	}
 	defer database.Close()
+
+	if *migrateOnly {
+		log.Printf("database migrations applied: %s", dbPath)
+		return
+	}
+
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET environment variable is required")
+	}
 
 	// 6. Instantiate services and handlers
 	repo := models.NewRepository(database)

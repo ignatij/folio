@@ -10,15 +10,16 @@ setup:
 	cd backend && go mod tidy
 	@echo "→ Running database migrations…"
 	@mkdir -p data
-	@DB_PATH=./data/blog.db cd backend && go run ./cmd/server/main.go --migrate-only 2>/dev/null || true
+	cd backend && DB_PATH=../data/blog.db go run ./cmd/server/main.go --migrate-only
 	@echo "→ Creating admin user…"
-	cd backend && go run ./cmd/create-admin/main.go
+	cd backend && go run ./cmd/create-admin/main.go -db ../data/blog.db
 
 # ── Dev: start backend + site (Eleventy) in watch mode ─────────────────────────
 dev:
-	@echo "→ Starting backend on :8080 and site on :8081…"
-	cd backend && go run ./cmd/server/main.go & \
-	cd site && npm run dev
+	@set -a; [ -f .env ] && . ./.env; set +a; \
+	echo "→ Starting backend on :$${PORT:-8080} and site on :8081…"; \
+	(cd backend && go run ./cmd/server/main.go) & \
+	cd site && BACKEND_URL="http://localhost:$${PORT:-8080}" npm run dev
 
 # ── Build: compile Go binary + build site ──────────────────────────────────────
 build:
