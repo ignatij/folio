@@ -8,6 +8,9 @@
     document.querySelectorAll(".prose img").forEach(function (img) {
       imgs.push(img);
     });
+    document.querySelectorAll(".reference-gallery-image").forEach(function (img) {
+      imgs.push(img);
+    });
 
     if (imgs.length === 0) return;
 

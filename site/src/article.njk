@@ -28,6 +28,9 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
     {% elif block.type === "gallery" %}
       {% set b = block %}
       {% include "partials/blocks/gallery.njk" %}
+    {% elif block.type === "recordings" %}
+      {% set b = block %}
+      {% include "partials/blocks/recordings.njk" %}
     {% elif block.type === "featured-articles" %}
       {% set b = block %}
       {% include "partials/blocks/featured-articles.njk" %}
@@ -88,7 +91,7 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
     {% endif %}
   {% endfor %}
 {% else %}
-<div class="max-w-3xl mx-auto px-6 py-12">
+<div class="max-w-4xl mx-auto px-6 py-14 md:py-20">
   <!-- Breadcrumb -->
   <nav class="text-xs mb-8" style="color: var(--color-muted);">
     <a href="/{{ lang }}/" style="color: var(--color-muted);">{{ i18n[lang].article_home }}</a>
@@ -98,50 +101,45 @@ permalink: "/{{ item.lang.code }}/articles/{{ item.article.slug }}.html"
     <span style="color: var(--color-text);">{{ article.title }}</span>
   </nav>
 
-  <!-- Cover image -->
-  {% if article.cover_image_path %}
-    <img
-      id="article-cover"
-      src="/uploads/{{ article.cover_image_path }}"
-      alt="{{ article.title }}"
-      class="w-full rounded-xl object-cover mb-10"
-      style="max-height: 420px;"
-    />
-  {% endif %}
+  <div class="grid gap-10 lg:grid-cols-[minmax(0,0.65fr)_minmax(0,1.35fr)] lg:items-start">
+    <aside class="space-y-6 lg:sticky lg:top-24">
+      <div>
+        {% if article.tag %}
+          <span class="blog-kicker">{{ article.tag }}</span>
+        {% endif %}
+        <h1 class="blog-section-title font-semibold leading-none mt-2" style="color: var(--color-text);">{{ article.title }}</h1>
+      </div>
 
-  <!-- Tag -->
-  {% if article.tag %}
-    <span class="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4"
-          style="background: color-mix(in srgb, var(--color-accent, #1a56db) 10%, transparent); color: var(--color-accent, #1a56db);">
-      {{ article.tag }}
-    </span>
-  {% endif %}
+      <div class="space-y-2 border-t pt-5" style="border-color: var(--color-border);">
+        <div class="blog-list-item__meta">Published</div>
+        <time datetime="{{ article.published_at }}" class="block">{{ article.published_at | localizedDate(lang) }}</time>
+        <div class="blog-list-item__meta mt-4">Reading time</div>
+        <div>{{ article.body | readingTime(lang, i18n[lang].reading_time_suffix) }}</div>
+      </div>
+    </aside>
 
-  <!-- Title -->
-  <h1 class="text-4xl font-extrabold leading-tight mb-4" style="color: var(--color-text);">{{ article.title }}</h1>
+    <div>
+      {% if article.cover_image_path %}
+        <img
+          id="article-cover"
+          src="/uploads/{{ article.cover_image_path }}"
+          alt="{{ article.title }}"
+          class="w-full rounded-[2rem] object-cover mb-10"
+          style="max-height: 560px;"
+        />
+      {% endif %}
 
-  <!-- Meta row -->
-  <div class="flex items-center gap-4 text-sm mb-10 pb-6" style="color: var(--color-muted); border-bottom: 1px solid var(--color-border);">
-    <time datetime="{{ article.published_at }}">{{ article.published_at | localizedDate(lang) }}</time>
-    <span>·</span>
-    <span>{{ article.body | readingTime(lang, i18n[lang].reading_time_suffix) }}</span>
-  </div>
+      <div class="prose max-w-none">
+        {{ article.body | safe }}
+      </div>
 
-  <!-- Body -->
-  <div class="prose max-w-none">
-    {{ article.body | safe }}
-  </div>
-
-  <!-- Back link -->
-  <div class="mt-16 pt-6 border-t">
-    <a href="/{{ lang }}/articles/" class="text-sm font-medium" style="color: var(--color-accent, #1a56db);">
-      ← {{ i18n[lang].article_back }}
-    </a>
+      <div class="mt-16 pt-6 border-t" style="border-color: var(--color-border);">
+        <a href="/{{ lang }}/articles/" class="blog-secondary-link text-sm">
+          Back to articles
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 {% endif %}
-{% endblock %}
-
-{% block scripts %}
-<script src="/site-assets/gallery.js" defer></script>
 {% endblock %}

@@ -23,6 +23,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   hero: "Hero",
   schedule: "Schedule",
   gallery: "Gallery",
+  recordings: "Recordings",
   "featured-articles": "Featured Articles",
   "latest-articles": "Latest Articles",
   "cta-band": "CTA Band",
@@ -428,6 +429,17 @@ export function applyGalleryDefaults(config: Record<string, unknown>): void {
   config.items = [];
   config.columns = 3;
   config.imageHeight = 300;
+  config.elementId = null;
+  config.customStyle = null;
+}
+
+export function applyRecordingsDefaults(config: Record<string, unknown>): void {
+  config.items = [
+    {
+      title: "Performance Video",
+      src: "",
+    },
+  ];
   config.elementId = null;
   config.customStyle = null;
 }
@@ -1201,6 +1213,7 @@ const PALETTE_GROUPS: { label: string; types: BlockType[] }[] = [
       "hero",
       "schedule",
       "gallery",
+      "recordings",
       "featured-articles",
       "latest-articles",
       "cta-band",

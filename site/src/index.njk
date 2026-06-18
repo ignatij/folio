@@ -14,6 +14,12 @@ permalink: "/{{ lang.code }}/index.html"
 
 {% block title %}{{ site.name }}{% endblock %}
 {% block description %}{{ site.description }}{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}
+<footer class="px-6 pb-16 text-center text-xs uppercase tracking-[0.35em]" style="color:#867d70;">
+  © 2026 {{ site.name }} · All Rights Reserved
+</footer>
+{% endblock %}
 
 {% block content %}
 {% for block in sections %}
@@ -26,6 +32,9 @@ permalink: "/{{ lang.code }}/index.html"
   {% elif block.type === "gallery" %}
     {% set b = block %}
     {% include "partials/blocks/gallery.njk" %}
+  {% elif block.type === "recordings" %}
+    {% set b = block %}
+    {% include "partials/blocks/recordings.njk" %}
   {% elif block.type === "featured-articles" %}
     {% set b = block %}
     {% include "partials/blocks/featured-articles.njk" %}

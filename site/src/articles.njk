@@ -16,9 +16,12 @@ permalink: "/{{ lang.code }}/articles/index.html"
 {% block description %}{{ i18n[lang].articles_intro }}{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-6 py-12">
-  <h1 class="text-4xl font-extrabold mb-2" style="color: var(--color-text);">{{ i18n[lang].articles_title }}</h1>
-  <p class="mb-8" style="color: var(--color-muted);">{{ i18n[lang].articles_intro }}</p>
+<div class="max-w-6xl mx-auto px-6 py-14 md:py-20">
+  <div class="max-w-3xl mb-12">
+    <p class="blog-kicker">Archive</p>
+    <h1 class="blog-section-title font-semibold" style="color: var(--color-text);">{{ i18n[lang].articles_title }}</h1>
+    <p class="blog-section-intro mt-4">{{ i18n[lang].articles_intro }}</p>
+  </div>
 
   {% if allArticles | length %}
     {# Collect unique tags from articles #}
@@ -38,7 +41,7 @@ permalink: "/{{ lang.code }}/articles/index.html"
     </div>
     {% endif %}
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="articles-grid">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" id="articles-grid">
       {% for article in allArticles %}
         {% set lang = langCode %}
         {% include "partials/article-card.njk" %}

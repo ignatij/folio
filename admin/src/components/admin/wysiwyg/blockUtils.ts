@@ -27,6 +27,7 @@ import {
   applySlideshowDefaults,
   applyScheduleDefaults,
   applyGalleryDefaults,
+  applyRecordingsDefaults,
 } from "../blockShared";
 
 // ── Shared structural interface ────────────────────────────────────────────────
@@ -191,6 +192,7 @@ function baseConfig(type: BlockType): Record<string, unknown> {
     type === "hero" ||
     type === "schedule" ||
     type === "gallery" ||
+    type === "recordings" ||
     type === "featured-articles" ||
     type === "latest-articles" ||
     type === "cta-band" ||
@@ -206,6 +208,7 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   if (type === "slideshow") applySlideshowDefaults(config);
   if (type === "schedule") applyScheduleDefaults(config);
   if (type === "gallery") applyGalleryDefaults(config);
+  if (type === "recordings") applyRecordingsDefaults(config);
   if (type === "text") applyTextDefaults(config);
   if (type === "image") applyImageDefaults(config);
   if (type === "button") applyButtonDefaults(config);

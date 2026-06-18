@@ -1,17 +1,46 @@
-<article class="group flex flex-col overflow-hidden transition-shadow hover:shadow-lg" data-tag="{{ article.tag }}" style="background: var(--color-bg-surface); border-radius: var(--radius-card); border: 1px solid var(--color-border);">
-  {% if article.cover_image_path %}
-    <a href="/{{ lang }}/articles/{{ article.slug }}.html">
-      <img src="/uploads/{{ article.cover_image_path }}" alt="{{ article.title }}" class="w-full h-48 object-cover" loading="lazy" />
-    </a>
-  {% endif %}
-  <div class="flex flex-col flex-1 p-5">
-    {% if article.tag %}
-      <span class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--color-accent);">{{ article.tag }}</span>
+<article class="editorial-card group flex h-full flex-col overflow-hidden" data-tag="{{ article.tag }}">
+  <a href="/{{ lang }}/articles/{{ article.slug }}.html" class="block">
+    {% if article.cover_image_path %}
+      <img
+        src="/uploads/{{ article.cover_image_path }}"
+        alt="{{ article.title }}"
+        class="editorial-card__image w-full"
+        loading="lazy"
+      />
+    {% else %}
+      <div class="editorial-card__image flex items-end p-6" style="background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 14%, transparent), color-mix(in srgb, var(--color-bg-surface) 100%, transparent));">
+        <div class="max-w-[12ch]">
+          <p class="blog-kicker">Article</p>
+          <p class="text-lg font-semibold leading-tight" style="color: var(--color-text);">
+            {{ article.title }}
+          </p>
+        </div>
+      </div>
     {% endif %}
-    <h3 class="text-lg font-bold mb-2 transition-colors" style="color: var(--color-text);">
-      <a href="/{{ lang }}/articles/{{ article.slug }}.html" style="color: var(--color-text);">{{ article.title }}</a>
+  </a>
+
+  <div class="flex flex-col flex-1 gap-4 p-5 md:p-6">
+    <div class="editorial-card__meta">
+      {% if article.published_at %}
+        <time datetime="{{ article.published_at }}">{{ article.published_at | localizedDate(lang) }}</time>
+      {% endif %}
+      {% if article.tag %}
+        <span>{{ article.tag }}</span>
+      {% endif %}
+    </div>
+
+    <h3 class="editorial-card__title font-semibold">
+      <a href="/{{ lang }}/articles/{{ article.slug }}.html" class="transition-colors" style="color: var(--color-text);">
+        {{ article.title }}
+      </a>
     </h3>
-    <p class="text-sm flex-1 line-clamp-3" style="color: var(--color-muted);">{{ article.excerpt }}</p>
-    <p class="text-xs mt-4" style="color: var(--color-muted);">{{ article.published_at | localizedDate(lang) }}</p>
+
+    <p class="editorial-card__excerpt flex-1 line-clamp-3">
+      {{ article.excerpt }}
+    </p>
+
+    <a href="/{{ lang }}/articles/{{ article.slug }}.html" class="blog-secondary-link mt-auto text-sm">
+      Read article
+    </a>
   </div>
 </article>

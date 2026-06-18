@@ -1,26 +1,26 @@
 {
   "preset": "default",
   "colors": {
-    "accent": "#1f4b99",
-    "accent-hover": "#173b79",
-    "accent-dark": "#102a57",
-    "cta": "#1f4b99",
-    "cta-hover": "#173b79",
-    "nav-from": "#f7f8fb",
-    "nav-to": "#f7f8fb",
-    "bg": "#f5f7fa",
+    "accent": "#111111",
+    "accent-hover": "#3d3d3d",
+    "accent-dark": "#000000",
+    "cta": "#111111",
+    "cta-hover": "#3d3d3d",
+    "nav-from": "#f4f1ec",
+    "nav-to": "#f4f1ec",
+    "bg": "#f4f1ec",
     "bg-surface": "#ffffff",
-    "text": "#18202a",
-    "muted": "#66758a",
-    "border": "#d8e0ea",
+    "text": "#161616",
+    "muted": "#7a7263",
+    "border": "#c4bfb5",
     "success": "#1f6b45",
     "warning": "#8a6a2f",
     "destructive": "#b42318"
   },
   "fonts": {
-    "body": "Inter",
-    "heading": "Merriweather",
+    "body": "Raleway",
+    "heading": "Raleway",
     "fallback": "system-ui, sans-serif"
   },
-  "radius": { "button": "12px", "card": "20px", "input": "12px" }
+  "radius": { "button": "9999px", "card": "28px", "input": "16px" }
 }

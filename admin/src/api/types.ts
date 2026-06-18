@@ -206,6 +206,7 @@ export type BlockType =
   | "hero"
   | "schedule"
   | "gallery"
+  | "recordings"
   | "featured-articles"
   | "latest-articles"
   | "cta-band"

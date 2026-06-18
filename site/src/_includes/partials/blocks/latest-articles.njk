@@ -1,11 +1,14 @@
 {% set latestArticles = articles.byLang[lang] | list %}
 {% if latestArticles | length %}
-{%- if _inContainer -%}<div class="w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>{%- else -%}<section class="max-w-5xl mx-auto px-6 py-10"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>{%- endif -%}
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold" style="color: var(--color-text);">{{ b.config.title | default("Latest Articles") }}</h2>
-    <a href="/{{ lang }}/articles/" class="text-sm font-medium" style="color: var(--color-accent);">View all →</a>
+{%- if _inContainer -%}<div class="w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>{%- else -%}<section class="max-w-6xl mx-auto px-6 py-12 md:py-16"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>{%- endif -%}
+  <div class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p class="blog-kicker">From the archive</p>
+      <h2 class="blog-section-title font-semibold" style="color: var(--color-text);">{{ b.config.title | default("Recent Posts") }}</h2>
+    </div>
+    <a href="/{{ lang }}/articles/" class="blog-secondary-link text-sm">View all</a>
   </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
     {% for article in latestArticles | limit(b.config.max_count | default(6)) %}
       {% set article = article %}
       {% include "partials/article-card.njk" %}

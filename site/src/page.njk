@@ -27,6 +27,8 @@ permalink: "/{{ item.lang.code }}/{{ item.page.slug }}/index.html"
         {% include "partials/blocks/schedule.njk" %}
       {% elif block.type === "gallery" %}
         {% include "partials/blocks/gallery.njk" %}
+      {% elif block.type === "recordings" %}
+        {% include "partials/blocks/recordings.njk" %}
       {% elif block.type === "featured-articles" %}
         {% include "partials/blocks/featured-articles.njk" %}
       {% elif block.type === "latest-articles" %}

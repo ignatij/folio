@@ -5,8 +5,8 @@
 # ─────────────────────────────────────────────────
 
 site:
-  name: "Folio"
-  tagline: "A modern publishing site"
+  name: "Anastasija Gichevska"
+  tagline: "Macedonian Pianist • Piano Accompanist • Piano Teacher"
   url: "http://localhost:8081"
   # Optional CTA / booking link shown in the call-to-action band.
   # Leave empty to hide the CTA band buttons.

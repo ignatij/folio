@@ -1,26 +1,20 @@
 {% set items = b.config.items if b.config.items and b.config.items.length else [] %}
-{% set cols = b.config.columns or 3 %}
-{% set imageHeight = b.config.imageHeight or 300 %}
 {%- if _inContainer -%}
 <div class="w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
 {%- else -%}
-<section class="max-w-5xl mx-auto px-6 py-10"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
+<section class="reference-section fade-section always-visible space-y-10"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
 {%- endif -%}
-  {% if b.config.eyebrow %}
-    <p class="text-xs uppercase mb-3" style="letter-spacing:0.45em;color:var(--color-muted);">{{ b.config.eyebrow }}</p>
-  {% endif %}
-  {% if b.config.title %}
-    <h2 class="mb-6" style="font-size:clamp(2rem,4vw,3rem);line-height:1.05;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text);">{{ b.config.title }}</h2>
-  {% endif %}
-  <div class="grid gap-5" style="grid-template-columns:repeat({{ cols }}, minmax(0, 1fr));">
+  <div class="space-y-2">
+    <p class="reference-eyebrow">{{ b.config.eyebrow or "Gallery" }}</p>
+    <h2 class="reference-section-title">{{ b.config.title or "In Focus" }}</h2>
+  </div>
+  <div class="grid gap-6 md:grid-cols-3">
     {% for item in items %}
-      <div style="overflow:hidden;border-radius:var(--radius-card);border:1px solid var(--color-border);background:var(--color-bg-surface);">
+      <button type="button" class="reference-gallery-card group" data-gallery-src="{{ item.src }}" aria-label="{{ item.alt or 'Open gallery image' }}">
         {% if item.src %}
-          <img src="{{ item.src }}" alt="{{ item.alt or '' }}" loading="lazy" style="display:block;width:100%;height:{{ imageHeight }}px;object-fit:cover;" />
-        {% else %}
-          <div style="height:{{ imageHeight }}px;display:flex;align-items:center;justify-content:center;color:var(--color-muted);">No image selected</div>
+          <img src="{{ item.src }}" alt="{{ item.alt or 'Piano performance still' }}" class="reference-gallery-image" loading="lazy" />
         {% endif %}
-      </div>
+      </button>
     {% endfor %}
   </div>
 {%- if _inContainer -%}</div>{%- else -%}</section>{%- endif -%}

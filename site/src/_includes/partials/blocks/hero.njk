@@ -1,28 +1,50 @@
-<section class="relative overflow-hidden"
+{%- set heroImage = b.config.bg_image or "/site-assets/reference/hero.jpg" -%}
+{%- set heroTitle = b.config.headline or site.name -%}
+{%- set heroSubtitle = b.config.subheadline or site.tagline -%}
+{%- set heroNav = nav.byLang[lang] if nav.byLang and nav.byLang[lang] and nav.byLang[lang].length else [
+  { label: "ABOUT", url: "#about", type: "external" },
+  { label: "SCHEDULE", url: "#schedule", type: "external" },
+  { label: "GALLERY", url: "#gallery", type: "external" },
+  { label: "RECORDINGS", url: "#recordings", type: "external" }
+] -%}
+
+<section class="reference-hero relative min-h-screen overflow-hidden bg-black text-white"
   {% if b.config.elementId %}id="{{ b.config.elementId }}"{% endif %}
-  {% if b.config.bg_image %}
-    style="background: url('{{ b.config.bg_image }}') center/cover no-repeat;{{ b.config.customStyle or '' }}"
-  {% elif b.config.customStyle %}
-    style="{{ b.config.customStyle }}"
-  {% endif %}>
-  {% if b.config.bg_image %}
-    <div class="absolute inset-0" style="background: rgba(0,0,0,0.45);"></div>
-  {% endif %}
-  <div class="relative max-w-5xl mx-auto px-6 py-20 text-center">
-    <h1 class="text-5xl font-extrabold tracking-tight mb-5 leading-tight" style="color: {{ 'white' if b.config.bg_image else 'var(--color-text)' }};">
-      {{ b.config.headline | default(site.name) }}
-    </h1>
-    {% if b.config.subheadline %}
-      <p class="text-xl max-w-2xl mx-auto" style="color: {{ 'rgba(255,255,255,0.85)' if b.config.bg_image else 'var(--color-muted)' }};">{{ b.config.subheadline }}</p>
-    {% endif %}
-    {% if b.config.cta_url %}
-      <div class="mt-8">
-        <a href="{{ b.config.cta_url }}" rel="noopener noreferrer"
-           class="inline-block px-8 py-4 text-white font-semibold text-lg transition-colors"
-           style="background: var(--color-accent, #1a56db); border-radius: var(--radius-button, 8px);">
-          {{ b.config.cta_label | default("Learn more") }}
-        </a>
+  {% if b.config.customStyle %}style="{{ b.config.customStyle }}"{% endif %}>
+  <img
+    src="{{ heroImage }}"
+    alt="{{ heroTitle }}"
+    class="absolute inset-0 h-full w-full object-cover object-top"
+    loading="eager"
+  />
+  <div class="absolute inset-0 reference-hero-overlay"></div>
+
+  <div class="relative z-10 flex min-h-screen flex-col">
+    <nav class="flex flex-wrap items-center justify-between gap-6 px-6 py-6 text-xs uppercase sm:px-12">
+      <a href="/{{ lang }}/" class="reference-brand">
+        {{ heroTitle | upper }}
+      </a>
+      <div class="flex flex-wrap gap-4 sm:ml-auto sm:flex-nowrap sm:gap-9">
+        {% for link in heroNav %}
+          {% if link.type === "builtin" or link.type === "page" %}
+            <a href="/{{ lang }}{{ link.url }}" class="reference-nav-link">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
+          {% else %}
+            <a href="{{ link.url }}" class="reference-nav-link">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
+          {% endif %}
+        {% endfor %}
       </div>
-    {% endif %}
+      <a href="#contact" class="reference-contact-link">Contact</a>
+    </nav>
+
+    <div class="flex flex-1 items-end px-6 pb-20 sm:px-12">
+      <div class="max-w-3xl space-y-5">
+        <div class="hero-line delay-2 h-px w-20 bg-white/70"></div>
+        {% if heroSubtitle %}
+          <p class="hero-line delay-3 reference-hero-subtitle">
+            {{ heroSubtitle }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </section>

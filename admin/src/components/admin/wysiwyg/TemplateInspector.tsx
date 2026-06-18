@@ -397,6 +397,97 @@ function BlockTypeFields({
       );
     }
 
+    case "recordings": {
+      const items = Array.isArray(block.config.items)
+        ? (block.config.items as Array<Record<string, string>>)
+        : [];
+      const updateItems = (next: Array<Record<string, string>>) =>
+        onConfigChange("items", next);
+      const updateItem = (
+        index: number,
+        key: "title" | "src",
+        value: string,
+      ) => {
+        updateItems(
+          items.map((item, i) => (i === index ? { ...item, [key]: value } : item)),
+        );
+      };
+      return (
+        <>
+          <Field
+            label="Eyebrow"
+            value={t("eyebrow")}
+            onChange={(v) => setT("eyebrow", v)}
+          />
+          <Field
+            label="Section title"
+            value={t("title")}
+            onChange={(v) => setT("title", v)}
+          />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-medium">Videos</label>
+              <button
+                type="button"
+                onClick={() =>
+                  updateItems([
+                    ...items,
+                    {
+                      title: "New recording",
+                      src: "https://www.youtube.com/embed/",
+                    },
+                  ])
+                }
+                className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+              >
+                Add video
+              </button>
+            </div>
+            <div className="space-y-3">
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-(--color-border) p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-(--color-muted)">
+                      Video {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateItems(items.filter((_, i) => i !== index))
+                      }
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <Field
+                    label="Title"
+                    value={item.title ?? ""}
+                    onChange={(v) => updateItem(index, "title", v)}
+                  />
+                  <Field
+                    label="Embed URL"
+                    value={item.src ?? ""}
+                    onChange={(v) => updateItem(index, "src", v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
+        </>
+      );
+    }
+
     case "featured-articles":
     case "latest-articles":
       return (

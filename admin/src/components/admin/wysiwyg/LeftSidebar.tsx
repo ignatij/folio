@@ -58,6 +58,7 @@ const PALETTE: {
       "hero",
       "schedule",
       "gallery",
+      "recordings",
       "featured-articles",
       "latest-articles",
       "cta-band",
@@ -70,6 +71,7 @@ const PALETTE: {
       hero: <HeroIcon />,
       schedule: <ScheduleIcon />,
       gallery: <GalleryIcon />,
+      recordings: <RecordingsIcon />,
       "featured-articles": <ArticlesIcon />,
       "latest-articles": <ArticlesIcon />,
       "cta-band": <CtaIcon />,
@@ -581,6 +583,8 @@ function BlockTypeIcon({
       return <ScheduleIcon size={size} />;
     case "gallery":
       return <GalleryIcon size={size} />;
+    case "recordings":
+      return <RecordingsIcon size={size} />;
     case "cta-band":
       return <CtaIcon size={size} />;
     case "rich-text":
@@ -716,6 +720,21 @@ function GalleryIcon({ size = 18 }: { size?: number }) {
       <rect x="9" y="2" width="5" height="5" rx="1" />
       <rect x="2" y="9" width="5" height="5" rx="1" />
       <rect x="9" y="9" width="5" height="5" rx="1" />
+    </svg>
+  );
+}
+function RecordingsIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="2" y="3" width="12" height="10" rx="1.5" />
+      <path d="m7 6 4 2-4 2V6z" />
     </svg>
   );
 }

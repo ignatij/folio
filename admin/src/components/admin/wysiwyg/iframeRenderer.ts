@@ -245,6 +245,8 @@ function blockToHtml(
       return scheduleToHtml(block, activeLang, mode);
     case "gallery":
       return galleryToHtml(block, activeLang, mode);
+    case "recordings":
+      return recordingsToHtml(block, activeLang, mode);
     case "container":
       return containerToHtml(block, activeLang, mode, navSnapshot, articleCtx);
     case "slideshow":
@@ -369,6 +371,44 @@ ${label}
 ${eyebrow ? `<div style="font-size:12px;letter-spacing:0.45em;text-transform:uppercase;color:var(--color-muted,#7a7263);margin-bottom:0.75rem;">${escHtml(eyebrow)}</div>` : ""}
 ${title ? `<h2 style="font-size:2.25rem;line-height:1.1;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text,#161616);margin:0 0 1.5rem;">${escHtml(title)}</h2>` : ""}
 <div style="display:grid;grid-template-columns:repeat(${columns}, minmax(0,1fr));gap:1.25rem;">${grid}</div>
+</section>`;
+}
+
+function recordingsToHtml(
+  block: RenderBlock,
+  activeLang: string,
+  mode: "home" | "page" | "article",
+): string {
+  const c = block.config;
+  const eyebrow = getTranslatedText(block, activeLang, mode, "eyebrow");
+  const title = getTranslatedText(block, activeLang, mode, "title");
+  const items = Array.isArray(c.items)
+    ? (c.items as Array<Record<string, string>>)
+    : [];
+  const customStyle = (c.customStyle as string) || "";
+  const elementId = (c.elementId as string) || "";
+  const label = `<span class="wysiwyg-label">▻ Recordings</span>`;
+  const cards = items.length
+    ? items
+        .map(
+          (item) => `<div style="padding:1rem;border:1px solid #cec6bb;border-radius:28px;background:rgba(255,255,255,0.8);box-shadow:0 1px 2px rgba(0,0,0,.05);">
+  <div style="aspect-ratio:16/9;overflow:hidden;border-radius:1rem;background:#111;">
+    ${
+      item.src
+        ? `<iframe src="${escAttr(item.src)}" title="${escAttr(item.title ?? "Recording")}" width="100%" height="100%" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:0;"></iframe>`
+        : `<div class="block-placeholder" style="min-height:12rem;border:none;border-radius:0;background:#111;color:white;"><div class="bp-label">Recording</div><div>Add a YouTube embed URL</div></div>`
+    }
+  </div>
+  <p style="margin-top:.75rem;font-size:.875rem;letter-spacing:.35em;text-transform:uppercase;color:#6f675a;">${escHtml(item.title ?? "")}</p>
+</div>`,
+        )
+        .join("")
+    : `<div class="block-placeholder"><div class="bp-label">Recordings</div><div>Add videos in the inspector</div></div>`;
+  return `<section data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="recordings"${elementId ? ` id="${escAttr(elementId)}"` : ""} style="max-width:64rem;margin:0 auto;padding:2.5rem 1.5rem;${escAttr(customStyle)}">
+${label}
+${eyebrow ? `<div style="font-size:12px;letter-spacing:0.45em;text-transform:uppercase;color:#7a7263;margin-bottom:0.75rem;">${escHtml(eyebrow)}</div>` : ""}
+${title ? `<h2 style="font-size:2.25rem;line-height:1.1;letter-spacing:0.35em;text-transform:uppercase;color:#1f1f1f;margin:0 0 1.5rem;">${escHtml(title)}</h2>` : ""}
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:1.5rem;">${cards}</div>
 </section>`;
 }
 
@@ -1364,6 +1404,7 @@ function richTextToHtml(
 
 const TEMPLATE_ICONS: Partial<Record<BlockType, string>> = {
   hero: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
+  recordings: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3V9z"/></svg>`,
   "featured-articles": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>`,
   "latest-articles": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>`,
   "cta-band": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="20" height="8" rx="2"/><path d="M8 12h8"/></svg>`,
@@ -1375,6 +1416,7 @@ const TEMPLATE_ICONS: Partial<Record<BlockType, string>> = {
 
 const TEMPLATE_DISPLAY: Partial<Record<BlockType, string>> = {
   hero: "Hero Section",
+  recordings: "Recordings",
   "featured-articles": "Featured Articles",
   "latest-articles": "Latest Articles",
   "cta-band": "CTA Band",
