@@ -1,26 +1,26 @@
 {
   "preset": "default",
   "colors": {
-    "accent": "#1a56db",
-    "accent-hover": "#1747c4",
-    "accent-dark": "#1345b7",
-    "cta": "#7e3af2",
-    "cta-hover": "#6c2bd9",
-    "nav-from": "#1a56db",
-    "nav-to": "#1747c4",
-    "bg": "#ffffff",
-    "bg-surface": "#f9fafb",
-    "text": "#111827",
-    "muted": "#6b7280",
-    "border": "#e5e7eb",
-    "success": "#0e9f6e",
-    "warning": "#ff9800",
-    "destructive": "#e02424"
+    "accent": "#1f4b99",
+    "accent-hover": "#173b79",
+    "accent-dark": "#102a57",
+    "cta": "#1f4b99",
+    "cta-hover": "#173b79",
+    "nav-from": "#f7f8fb",
+    "nav-to": "#f7f8fb",
+    "bg": "#f5f7fa",
+    "bg-surface": "#ffffff",
+    "text": "#18202a",
+    "muted": "#66758a",
+    "border": "#d8e0ea",
+    "success": "#1f6b45",
+    "warning": "#8a6a2f",
+    "destructive": "#b42318"
   },
   "fonts": {
     "body": "Inter",
-    "heading": "Inter",
+    "heading": "Merriweather",
     "fallback": "system-ui, sans-serif"
   },
-  "radius": { "button": "8px", "card": "12px", "input": "6px" }
+  "radius": { "button": "12px", "card": "20px", "input": "12px" }
 }

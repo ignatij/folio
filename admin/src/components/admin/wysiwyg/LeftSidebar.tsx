@@ -56,6 +56,8 @@ const PALETTE: {
     label: "Templates",
     types: [
       "hero",
+      "schedule",
+      "gallery",
       "featured-articles",
       "latest-articles",
       "cta-band",
@@ -66,6 +68,8 @@ const PALETTE: {
     ] as BlockType[],
     icons: {
       hero: <HeroIcon />,
+      schedule: <ScheduleIcon />,
+      gallery: <GalleryIcon />,
       "featured-articles": <ArticlesIcon />,
       "latest-articles": <ArticlesIcon />,
       "cta-band": <CtaIcon />,
@@ -573,6 +577,10 @@ function BlockTypeIcon({
       return <ButtonIcon size={size} />;
     case "hero":
       return <HeroIcon size={size} />;
+    case "schedule":
+      return <ScheduleIcon size={size} />;
+    case "gallery":
+      return <GalleryIcon size={size} />;
     case "cta-band":
       return <CtaIcon size={size} />;
     case "rich-text":
@@ -676,6 +684,38 @@ function HeroIcon({ size = 18 }: { size?: number }) {
     >
       <rect x="1" y="2" width="14" height="9" rx="1.5" />
       <path d="M5 14h6M8 11v3" />
+    </svg>
+  );
+}
+function ScheduleIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="2" y="3" width="12" height="11" rx="1.5" />
+      <path d="M5 2v3M11 2v3M2 6.5h12M4.5 9h2.5M4.5 11.5h4.5" />
+    </svg>
+  );
+}
+function GalleryIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="2" y="2" width="5" height="5" rx="1" />
+      <rect x="9" y="2" width="5" height="5" rx="1" />
+      <rect x="2" y="9" width="5" height="5" rx="1" />
+      <rect x="9" y="9" width="5" height="5" rx="1" />
     </svg>
   );
 }

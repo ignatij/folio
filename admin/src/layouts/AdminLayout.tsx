@@ -55,11 +55,18 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen flex">
       <aside
-        className="w-56 text-white flex flex-col shrink-0"
-        style={{ background: "var(--color-nav-from)" }}
+        className="w-56 flex flex-col shrink-0"
+        style={{
+          background: "color-mix(in srgb, var(--color-bg-surface) 92%, white)",
+          color: "var(--color-text)",
+          borderRight: "1px solid var(--color-border)",
+        }}
       >
-        <div className="h-16 flex items-center px-4 border-b border-white/10">
-          <Link to="/admin" className="font-bold text-lg tracking-tight">
+        <div
+          className="h-16 flex items-center px-4"
+          style={{ borderBottom: "1px solid var(--color-border)" }}
+        >
+          <Link to="/admin" className="font-bold text-lg tracking-tight text-(--color-text)">
             Blog Admin
           </Link>
         </div>
@@ -70,7 +77,7 @@ export default function AdminLayout() {
               return (
                 <p
                   key={i}
-                  className="px-2 pt-4 pb-1 text-xs font-semibold text-white/40 uppercase tracking-wider"
+                  className="px-2 pt-4 pb-1 text-xs font-semibold text-(--color-muted) uppercase tracking-wider"
                 >
                   {item.label}
                 </p>
@@ -84,9 +91,18 @@ export default function AdminLayout() {
                 className={({ isActive }) =>
                   `block px-3 py-2 rounded text-sm transition-colors ${
                     isActive
-                      ? "bg-white/20 text-white font-medium"
-                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                      ? "font-medium"
+                      : "text-(--color-muted) hover:text-(--color-text)"
                   }`
+                }
+                style={({ isActive }) =>
+                  isActive
+                    ? {
+                        background:
+                          "color-mix(in srgb, var(--color-accent) 14%, transparent)",
+                        color: "var(--color-text)",
+                      }
+                    : undefined
                 }
               >
                 {item.label}
@@ -95,10 +111,11 @@ export default function AdminLayout() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4" style={{ borderTop: "1px solid var(--color-border)" }}>
           <button
             onClick={logout}
-            className="w-full px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white rounded text-left transition-colors"
+            className="w-full px-3 py-2 text-sm text-(--color-muted) hover:text-(--color-text) rounded text-left transition-colors"
+            style={{ background: "transparent" }}
           >
             Logout
           </button>

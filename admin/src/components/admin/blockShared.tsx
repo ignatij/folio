@@ -21,6 +21,8 @@ import type { BlockType } from "../../api/types";
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   hero: "Hero",
+  schedule: "Schedule",
+  gallery: "Gallery",
   "featured-articles": "Featured Articles",
   "latest-articles": "Latest Articles",
   "cta-band": "CTA Band",
@@ -410,6 +412,24 @@ export function applyArticleTagDefaults(config: Record<string, unknown>): void {
   config.marginBottom = 0;
   config.marginLeft = 0;
   config.marginRight = 0;
+}
+
+export function applyScheduleDefaults(config: Record<string, unknown>): void {
+  config.items = [
+    { date: "Jan 15, 2027", title: "Sample Event", location: "City, Country" },
+    { date: "Feb 28, 2027", title: "Another Event", location: "Venue Name" },
+    { date: "Apr 10, 2027", title: "Featured Appearance", location: "Event Location" },
+  ];
+  config.elementId = null;
+  config.customStyle = null;
+}
+
+export function applyGalleryDefaults(config: Record<string, unknown>): void {
+  config.items = [];
+  config.columns = 3;
+  config.imageHeight = 300;
+  config.elementId = null;
+  config.customStyle = null;
 }
 
 // ── Icon toggle button (used inside ContainerBlockEditor) ───────────────────
@@ -1179,6 +1199,8 @@ const PALETTE_GROUPS: { label: string; types: BlockType[] }[] = [
     label: "Templates",
     types: [
       "hero",
+      "schedule",
+      "gallery",
       "featured-articles",
       "latest-articles",
       "cta-band",

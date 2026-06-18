@@ -204,6 +204,8 @@ export interface PageBlock {
 
 export type BlockType =
   | "hero"
+  | "schedule"
+  | "gallery"
   | "featured-articles"
   | "latest-articles"
   | "cta-band"

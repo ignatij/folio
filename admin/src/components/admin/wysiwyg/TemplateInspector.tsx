@@ -105,6 +105,9 @@ function BlockTypeFields({
   socialSnapshot?: SocialLink[];
 }) {
   const [mediaPicker, setMediaPicker] = useState<string | null>(null);
+  const [galleryTargetIndex, setGalleryTargetIndex] = useState<number | null>(
+    null,
+  );
 
   switch (type) {
     case "hero":
@@ -159,6 +162,240 @@ function BlockTypeFields({
           </div>
         </>
       );
+
+    case "schedule": {
+      const items = Array.isArray(block.config.items)
+        ? (block.config.items as Array<Record<string, string>>)
+        : [];
+      const updateItems = (next: Array<Record<string, string>>) =>
+        onConfigChange("items", next);
+      const updateItem = (
+        index: number,
+        key: "date" | "title" | "location",
+        value: string,
+      ) => {
+        updateItems(
+          items.map((item, i) => (i === index ? { ...item, [key]: value } : item)),
+        );
+      };
+      return (
+        <>
+          <Field
+            label="Eyebrow"
+            value={t("eyebrow")}
+            onChange={(v) => setT("eyebrow", v)}
+          />
+          <Field
+            label="Section title"
+            value={t("title")}
+            onChange={(v) => setT("title", v)}
+          />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-medium">Events</label>
+              <button
+                type="button"
+                onClick={() =>
+                  updateItems([
+                    ...items,
+                    { date: "", title: "New event", location: "" },
+                  ])
+                }
+                className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+              >
+                Add event
+              </button>
+            </div>
+            <div className="space-y-3">
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-(--color-border) p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-(--color-muted)">
+                      Event {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateItems(items.filter((_, i) => i !== index))
+                      }
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <Field
+                    label="Date"
+                    value={item.date ?? ""}
+                    onChange={(v) => updateItem(index, "date", v)}
+                  />
+                  <Field
+                    label="Title"
+                    value={item.title ?? ""}
+                    onChange={(v) => updateItem(index, "title", v)}
+                  />
+                  <Field
+                    label="Location"
+                    value={item.location ?? ""}
+                    onChange={(v) => updateItem(index, "location", v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
+        </>
+      );
+    }
+
+    case "gallery": {
+      const items = Array.isArray(block.config.items)
+        ? (block.config.items as Array<Record<string, string>>)
+        : [];
+      const updateItems = (next: Array<Record<string, string>>) =>
+        onConfigChange("items", next);
+      const updateItem = (
+        index: number,
+        key: "src" | "alt",
+        value: string,
+      ) => {
+        updateItems(
+          items.map((item, i) => (i === index ? { ...item, [key]: value } : item)),
+        );
+      };
+      return (
+        <>
+          <Field
+            label="Eyebrow"
+            value={t("eyebrow")}
+            onChange={(v) => setT("eyebrow", v)}
+          />
+          <Field
+            label="Section title"
+            value={t("title")}
+            onChange={(v) => setT("title", v)}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium mb-1">Columns</label>
+              <input
+                type="number"
+                min={1}
+                max={4}
+                value={(block.config.columns as number) ?? 3}
+                onChange={(e) =>
+                  onConfigChange("columns", Number(e.target.value))
+                }
+                className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                Image height
+              </label>
+              <input
+                type="number"
+                min={120}
+                max={800}
+                value={(block.config.imageHeight as number) ?? 300}
+                onChange={(e) =>
+                  onConfigChange("imageHeight", Number(e.target.value))
+                }
+                className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+              />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-medium">Images</label>
+              <button
+                type="button"
+                onClick={() =>
+                  updateItems([...items, { src: "", alt: "Gallery image" }])
+                }
+                className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+              >
+                Add image
+              </button>
+            </div>
+            <div className="space-y-3">
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-(--color-border) p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-(--color-muted)">
+                      Image {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateItems(items.filter((_, i) => i !== index))
+                      }
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      Image
+                    </label>
+                    <ImagePickButton
+                      src={item.src}
+                      onPick={() => {
+                        setGalleryTargetIndex(index);
+                        setMediaPicker(`gallery-${index}`);
+                      }}
+                      onRemove={() => updateItem(index, "src", "")}
+                    />
+                  </div>
+                  <Field
+                    label="Alt text"
+                    value={item.alt ?? ""}
+                    onChange={(v) => updateItem(index, "alt", v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          {mediaPicker?.startsWith("gallery-") && galleryTargetIndex !== null && (
+            <MediaPickerModal
+              mode="image"
+              onSelect={(f) => {
+                updateItem(
+                  galleryTargetIndex,
+                  "src",
+                  `/uploads/${f.filename}`,
+                );
+                setGalleryTargetIndex(null);
+                setMediaPicker(null);
+              }}
+              onClose={() => {
+                setGalleryTargetIndex(null);
+                setMediaPicker(null);
+              }}
+            />
+          )}
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
+        </>
+      );
+    }
 
     case "featured-articles":
     case "latest-articles":

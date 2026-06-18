@@ -25,6 +25,8 @@ import {
   applyArticleTagDefaults,
   applyArticleBodyDefaults,
   applySlideshowDefaults,
+  applyScheduleDefaults,
+  applyGalleryDefaults,
 } from "../blockShared";
 
 // ── Shared structural interface ────────────────────────────────────────────────
@@ -187,6 +189,8 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   // Template blocks all support an HTML id anchor and raw inline CSS
   if (
     type === "hero" ||
+    type === "schedule" ||
+    type === "gallery" ||
     type === "featured-articles" ||
     type === "latest-articles" ||
     type === "cta-band" ||
@@ -200,6 +204,8 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   }
   if (type === "container") applyContainerDefaults(config);
   if (type === "slideshow") applySlideshowDefaults(config);
+  if (type === "schedule") applyScheduleDefaults(config);
+  if (type === "gallery") applyGalleryDefaults(config);
   if (type === "text") applyTextDefaults(config);
   if (type === "image") applyImageDefaults(config);
   if (type === "button") applyButtonDefaults(config);

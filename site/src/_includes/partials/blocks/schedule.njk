@@ -1,0 +1,22 @@
+{% set items = b.config.items if b.config.items and b.config.items.length else [] %}
+{%- if _inContainer -%}
+<div class="w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
+{%- else -%}
+<section class="max-w-5xl mx-auto px-6 py-10"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
+{%- endif -%}
+  {% if b.config.eyebrow %}
+    <p class="text-xs uppercase mb-3" style="letter-spacing:0.45em;color:var(--color-muted);">{{ b.config.eyebrow }}</p>
+  {% endif %}
+  {% if b.config.title %}
+    <h2 class="mb-6" style="font-size:clamp(2rem,4vw,3rem);line-height:1.05;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text);">{{ b.config.title }}</h2>
+  {% endif %}
+  <div style="background:color-mix(in srgb, white 82%, transparent);border:1px solid var(--color-border);">
+    {% for item in items %}
+      <div class="flex flex-wrap gap-4 justify-between items-center px-6 py-6" {% if not loop.last %}style="border-bottom:1px solid var(--color-border);"{% endif %}>
+        <div class="text-xs uppercase" style="letter-spacing:0.42em;color:var(--color-muted);">{{ item.date }}</div>
+        <div class="text-base uppercase" style="letter-spacing:0.18em;color:var(--color-text);">{{ item.title }}</div>
+        <div class="text-xs uppercase" style="letter-spacing:0.30em;color:var(--color-muted);">{{ item.location }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{%- if _inContainer -%}</div>{%- else -%}</section>{%- endif -%}

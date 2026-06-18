@@ -23,6 +23,10 @@ permalink: "/{{ item.lang.code }}/{{ item.page.slug }}/index.html"
       {% set b = block %}
       {% if block.type === "hero" %}
         {% include "partials/blocks/hero.njk" %}
+      {% elif block.type === "schedule" %}
+        {% include "partials/blocks/schedule.njk" %}
+      {% elif block.type === "gallery" %}
+        {% include "partials/blocks/gallery.njk" %}
       {% elif block.type === "featured-articles" %}
         {% include "partials/blocks/featured-articles.njk" %}
       {% elif block.type === "latest-articles" %}
@@ -63,4 +67,3 @@ permalink: "/{{ item.lang.code }}/{{ item.page.slug }}/index.html"
   </article>
 {% endif %}
 {% endblock %}
-

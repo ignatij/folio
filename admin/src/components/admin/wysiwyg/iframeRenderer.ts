@@ -241,6 +241,10 @@ function blockToHtml(
 ): string {
   if (block.visible === false) return "";
   switch (block.type) {
+    case "schedule":
+      return scheduleToHtml(block, activeLang, mode);
+    case "gallery":
+      return galleryToHtml(block, activeLang, mode);
     case "container":
       return containerToHtml(block, activeLang, mode, navSnapshot, articleCtx);
     case "slideshow":
@@ -284,6 +288,88 @@ function blockToHtml(
     default:
       return templatePlaceholderHtml(block);
   }
+}
+
+function getTranslatedText(
+  block: RenderBlock,
+  activeLang: string,
+  mode: "home" | "page" | "article",
+  key: string,
+): string {
+  if (mode === "home") {
+    return (block.translations?.[activeLang]?.[key] as string) ?? "";
+  }
+  return (block.config[key] as string) ?? "";
+}
+
+function scheduleToHtml(
+  block: RenderBlock,
+  activeLang: string,
+  mode: "home" | "page" | "article",
+): string {
+  const c = block.config;
+  const eyebrow = getTranslatedText(block, activeLang, mode, "eyebrow");
+  const title = getTranslatedText(block, activeLang, mode, "title");
+  const items = Array.isArray(c.items)
+    ? (c.items as Array<Record<string, string>>)
+    : [];
+  const customStyle = (c.customStyle as string) || "";
+  const elementId = (c.elementId as string) || "";
+  const label = `<span class="wysiwyg-label">◫ Schedule</span>`;
+  const rows = items.length
+    ? items
+        .map(
+          (item, index) => `<div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;padding:1.25rem;${index < items.length - 1 ? "border-bottom:1px solid var(--color-border,#d6cfc3);" : ""}">
+  <div style="font-size:0.72rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--color-muted,#7a7263);">${escHtml(item.date ?? "")}</div>
+  <div style="font-size:1rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--color-text,#161616);">${escHtml(item.title ?? "")}</div>
+  <div style="font-size:0.78rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--color-muted,#7a7263);">${escHtml(item.location ?? "")}</div>
+</div>`,
+        )
+        .join("")
+    : `<div class="block-placeholder"><div class="bp-label">Schedule</div><div>Add events in the inspector</div></div>`;
+  return `<section data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="schedule"${elementId ? ` id="${escAttr(elementId)}"` : ""} style="max-width:64rem;margin:0 auto;padding:2.5rem 1.5rem;${escAttr(customStyle)}">
+${label}
+${eyebrow ? `<div style="font-size:12px;letter-spacing:0.45em;text-transform:uppercase;color:var(--color-muted,#7a7263);margin-bottom:0.75rem;">${escHtml(eyebrow)}</div>` : ""}
+${title ? `<h2 style="font-size:2.25rem;line-height:1.1;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text,#161616);margin:0 0 1.5rem;">${escHtml(title)}</h2>` : ""}
+<div style="background:rgba(255,255,255,0.82);border:1px solid var(--color-border,#d6cfc3);">${rows}</div>
+</section>`;
+}
+
+function galleryToHtml(
+  block: RenderBlock,
+  activeLang: string,
+  mode: "home" | "page" | "article",
+): string {
+  const c = block.config;
+  const eyebrow = getTranslatedText(block, activeLang, mode, "eyebrow");
+  const title = getTranslatedText(block, activeLang, mode, "title");
+  const items = Array.isArray(c.items)
+    ? (c.items as Array<Record<string, string>>)
+    : [];
+  const columns = Math.max(1, Math.min(4, Number(c.columns) || 3));
+  const imageHeight = Math.max(120, Number(c.imageHeight) || 300);
+  const customStyle = (c.customStyle as string) || "";
+  const elementId = (c.elementId as string) || "";
+  const label = `<span class="wysiwyg-label">▦ Gallery</span>`;
+  const grid = items.length
+    ? items
+        .map(
+          (item) => `<div style="border:1px solid var(--color-border,#d6cfc3);border-radius:28px;overflow:hidden;background:#f3f4f6;">
+  ${
+    item.src
+      ? `<img src="${escAttr(item.src)}" alt="${escAttr(item.alt ?? "")}" style="width:100%;height:${imageHeight}px;object-fit:cover;display:block;" />`
+      : `<div class="block-placeholder" style="min-height:${imageHeight}px;border:none;border-radius:0;background:#f3f4f6;"><div class="bp-label">Gallery image</div><div>Select an uploaded image</div></div>`
+  }
+</div>`,
+        )
+        .join("")
+    : `<div class="block-placeholder"><div class="bp-label">Gallery</div><div>Add images in the inspector</div></div>`;
+  return `<section data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="gallery"${elementId ? ` id="${escAttr(elementId)}"` : ""} style="max-width:64rem;margin:0 auto;padding:2.5rem 1.5rem;${escAttr(customStyle)}">
+${label}
+${eyebrow ? `<div style="font-size:12px;letter-spacing:0.45em;text-transform:uppercase;color:var(--color-muted,#7a7263);margin-bottom:0.75rem;">${escHtml(eyebrow)}</div>` : ""}
+${title ? `<h2 style="font-size:2.25rem;line-height:1.1;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text,#161616);margin:0 0 1.5rem;">${escHtml(title)}</h2>` : ""}
+<div style="display:grid;grid-template-columns:repeat(${columns}, minmax(0,1fr));gap:1.25rem;">${grid}</div>
+</section>`;
 }
 
 // ── Container ─────────────────────────────────────────────────────────────────

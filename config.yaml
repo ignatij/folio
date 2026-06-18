@@ -5,9 +5,9 @@
 # ─────────────────────────────────────────────────
 
 site:
-  name: "My Blog"
-  tagline: "Thoughts, ideas, and more."
-  url: "https://yourblog.com"
+  name: "Folio"
+  tagline: "A modern publishing site"
+  url: "http://localhost:8081"
   # Optional CTA / booking link shown in the call-to-action band.
   # Leave empty to hide the CTA band buttons.
   bookingUrl: ""
@@ -40,10 +40,10 @@ languages:
 # These appear as category labels on articles.
 # Admin UI lets you pick from this list when editing.
 tags:
-  - "Tutorials"
   - "News"
-  - "Guides"
-  - "Opinion"
+  - "Essays"
+  - "Projects"
+  - "Updates"
 
 # ── Contact form ───────────────────────────────────
 # Email address that receives contact form submissions.
