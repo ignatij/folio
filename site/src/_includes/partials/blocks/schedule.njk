@@ -13,7 +13,7 @@
       <div class="reference-schedule-row">
         <div class="reference-schedule-date">{{ item.date }}</div>
         <div class="flex-1">
-          <p class="reference-schedule-title">{{ item.title }}</p>
+          <p class="reference-schedule-title">{{ item.title | escape | replace("&amp;", "<span class=\"ampersand\">&amp;</span>") | safe }}</p>
         </div>
         <p class="reference-schedule-location">{{ item.location }}</p>
       </div>

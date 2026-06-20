@@ -749,16 +749,24 @@ img {
     color: #161616;
 }
 
-.reference-section {
-    max-width: 64rem;
-    margin: 0 auto;
+.reference-main {
     padding: 5rem 1.5rem;
+}
+
+.reference-section {
+    max-width: none;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.reference-main > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 6rem;
 }
 
 .reference-eyebrow {
     font-size: 0.75rem;
     letter-spacing: 0.5em;
-    text-transform: uppercase;
+    text-transform: none;
     color: #7a7263;
 }
 
@@ -767,7 +775,7 @@ img {
     font-size: 1.875rem;
     line-height: 1.2;
     letter-spacing: 0.35em;
-    text-transform: uppercase;
+    text-transform: none;
     color: #1f1f1f;
 }
 
@@ -788,6 +796,7 @@ img {
 }
 
 .reference-schedule-date {
+    font-family: var(--font-heading, var(--font-body, sans-serif));
     font-size: 0.75rem;
     letter-spacing: 0.5em;
     text-transform: uppercase;
@@ -795,16 +804,25 @@ img {
 }
 
 .reference-schedule-title {
+    font-family: var(--font-heading, var(--font-body, sans-serif));
     font-size: 1.125rem;
     letter-spacing: 0.2em;
+    text-transform: none;
     color: #161616;
 }
 
 .reference-schedule-location {
+    font-family: var(--font-body, sans-serif);
     font-size: 0.875rem;
     letter-spacing: 0.35em;
     text-transform: uppercase;
     color: #6f675a;
+}
+
+.ampersand {
+    display: inline-block;
+    margin: 0 0.15em;
+    letter-spacing: normal;
 }
 
 .reference-gallery-card {
@@ -825,6 +843,11 @@ img {
     transform: scale(1.05);
 }
 
+.reference-gallery-card:focus {
+    outline: 2px solid #7a7263;
+    outline-offset: 2px;
+}
+
 .reference-card-title {
     font-size: 0.875rem;
     letter-spacing: 0.35em;
@@ -835,6 +858,15 @@ img {
 .reference-about {
     display: grid;
     gap: 3rem;
+    align-items: start;
+    max-width: none;
+}
+
+.reference-about .reference-section-title {
+    font-size: 1.875rem;
+    line-height: 1.2;
+    letter-spacing: 0.35em;
+    text-transform: none;
 }
 
 .reference-about-copy {
@@ -844,6 +876,8 @@ img {
 }
 
 .reference-quote-card {
+    width: 100%;
+    justify-self: stretch;
     border: 1px solid #d4cec3;
     border-radius: 32px;
     background: rgba(255, 255, 255, 0.7);
@@ -852,6 +886,8 @@ img {
 }
 
 .reference-quote-card blockquote {
+    display: block;
+    width: 100%;
     font-family: Georgia, Cambria, "Times New Roman", Times, serif;
     font-size: 1.25rem;
     line-height: 1.375;
@@ -865,22 +901,131 @@ img {
     padding: 3rem 1.5rem;
 }
 
+.reference-contact-grid {
+    display: grid;
+    gap: 3rem;
+}
+
+.reference-contact-copy {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+}
+
+.reference-social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.reference-social-link,
+.reference-contact-label,
+.reference-contact-submit {
+    font-family: var(--font-heading, var(--font-body, var(--font-fallback, system-ui)));
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+}
+
+.reference-social-link {
+    color: #1d1d1d;
+}
+
+.reference-social-link:hover {
+    color: #7a7263;
+    text-decoration: none;
+}
+
+.reference-contact-form {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.reference-contact-field {
+    display: grid;
+    gap: 0.625rem;
+}
+
+.reference-contact-label {
+    color: #8d8476;
+}
+
+.reference-contact-input {
+    width: 100%;
+    border: 1px solid #d9d3c8;
+    border-radius: 1rem;
+    background: #f9f6f0;
+    color: #1d1d1d;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    padding: 1rem;
+}
+
+.reference-contact-input::placeholder {
+    color: #9aa3b2;
+}
+
+.reference-contact-input:focus {
+    border-color: #a0917c;
+    outline: none;
+}
+
+.reference-contact-textarea {
+    min-height: 8.5rem;
+    resize: vertical;
+}
+
+.reference-contact-submit {
+    width: 100%;
+    border: 1px solid #111;
+    border-radius: 9999px;
+    color: #1d1d1d;
+    padding: 0.75rem 1.5rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.reference-contact-submit:hover {
+    background: #111;
+    color: #fff;
+}
+
 @media (min-width: 768px) {
+    .reference-main {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+
     .reference-schedule-row {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
     }
+
+    .reference-contact-section {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
 }
 
 @media (min-width: 1024px) {
+    .reference-main {
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
+
     .reference-about {
         grid-template-columns: 1.1fr 0.9fr;
+        gap: 3rem;
     }
 
     .reference-contact-section {
         padding-left: 4rem;
         padding-right: 4rem;
+    }
+
+    .reference-contact-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4rem;
     }
 }
 

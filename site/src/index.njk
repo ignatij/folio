@@ -26,7 +26,13 @@ permalink: "/{{ lang.code }}/index.html"
   {% if block.type === "hero" %}
     {% set b = block %}
     {% include "partials/blocks/hero.njk" %}
-  {% elif block.type === "schedule" %}
+  {% endif %}
+{% endfor %}
+
+<div class="reference-main">
+{% for block in sections %}
+  {% if block.type !== "hero" %}
+  {% if block.type === "schedule" %}
     {% set b = block %}
     {% include "partials/blocks/schedule.njk" %}
   {% elif block.type === "gallery" %}
@@ -78,5 +84,8 @@ permalink: "/{{ lang.code }}/index.html"
     {% set b = block %}
     {% include "partials/blocks/slideshow.njk" %}
   {% endif %}
+
+  {% endif %}
 {% endfor %}
+</div>
 {% endblock %}
