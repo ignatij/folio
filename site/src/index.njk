@@ -35,6 +35,12 @@ permalink: "/{{ lang.code }}/index.html"
   {% if block.type === "schedule" %}
     {% set b = block %}
     {% include "partials/blocks/schedule.njk" %}
+  {% elif block.type === "about" %}
+    {% set b = block %}
+    {% include "partials/blocks/about.njk" %}
+  {% elif block.type === "contact" %}
+    {% set b = block %}
+    {% include "partials/blocks/contact.njk" %}
   {% elif block.type === "gallery" %}
     {% set b = block %}
     {% include "partials/blocks/gallery.njk" %}

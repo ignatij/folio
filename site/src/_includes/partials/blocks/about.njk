@@ -1,0 +1,31 @@
+{%- set cc = b.config -%}
+{%- if _inContainer -%}
+<div class="reference-about w-full"{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %}>
+{%- else -%}
+<section class="reference-section reference-about fade-section"{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %}>
+{%- endif -%}
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <p class="reference-eyebrow">{{ cc.eyebrow or "About" }}</p>
+      <h2 class="reference-section-title">{{ cc.title }}</h2>
+    </div>
+    {% if cc.body %}
+      <div class="reference-about-copy">
+        <p>{{ cc.body }}</p>
+      </div>
+    {% endif %}
+    {% if cc.buttonLabel and cc.buttonUrl %}
+      <p>
+        <a class="reference-pill-button" href="{{ cc.buttonUrl }}"{% if cc.buttonDownload %} download{% endif %}>{{ cc.buttonLabel }}</a>
+      </p>
+    {% endif %}
+  </div>
+  {% if cc.quote %}
+    <div class="reference-quote-card">
+      <blockquote>{{ cc.quote }}</blockquote>
+      {% if cc.quoteAuthor %}
+        <p class="reference-quote-author">{{ cc.quoteAuthor }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+{%- if _inContainer -%}</div>{%- else -%}</section>{%- endif -%}

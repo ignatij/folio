@@ -9,6 +9,9 @@ backend/folio
 backend/blog.db
 backend/blog.db-shm
 backend/blog.db-wal
+data/blog.db
+data/blog.db-shm
+data/blog.db-wal
 backend/uploads/
 
 # ── Secrets ────────────────────────────────────────

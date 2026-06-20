@@ -56,6 +56,8 @@
       {%- set block = child -%}
       {%- if child.type === "hero" %}{%- include "partials/blocks/hero.njk" %}
       {%- elif child.type === "schedule" %}{%- include "partials/blocks/schedule.njk" %}
+      {%- elif child.type === "about" %}{%- include "partials/blocks/about.njk" %}
+      {%- elif child.type === "contact" %}{%- include "partials/blocks/contact.njk" %}
       {%- elif child.type === "gallery" %}{%- include "partials/blocks/gallery.njk" %}
       {%- elif child.type === "recordings" %}{%- include "partials/blocks/recordings.njk" %}
       {%- elif child.type === "featured-articles" %}{%- include "partials/blocks/featured-articles.njk" %}

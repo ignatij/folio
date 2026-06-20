@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"log"
@@ -21,6 +22,9 @@ import (
 	"folio/internal/models"
 	"folio/internal/services"
 )
+
+//go:embed seeds/home_sections.json
+var defaultHomeSections string
 
 func getEnv(key, def string) string {
 	if v := os.Getenv(key); v != "" {
@@ -110,15 +114,7 @@ func seedSettings(repo *models.Repository, cfg *config.Config, themePath string)
 
 	// Seed default home_sections matching the existing layout.
 	if _, ok := all["home_sections"]; !ok {
-		defaultSections := `[
-			{"id":"hero","type":"hero","visible":true,"order":0,"config":{"bg_image":"/site-assets/reference/hero.jpg","elementId":null,"customStyle":null},"translations":{"en":{"headline":"Anastasija Gichevska","subheadline":"Macedonian Pianist • Piano Accompanist • Piano Teacher","cta_label":"","cta_url":""}}},
-			{"id":"about","type":"rich-text","visible":true,"order":1,"config":{"elementId":"about","customStyle":"","fullWidth":true,"content":"<div class=\"reference-section reference-about\"><div class=\"space-y-6\"><div class=\"space-y-2\"><p class=\"reference-eyebrow\">About</p><h2 class=\"reference-section-title\">Anastasija Gichevska</h2></div><div class=\"reference-about-copy\"><p>Anastasija Gichevska is a Macedonian concert pianist, chamber musician, and piano teacher with an international career. She completed her Bachelor’s degree in Piano Performance with honors at the Faculty of Music in Skopje, North Macedonia, continued her Master’s studies at the Academy of Music in Ljubljana, Slovenia, and University of Music and Performing Arts Graz (KUG), Austria. A prizewinner of over 30 international competitions, Anastasija has performed as a soloist, chamber musician, and with orchestra across Europe and the USA, earning recognition for her expressive playing and dynamic stage presence. Alongside her performing career, she is a dedicated teacher, guiding students to develop both technical mastery and deep musical artistry.</p></div><p><a class=\"inline-flex items-center justify-center rounded-full border border-[#111] px-6 py-3 text-xs uppercase tracking-[0.4em] transition hover:bg-[#111] hover:text-white\" href=\"/cv.pdf\" download>Biography PDF</a></p></div><div class=\"reference-quote-card\"><blockquote>“A pianist with a strong temperament and deep emotional expression.”</blockquote><p class=\"mt-4 text-xs uppercase tracking-[0.4em] text-[#7a7263]\">David Fray</p></div></div>"},"translations":{"en":{}}},
-			{"id":"schedule","type":"schedule","visible":true,"order":2,"config":{"elementId":"schedule","customStyle":null,"items":[{"date":"FEB 08, 2026","title":"Voice & Piano Concert","location":"Biel, Switzerland"},{"date":"MAR 31, 2026","title":"Violin & Piano Concert","location":"Split, Croatia"},{"date":"MAY 30, 2026","title":"Solo Piano Concert","location":"León, Spain"}]},"translations":{"en":{"eyebrow":"Schedule","title":"Upcoming Performances"}}},
-			{"id":"gallery","type":"gallery","visible":true,"order":3,"config":{"elementId":"gallery","customStyle":null,"columns":3,"imageHeight":288,"items":[{"src":"/site-assets/reference/gallery-01.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-02.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-03.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-04.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-05.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-06.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-07.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-08.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-09.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-10.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-11.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-12.jpg","alt":"Piano performance still"},{"src":"/site-assets/reference/gallery-13.jpg","alt":"Piano performance still"}]},"translations":{"en":{"eyebrow":"Gallery","title":"In Focus"}}},
-			{"id":"recordings","type":"recordings","visible":true,"order":4,"config":{"elementId":"recordings","customStyle":null,"items":[]},"translations":{"en":{"eyebrow":"Recordings","title":"Watch & Listen"}}},
-			{"id":"contact-section","type":"rich-text","visible":true,"order":5,"config":{"elementId":"contact","customStyle":"","fullWidth":true,"content":"<div class=\"reference-section\"><div class=\"reference-contact-section\"><div class=\"space-y-6\"><div class=\"space-y-2\"><p class=\"reference-eyebrow\">Contact</p><h2 class=\"reference-section-title\">Collaborations & Online Piano Lessons</h2></div><p class=\"text-sm leading-relaxed text-[#3d3d3d]\">For performance engagements, media requests, masterclasses, online lessons, or collaborative projects, please get in touch.</p><p><a class=\"inline-flex items-center justify-center rounded-full border border-[#111] px-6 py-3 text-xs uppercase tracking-[0.4em] transition hover:bg-[#111] hover:text-white\" href=\"/en/contact/\">Send Message</a></p></div></div></div>"},"translations":{"en":{}}}
-		]`
-		_ = repo.SetSetting(ctx, "home_sections", defaultSections)
+		_ = repo.SetSetting(ctx, "home_sections", defaultHomeSections)
 	}
 
 	// Seed languages from config.yaml if not yet stored in DB.

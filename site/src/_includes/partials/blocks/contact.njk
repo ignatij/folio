@@ -1,0 +1,50 @@
+{%- set cc = b.config -%}
+{%- set formId = b.id or "home-contact" -%}
+{%- if _inContainer -%}
+<div class="reference-contact-section w-full"{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %}>
+{%- else -%}
+<section class="reference-section"{% if cc.elementId %} id="{{ cc.elementId }}"{% endif %}{% if cc.customStyle %} style="{{ cc.customStyle }}"{% endif %}>
+  <div class="reference-contact-section">
+{%- endif -%}
+    <div class="reference-contact-grid">
+      <div class="reference-contact-copy">
+        <div class="space-y-2">
+          <p class="reference-eyebrow">{{ cc.eyebrow or "Contact" }}</p>
+          <h2 class="reference-section-title">{{ cc.title }}</h2>
+        </div>
+        {% if cc.intro %}
+          <p class="text-sm leading-relaxed text-[#3d3d3d]">{{ cc.intro }}</p>
+        {% endif %}
+        {% if cc.socialLinks and cc.socialLinks.length %}
+          <div class="reference-social-links">
+            {% for link in cc.socialLinks %}
+              <a class="reference-social-link" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <form class="reference-contact-form" action="{{ cc.formAction }}" method="POST">
+        {% if cc.subject %}
+          <input type="hidden" name="_subject" value="{{ cc.subject }}">
+        {% endif %}
+        <input type="hidden" name="_captcha" value="{{ 'true' if cc.captcha else 'false' }}">
+        <div class="reference-contact-field">
+          <label class="reference-contact-label" for="{{ formId }}-name">{{ cc.nameLabel or "Full Name" }}</label>
+          <input class="reference-contact-input" id="{{ formId }}-name" type="text" name="name" placeholder="{{ cc.namePlaceholder or 'Full Name' }}" required>
+        </div>
+        <div class="reference-contact-field">
+          <label class="reference-contact-label" for="{{ formId }}-email">{{ cc.emailLabel or "Email" }}</label>
+          <input class="reference-contact-input" id="{{ formId }}-email" type="email" name="email" placeholder="{{ cc.emailPlaceholder or 'Email' }}" required>
+        </div>
+        <div class="reference-contact-field">
+          <label class="reference-contact-label" for="{{ formId }}-message">{{ cc.messageLabel or "Message" }}</label>
+          <textarea class="reference-contact-input reference-contact-textarea" id="{{ formId }}-message" name="message" placeholder="{{ cc.messagePlaceholder or 'Message' }}" required></textarea>
+        </div>
+        <button class="reference-contact-submit" type="submit">{{ cc.submitLabel or "Send Message" }}</button>
+      </form>
+    </div>
+{%- if _inContainer -%}</div>{%- else -%}
+  </div>
+</section>
+{%- endif -%}

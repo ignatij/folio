@@ -1,0 +1,223 @@
+[
+  {
+    "id": "hero",
+    "type": "hero",
+    "visible": true,
+    "order": 0,
+    "config": {
+      "bg_image": "/site-assets/reference/hero.jpg",
+      "elementId": null,
+      "customStyle": null
+    },
+    "translations": {
+      "en": {
+        "headline": "Anastasija Gichevska",
+        "subheadline": "Macedonian Pianist • Piano Accompanist • Piano Teacher",
+        "cta_label": "",
+        "cta_url": ""
+      }
+    }
+  },
+  {
+    "id": "about",
+    "type": "about",
+    "visible": true,
+    "order": 1,
+    "config": {
+      "elementId": "about",
+      "eyebrow": "About",
+      "title": "Anastasija Gichevska",
+      "body": "Anastasija Gichevska is a Macedonian concert pianist, chamber musician, and piano teacher with an international career. She completed her Bachelor’s degree in Piano Performance with honors at the Faculty of Music in Skopje, North Macedonia, continued her Master’s studies at the Academy of Music in Ljubljana, Slovenia, and University of Music and Performing Arts Graz (KUG), Austria. A prizewinner of over 30 international competitions, Anastasija has performed as a soloist, chamber musician, and with orchestra across Europe and the USA, earning recognition for her expressive playing and dynamic stage presence. Alongside her performing career, she is a dedicated teacher, guiding students to develop both technical mastery and deep musical artistry.",
+      "buttonLabel": "Biography PDF",
+      "buttonUrl": "/cv.pdf",
+      "buttonDownload": true,
+      "quote": "“A pianist with a strong temperament and deep emotional expression.”",
+      "quoteAuthor": "David Fray"
+    },
+    "translations": {
+      "en": {}
+    }
+  },
+  {
+    "id": "schedule",
+    "type": "schedule",
+    "visible": true,
+    "order": 2,
+    "config": {
+      "elementId": "schedule",
+      "customStyle": null,
+      "items": [
+        {
+          "date": "FEB 08, 2026",
+          "title": "Voice & Piano Concert",
+          "location": "Biel, Switzerland"
+        },
+        {
+          "date": "MAR 31, 2026",
+          "title": "Violin & Piano Concert",
+          "location": "Split, Croatia"
+        },
+        {
+          "date": "MAY 30, 2026",
+          "title": "Solo Piano Concert",
+          "location": "León, Spain"
+        }
+      ]
+    },
+    "translations": {
+      "en": {
+        "eyebrow": "Schedule",
+        "title": "Upcoming Performances"
+      }
+    }
+  },
+  {
+    "id": "gallery",
+    "type": "gallery",
+    "visible": true,
+    "order": 3,
+    "config": {
+      "elementId": "gallery",
+      "customStyle": null,
+      "columns": 3,
+      "imageHeight": 288,
+      "items": [
+        {
+          "src": "/site-assets/reference/gallery-01.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-02.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-03.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-04.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-05.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-06.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-07.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-08.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-09.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-10.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-11.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-12.jpg",
+          "alt": "Piano performance still"
+        },
+        {
+          "src": "/site-assets/reference/gallery-13.jpg",
+          "alt": "Piano performance still"
+        }
+      ]
+    },
+    "translations": {
+      "en": {
+        "eyebrow": "Gallery",
+        "title": "In Focus"
+      }
+    }
+  },
+  {
+    "id": "recordings",
+    "type": "recordings",
+    "visible": true,
+    "order": 4,
+    "config": {
+      "elementId": "recordings",
+      "customStyle": null,
+      "items": [
+        {
+          "title": "M. Mussorgsky: \"Pictures at an Exhibition\"",
+          "src": "https://www.youtube.com/embed/VMjyvPZZKrY"
+        },
+        {
+          "title": "L. van Beethoven: Violin Sonata Op. 12 No. 1 in D Major",
+          "src": "https://www.youtube.com/embed/sKi2-kFfMh0"
+        },
+        {
+          "title": "M. Ravel: \"Une barque sur l’ocean\" (Miroirs, III)",
+          "src": "https://www.youtube.com/embed/kdcTCpOH5zY"
+        },
+        {
+          "title": "S. Rachmaninoff: Trio élégiaque No. 1 in G minor",
+          "src": "https://www.youtube.com/embed/t4lml3JJAQI"
+        },
+        {
+          "title": "L. van Beethoven: Sonata Op. 109 in E Major (III)",
+          "src": "https://www.youtube.com/embed/SqSKNcpF4hQ"
+        }
+      ]
+    },
+    "translations": {
+      "en": {
+        "eyebrow": "Recordings",
+        "title": "Watch & Listen"
+      }
+    }
+  },
+  {
+    "id": "contact-section",
+    "type": "contact",
+    "visible": true,
+    "order": 5,
+    "config": {
+      "elementId": "contact",
+      "eyebrow": "Contact",
+      "title": "Collaborations & Online Piano Lessons",
+      "intro": "For performance engagements, media requests, masterclasses, online lessons, or collaborative projects, please get in touch.",
+      "formAction": "https://formsubmit.co/anastasija.gicevska@hotmail.com",
+      "subject": "New inquiry from anastasijagichevska.com",
+      "captcha": false,
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Full Name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Share repertoire, dates, or media requests.",
+      "submitLabel": "Send Message",
+      "socialLinks": [
+        {
+          "label": "Instagram",
+          "url": "https://www.instagram.com/agichevska"
+        },
+        {
+          "label": "YouTube",
+          "url": "https://www.youtube.com/@anastasijagichevska1901"
+        },
+        {
+          "label": "LinkedIn",
+          "url": "https://www.linkedin.com/in/anastasija-gichevska-866a3b245/"
+        }
+      ]
+    },
+    "translations": {
+      "en": {}
+    }
+  }
+]

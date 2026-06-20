@@ -779,6 +779,28 @@ img {
     color: #1f1f1f;
 }
 
+.reference-pill-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #111;
+    border-radius: 9999px;
+    color: #111;
+    font-family: var(--font-heading, var(--font-body, var(--font-fallback, system-ui)));
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    line-height: 1;
+    padding: 0.875rem 1.5rem;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.reference-pill-button:hover {
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+}
+
 .reference-schedule-list {
     border: 1px solid #c4bfb5;
     background: rgba(255, 255, 255, 0.8);
@@ -892,6 +914,15 @@ img {
     font-size: 1.25rem;
     line-height: 1.375;
     color: #1d1d1d;
+}
+
+.reference-quote-author {
+    color: #7a7263;
+    font-family: var(--font-heading, var(--font-body, var(--font-fallback, system-ui)));
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    margin-top: 1rem;
+    text-transform: uppercase;
 }
 
 .reference-contact-section {
