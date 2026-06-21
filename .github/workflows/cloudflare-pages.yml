@@ -1,0 +1,92 @@
+name: Deploy static site to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build static artifact and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Build local backend
+        working-directory: backend
+        run: CGO_ENABLED=0 go build -o ../dist/folio-server ./cmd/server/main.go
+
+      - name: Start local backend from committed seeds
+        env:
+          PORT: "8080"
+          DB_PATH: /tmp/folio-pages.db
+          JWT_SECRET: ci-static-export-secret
+          UPLOAD_DIR: /tmp/folio-uploads
+        run: |
+          mkdir -p /tmp/folio-uploads
+          ./dist/folio-server &
+          echo $! > /tmp/folio-server.pid
+
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/up > /dev/null 2>&1; then
+              echo "Backend is up"
+              exit 0
+            fi
+            sleep 0.5
+          done
+
+          echo "Backend did not become ready in time"
+          exit 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Build static site
+        working-directory: site
+        env:
+          BACKEND_URL: http://localhost:8080
+        run: npm run build
+
+      - name: Copy uploaded media into static artifact
+        run: |
+          mkdir -p site/dist/uploads
+          cp -R /tmp/folio-uploads/. site/dist/uploads/
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT_NAME: ${{ vars.CLOUDFLARE_PAGES_PROJECT_NAME }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_PAGES_PROJECT_NAME"
+          npx --yes wrangler@latest pages deploy site/dist \
+            --project-name "$CLOUDFLARE_PAGES_PROJECT_NAME" \
+            --branch "${GITHUB_REF_NAME}"
+
+      - name: Stop local backend
+        if: always()
+        run: kill "$(cat /tmp/folio-server.pid)" 2>/dev/null || true

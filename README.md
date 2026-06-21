@@ -144,6 +144,87 @@ The `docker-compose.yml` wires together:
 
 ---
 
+## Static Cloudflare Pages deployment
+
+This project can also be deployed as a fully static site on Cloudflare Pages.
+In this mode, Cloudflare only serves prebuilt HTML, CSS, JavaScript, images, and
+other static assets. The Go backend, admin panel, and SQLite database are used
+locally or temporarily in CI only; they are not deployed to Cloudflare.
+
+### Content snapshot model
+
+Admin changes are first saved into the local SQLite database. For CI/static
+deployment, the current content must be exported into committed seed files:
+
+```text
+backend/cmd/server/seeds/home_sections.json
+backend/cmd/server/seeds/site_settings.snapshot.json
+backend/cmd/server/seeds/uploads/
+```
+
+The runtime upload folders should stay local:
+
+```text
+backend/uploads/
+uploads/
+```
+
+When CI runs, it starts a temporary local backend with an empty temporary DB.
+The backend seeds that DB from the committed JSON files, copies seeded uploads
+into a temporary upload directory, and Eleventy builds the static site from that
+temporary backend API. The final Cloudflare artifact is `site/dist`.
+
+### Manual static export
+
+Start the backend locally:
+
+```bash
+cd backend
+go run ./cmd/server/main.go
+```
+
+Build the static site from another terminal:
+
+```bash
+cd site
+BACKEND_URL=http://localhost:8080 npm run build
+```
+
+Copy uploaded media into the static artifact:
+
+```bash
+mkdir -p site/dist/uploads
+cp -R backend/uploads/. site/dist/uploads/
+```
+
+Deploy with Wrangler:
+
+```bash
+npx wrangler pages deploy site/dist --project-name YOUR_CLOUDFLARE_PAGES_PROJECT
+```
+
+### GitHub Actions deployment
+
+The workflow in `.github/workflows/cloudflare-pages.yml` performs the same
+static export in CI and deploys `site/dist` to Cloudflare Pages.
+
+Configure these GitHub repository settings:
+
+```text
+Secrets:
+  CLOUDFLARE_API_TOKEN
+  CLOUDFLARE_ACCOUNT_ID
+
+Variables:
+  CLOUDFLARE_PAGES_PROJECT_NAME
+```
+
+After changing content in the admin panel, export the desired local DB state
+back into the seed files and commit those files before pushing. CI deploys from
+the committed seed snapshot, not from your local `backend/blog.db`.
+
+---
+
 ## Deploy with the ONCE app server (recommended)
 
 [ONCE](https://github.com/basecamp/once) is an open-source app server by 37signals that lets you run multiple
