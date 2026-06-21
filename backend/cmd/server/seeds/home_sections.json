@@ -98,7 +98,7 @@
       "title": "Past Performances",
       "items": [
         {
-          "date": "MAY 30, 2026",
+          "date": "Jun 06, 2026",
           "title": "Solo Piano Concert",
           "location": "León, Spain",
           "image": "/uploads/7806b57f-4bc8-4f91-94b7-fe310bee882c.webp",
@@ -124,28 +124,28 @@
           ],
           "program": [
             {
-              "label": "Bach-Siloti",
-              "value": "Prelude in b minor"
+              "label": "Johann Sebastian Bach / Alexander Siloti ",
+              "value": "Prelude in B minor"
             },
             {
               "label": "M. Nikolovski",
-              "value": "Suite for piano"
+              "value": "Suite for Piano"
             },
             {
-              "label": "Bach-Busoni",
-              "value": "Chaconne in d minor "
+              "label": "Johann Sebastian Bach / Ferruccio Busoni",
+              "value": "Chaconne in D minor"
             },
             {
-              "label": "J. Maticic",
-              "value": "“Odsevi na jezero” suite op.2 no1 "
+              "label": "Josip Matičić",
+              "value": "Odsevi na jezero, Suite Op. 2 No. 1"
             },
             {
-              "label": "M. Ravel",
-              "value": "“Une barque sur l’ocean” III mov “Miroirs”"
+              "label": "Maurice Ravel",
+              "value": "Une barque sur l’océan"
             },
             {
-              "label": "F. Chopin",
-              "value": "Scherzo op. 31 no. 2"
+              "label": "Frédéric Chopin",
+              "value": "Scherzo No. 2 in B-flat minor, Op. 31"
             }
           ]
         },
