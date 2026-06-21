@@ -263,7 +263,7 @@
     {
       "id": "gallery",
       "type": "gallery",
-      "visible": false,
+      "visible": true,
       "order": 4,
       "config": {
         "elementId": "gallery",
