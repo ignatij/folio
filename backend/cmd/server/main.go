@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	_ "embed"
+	"embed"
 	"encoding/json"
 	"flag"
 	"log"
@@ -26,11 +26,44 @@ import (
 //go:embed seeds/home_sections.json
 var defaultHomeSections string
 
+//go:embed seeds/uploads/*
+var seedUploads embed.FS
+
 func getEnv(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
 	}
 	return def
+}
+
+func copySeedUploads(uploadDir string) {
+	entries, err := seedUploads.ReadDir("seeds/uploads")
+	if err != nil {
+		log.Printf("copySeedUploads: failed to read embedded uploads: %v", err)
+		return
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		name := entry.Name()
+		dst := filepath.Join(uploadDir, name)
+		if _, err := os.Stat(dst); err == nil {
+			continue
+		}
+
+		data, err := seedUploads.ReadFile(filepath.Join("seeds/uploads", name))
+		if err != nil {
+			log.Printf("copySeedUploads: failed to read %s: %v", name, err)
+			continue
+		}
+
+		if err := os.WriteFile(dst, data, 0644); err != nil {
+			log.Printf("copySeedUploads: failed to write %s: %v", dst, err)
+		}
+	}
 }
 
 // seedSettings seeds DB settings from config.yaml + theme.json on first boot.
@@ -183,6 +216,7 @@ func main() {
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		log.Fatalf("failed to create upload dir: %v", err)
 	}
+	copySeedUploads(uploadDir)
 
 	// 5. Open database
 	database, err := db.Open(dbPath)
