@@ -42,6 +42,23 @@ function attachDerivedHomeData(blocks) {
   const firstPerformance = schedule?.config.items[0];
 
   return blocks.map((block) => {
+    if (block.type === "schedule") {
+      const items = Array.isArray(block.config?.items)
+        ? block.config.items.map((item) => ({
+            ...item,
+            detailUrl: performancePath("upcoming", item),
+          }))
+        : [];
+
+      return {
+        ...block,
+        config: {
+          ...block.config,
+          items,
+        },
+      };
+    }
+
     if (block.type === "past-performances") {
       const items = Array.isArray(block.config?.items)
         ? block.config.items.map((item) => ({
@@ -70,7 +87,7 @@ function attachDerivedHomeData(blocks) {
           date: firstPerformance.date,
           title: firstPerformance.title,
           location: firstPerformance.location,
-          url: firstPerformance.detailUrl || "#schedule",
+          url: performancePath("upcoming", firstPerformance) || "#schedule",
         },
       },
     };

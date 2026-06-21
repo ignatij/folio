@@ -49,9 +49,6 @@ permalink: "{{ performance.url }}index.html"
         {% if performance.intro %}
           <p class="reference-detail-intro">{{ performance.intro }}</p>
         {% endif %}
-        {% if performance.kind === "upcoming" %}
-          <a class="reference-pill-button" href="#details">Details</a>
-        {% endif %}
       </div>
 
       {% if performance.facts and performance.facts.length %}
