@@ -1005,8 +1005,9 @@ img {
 
 .reference-past-title {
     color: #161616;
-    font-size: 1.2rem;
-    letter-spacing: 0.18em;
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    line-height: 1.35;
 }
 
 .reference-past-title:hover {
@@ -1115,13 +1116,24 @@ img {
     left: 1.5rem;
     right: 1.5rem;
     bottom: 1.5rem;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.reference-detail-image-meta,
+.reference-detail-image-title {
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.42em;
+    line-height: 1.5;
+    text-transform: uppercase;
 }
 
 .reference-detail-image-meta {
-    color: rgba(255, 255, 255, 0.86);
-    font-size: 0.75rem;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
+    text-align: right;
 }
 
 .reference-detail-hero,
@@ -1139,11 +1151,15 @@ img {
     padding: 2rem;
 }
 
+.reference-detail-hero-summary {
+    display: block;
+}
+
 .reference-detail-title {
     color: #1f1f1f;
-    font-size: clamp(2.35rem, 7vw, 6rem);
-    line-height: 0.95;
-    letter-spacing: 0.18em;
+    font-size: clamp(1.65rem, 3.35vw, 3rem);
+    line-height: 1.12;
+    letter-spacing: 0.12em;
 }
 
 .reference-detail-intro {
@@ -1184,9 +1200,9 @@ img {
     margin-top: 5rem;
 }
 
-.reference-detail-two-col {
+.reference-detail-section {
     display: grid;
-    gap: 2rem;
+    gap: 2.25rem;
 }
 
 .reference-detail-card,
@@ -1397,6 +1413,17 @@ img {
     color: #fff;
 }
 
+@media (max-width: 767px) {
+    .reference-detail-image-copy {
+        display: grid;
+        align-items: start;
+    }
+
+    .reference-detail-image-meta {
+        text-align: left;
+    }
+}
+
 @media (min-width: 768px) {
     .reference-main {
         padding-left: 3rem;
@@ -1432,10 +1459,6 @@ img {
         left: 3rem;
         right: 3rem;
         bottom: 2.5rem;
-    }
-
-    .reference-detail-two-col {
-        grid-template-columns: 0.7fr 1.3fr;
     }
 
     .reference-detail-photo-grid {

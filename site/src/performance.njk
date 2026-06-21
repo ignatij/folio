@@ -25,22 +25,27 @@ permalink: "{{ performance.url }}index.html"
     <a class="reference-detail-back" href="{{ performance.backUrl or '/en/' }}">{{ performance.backLabel or "Back" }}</a>
 
     {% set detailHeroImage = performance.heroImage or (performance.images[0].src if performance.images and performance.images.length else "") %}
+    {% set titleInImageHero = performance.kind === "past" and detailHeroImage %}
     {% if performance.kind === "past" and detailHeroImage %}
       <section class="reference-detail-image-hero">
         <img src="{{ detailHeroImage }}" alt="{{ performance.title }}" loading="eager" />
         <div class="reference-detail-image-overlay"></div>
         <div class="reference-detail-image-copy">
+          <h1 class="reference-detail-image-title">{{ performance.title }}</h1>
           <p class="reference-detail-image-meta">{{ performance.date }}{% if performance.location %} · {{ performance.location }}{% endif %}</p>
         </div>
       </section>
     {% endif %}
 
-    <section class="reference-detail-hero">
+    {% if not titleInImageHero or performance.intro or performance.kind === "upcoming" %}
+    <section class="reference-detail-hero{% if titleInImageHero %} reference-detail-hero-summary{% endif %}">
       <div class="space-y-6">
-        <div class="space-y-2">
-          <p class="reference-eyebrow">{{ performance.eyebrow }}</p>
-          <h1 class="reference-detail-title">{{ performance.title }}</h1>
-        </div>
+        {% if not titleInImageHero %}
+          <div class="space-y-2">
+            <p class="reference-eyebrow">{{ performance.eyebrow }}</p>
+            <h1 class="reference-detail-title">{{ performance.title }}</h1>
+          </div>
+        {% endif %}
         {% if performance.intro %}
           <p class="reference-detail-intro">{{ performance.intro }}</p>
         {% endif %}
@@ -60,10 +65,11 @@ permalink: "{{ performance.url }}index.html"
         </div>
       {% endif %}
     </section>
+    {% endif %}
 
     <div class="reference-detail-sections">
       {% if performance.program and performance.program.length %}
-        <section class="reference-detail-two-col" id="details">
+        <section class="reference-detail-section" id="details">
           <div class="space-y-2">
             <p class="reference-eyebrow">{{ "Program" if performance.kind === "past" else "Details" }}</p>
             <h2 class="reference-section-title">{{ "Repertoire" if performance.kind === "past" else "Concert Information" }}</h2>
@@ -82,7 +88,7 @@ permalink: "{{ performance.url }}index.html"
       {% endif %}
 
       {% if performance.images and performance.images.length or performance.videos and performance.videos.length %}
-        <section class="reference-detail-two-col">
+        <section class="reference-detail-section">
           <div class="space-y-2">
             <p class="reference-eyebrow">Media</p>
             <h2 class="reference-section-title">Photos & Video</h2>
