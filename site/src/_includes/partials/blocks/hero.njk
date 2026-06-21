@@ -1,6 +1,7 @@
 {%- set heroImage = b.config.bg_image or "/site-assets/reference/hero.jpg" -%}
 {%- set heroTitle = b.config.headline or site.name -%}
 {%- set heroSubtitle = b.config.subheadline or site.tagline -%}
+{%- set nextPerformance = b.config.nextPerformance -%}
 {%- set heroNav = nav.byLang[lang] if nav.byLang and nav.byLang[lang] and nav.byLang[lang].length else [
   { label: "ABOUT", url: "#about", type: "external" },
   { label: "SCHEDULE", url: "#schedule", type: "external" },
@@ -46,5 +47,13 @@
         {% endif %}
       </div>
     </div>
+
+    {% if nextPerformance and nextPerformance.title %}
+      <a class="reference-next-card" href="{{ nextPerformance.url or '#schedule' }}">
+        <span class="reference-next-eyebrow">{{ nextPerformance.eyebrow or "Next Performance" }}</span>
+        <span class="reference-next-title">{{ nextPerformance.title }}</span>
+        <span class="reference-next-meta">{{ nextPerformance.date }}{% if nextPerformance.location %} · {{ nextPerformance.location }}{% endif %}</span>
+      </a>
+    {% endif %}
   </div>
 </section>

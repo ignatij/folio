@@ -7,7 +7,8 @@
     "config": {
       "bg_image": "/site-assets/reference/hero.jpg",
       "elementId": null,
-      "customStyle": null
+      "customStyle": null,
+      "nextPerformanceEyebrow": "Next Performance"
     },
     "translations": {
       "en": {
@@ -48,19 +49,34 @@
       "customStyle": null,
       "items": [
         {
-          "date": "FEB 08, 2026",
-          "title": "Voice & Piano Concert",
-          "location": "Biel, Switzerland"
+          "date": "JUL 04, 2026",
+          "title": "Piano & Voice Recital",
+          "location": "Ohrid, Macedonia",
+          "detailUrl": ""
         },
         {
-          "date": "MAR 31, 2026",
-          "title": "Violin & Piano Concert",
-          "location": "Split, Croatia"
+          "date": "JUL 12-17, 2026",
+          "title": "Mozart Piano Concerto K 467",
+          "location": "Erba, Italy",
+          "detailUrl": ""
         },
         {
-          "date": "MAY 30, 2026",
-          "title": "Solo Piano Concert",
-          "location": "León, Spain"
+          "date": "AUG 22, 2026",
+          "title": "Piano & Voice Recital",
+          "location": "Skopje, Macedonia",
+          "detailUrl": ""
+        },
+        {
+          "date": "SEP 03, 2026",
+          "title": "Two Violins Recital",
+          "location": " Bitola, Macedonia",
+          "detailUrl": ""
+        },
+        {
+          "date": "NOV 11, 2026",
+          "title": " Violin & Piano Recital",
+          "location": " Zagreb, Croatia",
+          "detailUrl": ""
         }
       ]
     },
@@ -72,10 +88,146 @@
     }
   },
   {
-    "id": "gallery",
-    "type": "gallery",
+    "id": "past-performances",
+    "type": "past-performances",
     "visible": true,
     "order": 3,
+    "config": {
+      "elementId": "past-performances",
+      "eyebrow": "Archive",
+      "title": "Past Performances",
+      "items": [
+        {
+          "date": "MAY 30, 2026",
+          "title": "Solo Piano Concert",
+          "location": "León, Spain",
+          "image": "/uploads/7806b57f-4bc8-4f91-94b7-fe310bee882c.webp",
+          "url": "/en/performances/past/solo-piano-concert-leon-2026/",
+          "summary": "",
+          "media": [
+            "Photos",
+            "YouTube"
+          ],
+          "images": [
+            {
+              "src": "/uploads/0dabbe0c-d9cc-48db-a777-38cd8ddac6c1.webp",
+              "alt": "Solo Piano Concert"
+            },
+            {
+              "src": "/uploads/c4ab7568-06fb-4bd2-9a7e-1aecae9e7b57.webp",
+              "alt": "Solo Piano Concert"
+            },
+            {
+              "src": "/uploads/7806b57f-4bc8-4f91-94b7-fe310bee882c.webp",
+              "alt": "Solo Piano Concert"
+            }
+          ],
+          "program": [
+            {
+              "label": "Bach-Siloti",
+              "value": "Prelude in b minor"
+            },
+            {
+              "label": "M. Nikolovski",
+              "value": "Suite for piano"
+            },
+            {
+              "label": "Bach-Busoni",
+              "value": "Chaconne in d minor "
+            },
+            {
+              "label": "J. Maticic",
+              "value": "“Odsevi na jezero” suite op.2 no1 "
+            },
+            {
+              "label": "M. Ravel",
+              "value": "“Une barque sur l’ocean” III mov “Miroirs”"
+            },
+            {
+              "label": "F. Chopin",
+              "value": "Scherzo op. 31 no. 2"
+            }
+          ]
+        },
+        {
+          "date": "MAR 31, 2026",
+          "title": "Violin & Piano Concert",
+          "location": "Split, Croatia",
+          "image": "/uploads/722f5915-a9bf-4a9b-ba5f-1813ecad379c.webp",
+          "url": "/en/performances/past/violin-piano-concert-split-2026/",
+          "summary": "",
+          "media": [
+            "Photos",
+            "YouTube"
+          ],
+          "images": [
+            {
+              "src": "/uploads/a44c67d9-96d0-4e06-93b5-39dfe1e45dea.webp",
+              "alt": "Violin & Piano Concert"
+            },
+            {
+              "src": "/uploads/5b95bf3c-9fa0-4f0d-b30f-3380abaaf080.webp",
+              "alt": "Violin & Piano Concert"
+            }
+          ],
+          "program": [
+            {
+              "label": "L.van Beethoven",
+              "value": "Violin sonata op12 no 1"
+            },
+            {
+              "label": "L. Janachek",
+              "value": "op12 no 1"
+            },
+            {
+              "label": "A. Beach",
+              "value": "Romance for violin and piano "
+            },
+            {
+              "label": "B. Bartok",
+              "value": "Romanian pieces"
+            }
+          ]
+        },
+        {
+          "date": "FEB 08, 2026",
+          "title": "Voice & Piano Concert",
+          "location": "Biel, Switzerland",
+          "image": "/uploads/dea7def0-955c-40c2-add8-321266f64288.webp",
+          "url": "/en/performances/past/voice-piano-concert-biel-2026/",
+          "summary": "Macedonian solo pieces for piano and mezzosopran",
+          "media": [
+            "Photos",
+            "YouTube"
+          ],
+          "images": [
+            {
+              "src": "/uploads/dea7def0-955c-40c2-add8-321266f64288.webp",
+              "alt": "Voice & Piano Concert"
+            },
+            {
+              "src": "/uploads/b6f9ff36-bd86-464b-9367-90267cbad5ee.webp",
+              "alt": "Voice & Piano Concert"
+            }
+          ],
+          "program": [
+            {
+              "label": "",
+              "value": ""
+            }
+          ]
+        }
+      ]
+    },
+    "translations": {
+      "en": {}
+    }
+  },
+  {
+    "id": "gallery",
+    "type": "gallery",
+    "visible": false,
+    "order": 4,
     "config": {
       "elementId": "gallery",
       "customStyle": null,
@@ -147,7 +299,7 @@
     "id": "recordings",
     "type": "recordings",
     "visible": true,
-    "order": 4,
+    "order": 5,
     "config": {
       "elementId": "recordings",
       "customStyle": null,
@@ -185,7 +337,7 @@
     "id": "contact-section",
     "type": "contact",
     "visible": true,
-    "order": 5,
+    "order": 6,
     "config": {
       "elementId": "contact",
       "eyebrow": "Contact",

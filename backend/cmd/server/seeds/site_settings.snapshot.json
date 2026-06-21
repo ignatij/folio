@@ -1,0 +1,521 @@
+{
+  "footer_links": [
+    {
+      "type": "builtin",
+      "label": "Home",
+      "url": "/",
+      "order": 0
+    },
+    {
+      "type": "builtin",
+      "label": "Articles",
+      "url": "/articles/",
+      "order": 1
+    },
+    {
+      "type": "builtin",
+      "label": "Contact",
+      "url": "/contact/",
+      "order": 2
+    }
+  ],
+  "header_sections": [
+    {
+      "id": "header-nav-links",
+      "type": "nav-links",
+      "visible": true,
+      "order": 0,
+      "config": {
+        "dropdown_style": "simple",
+        "show_language_switcher": true,
+        "link_color": null,
+        "bg_color": null,
+        "sticky": true
+      },
+      "translations": {}
+    }
+  ],
+  "home_sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "visible": true,
+      "order": 0,
+      "config": {
+        "bg_image": "/site-assets/reference/hero.jpg",
+        "elementId": null,
+        "customStyle": null,
+        "nextPerformanceEyebrow": "Next Performance"
+      },
+      "translations": {
+        "en": {
+          "headline": "Anastasija Gichevska",
+          "subheadline": "Macedonian Pianist • Piano Accompanist • Piano Teacher",
+          "cta_label": "",
+          "cta_url": ""
+        }
+      }
+    },
+    {
+      "id": "about",
+      "type": "about",
+      "visible": true,
+      "order": 1,
+      "config": {
+        "elementId": "about",
+        "eyebrow": "About",
+        "title": "Anastasija Gichevska",
+        "body": "Anastasija Gichevska is a Macedonian concert pianist, chamber musician, and piano teacher with an international career. She completed her Bachelor’s degree in Piano Performance with honors at the Faculty of Music in Skopje, North Macedonia, continued her Master’s studies at the Academy of Music in Ljubljana, Slovenia, and University of Music and Performing Arts Graz (KUG), Austria. A prizewinner of over 30 international competitions, Anastasija has performed as a soloist, chamber musician, and with orchestra across Europe and the USA, earning recognition for her expressive playing and dynamic stage presence. Alongside her performing career, she is a dedicated teacher, guiding students to develop both technical mastery and deep musical artistry.",
+        "buttonLabel": "Biography PDF",
+        "buttonUrl": "/cv.pdf",
+        "buttonDownload": true,
+        "quote": "“A pianist with a strong temperament and deep emotional expression.”",
+        "quoteAuthor": "David Fray"
+      },
+      "translations": {
+        "en": {}
+      }
+    },
+    {
+      "id": "schedule",
+      "type": "schedule",
+      "visible": true,
+      "order": 2,
+      "config": {
+        "elementId": "schedule",
+        "customStyle": null,
+        "items": [
+          {
+            "date": "JUL 04, 2026",
+            "title": "Piano & Voice Recital",
+            "location": "Ohrid, Macedonia",
+            "detailUrl": ""
+          },
+          {
+            "date": "JUL 12-17, 2026",
+            "title": "Mozart Piano Concerto K 467",
+            "location": "Erba, Italy",
+            "detailUrl": ""
+          },
+          {
+            "date": "AUG 22, 2026",
+            "title": "Piano & Voice Recital",
+            "location": "Skopje, Macedonia",
+            "detailUrl": ""
+          },
+          {
+            "date": "SEP 03, 2026",
+            "title": "Two Violins Recital",
+            "location": " Bitola, Macedonia",
+            "detailUrl": ""
+          },
+          {
+            "date": "NOV 11, 2026",
+            "title": " Violin & Piano Recital",
+            "location": " Zagreb, Croatia",
+            "detailUrl": ""
+          }
+        ]
+      },
+      "translations": {
+        "en": {
+          "eyebrow": "Schedule",
+          "title": "Upcoming Performances"
+        }
+      }
+    },
+    {
+      "id": "past-performances",
+      "type": "past-performances",
+      "visible": true,
+      "order": 3,
+      "config": {
+        "elementId": "past-performances",
+        "eyebrow": "Archive",
+        "title": "Past Performances",
+        "items": [
+          {
+            "date": "MAY 30, 2026",
+            "title": "Solo Piano Concert",
+            "location": "León, Spain",
+            "image": "/uploads/7806b57f-4bc8-4f91-94b7-fe310bee882c.webp",
+            "url": "/en/performances/past/solo-piano-concert-leon-2026/",
+            "summary": "",
+            "media": [
+              "Photos",
+              "YouTube"
+            ],
+            "images": [
+              {
+                "src": "/uploads/0dabbe0c-d9cc-48db-a777-38cd8ddac6c1.webp",
+                "alt": "Solo Piano Concert"
+              },
+              {
+                "src": "/uploads/c4ab7568-06fb-4bd2-9a7e-1aecae9e7b57.webp",
+                "alt": "Solo Piano Concert"
+              },
+              {
+                "src": "/uploads/7806b57f-4bc8-4f91-94b7-fe310bee882c.webp",
+                "alt": "Solo Piano Concert"
+              }
+            ],
+            "program": [
+              {
+                "label": "Bach-Siloti",
+                "value": "Prelude in b minor"
+              },
+              {
+                "label": "M. Nikolovski",
+                "value": "Suite for piano"
+              },
+              {
+                "label": "Bach-Busoni",
+                "value": "Chaconne in d minor "
+              },
+              {
+                "label": "J. Maticic",
+                "value": "“Odsevi na jezero” suite op.2 no1 "
+              },
+              {
+                "label": "M. Ravel",
+                "value": "“Une barque sur l’ocean” III mov “Miroirs”"
+              },
+              {
+                "label": "F. Chopin",
+                "value": "Scherzo op. 31 no. 2"
+              }
+            ]
+          },
+          {
+            "date": "MAR 31, 2026",
+            "title": "Violin & Piano Concert",
+            "location": "Split, Croatia",
+            "image": "/uploads/722f5915-a9bf-4a9b-ba5f-1813ecad379c.webp",
+            "url": "/en/performances/past/violin-piano-concert-split-2026/",
+            "summary": "",
+            "media": [
+              "Photos",
+              "YouTube"
+            ],
+            "images": [
+              {
+                "src": "/uploads/a44c67d9-96d0-4e06-93b5-39dfe1e45dea.webp",
+                "alt": "Violin & Piano Concert"
+              },
+              {
+                "src": "/uploads/5b95bf3c-9fa0-4f0d-b30f-3380abaaf080.webp",
+                "alt": "Violin & Piano Concert"
+              }
+            ],
+            "program": [
+              {
+                "label": "L.van Beethoven",
+                "value": "Violin sonata op12 no 1"
+              },
+              {
+                "label": "L. Janachek",
+                "value": "op12 no 1"
+              },
+              {
+                "label": "A. Beach",
+                "value": "Romance for violin and piano "
+              },
+              {
+                "label": "B. Bartok",
+                "value": "Romanian pieces"
+              }
+            ]
+          },
+          {
+            "date": "FEB 08, 2026",
+            "title": "Voice & Piano Concert",
+            "location": "Biel, Switzerland",
+            "image": "/uploads/dea7def0-955c-40c2-add8-321266f64288.webp",
+            "url": "/en/performances/past/voice-piano-concert-biel-2026/",
+            "summary": "Macedonian solo pieces for piano and mezzosopran",
+            "media": [
+              "Photos",
+              "YouTube"
+            ],
+            "images": [
+              {
+                "src": "/uploads/dea7def0-955c-40c2-add8-321266f64288.webp",
+                "alt": "Voice & Piano Concert"
+              },
+              {
+                "src": "/uploads/b6f9ff36-bd86-464b-9367-90267cbad5ee.webp",
+                "alt": "Voice & Piano Concert"
+              }
+            ],
+            "program": [
+              {
+                "label": "",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "translations": {
+        "en": {}
+      }
+    },
+    {
+      "id": "gallery",
+      "type": "gallery",
+      "visible": false,
+      "order": 4,
+      "config": {
+        "elementId": "gallery",
+        "customStyle": null,
+        "columns": 3,
+        "imageHeight": 288,
+        "items": [
+          {
+            "src": "/site-assets/reference/gallery-01.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-02.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-03.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-04.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-05.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-06.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-07.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-08.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-09.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-10.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-11.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-12.jpg",
+            "alt": "Piano performance still"
+          },
+          {
+            "src": "/site-assets/reference/gallery-13.jpg",
+            "alt": "Piano performance still"
+          }
+        ]
+      },
+      "translations": {
+        "en": {
+          "eyebrow": "Gallery",
+          "title": "In Focus"
+        }
+      }
+    },
+    {
+      "id": "recordings",
+      "type": "recordings",
+      "visible": true,
+      "order": 5,
+      "config": {
+        "elementId": "recordings",
+        "customStyle": null,
+        "items": [
+          {
+            "title": "M. Mussorgsky: \"Pictures at an Exhibition\"",
+            "src": "https://www.youtube.com/embed/VMjyvPZZKrY"
+          },
+          {
+            "title": "L. van Beethoven: Violin Sonata Op. 12 No. 1 in D Major",
+            "src": "https://www.youtube.com/embed/sKi2-kFfMh0"
+          },
+          {
+            "title": "M. Ravel: \"Une barque sur l’ocean\" (Miroirs, III)",
+            "src": "https://www.youtube.com/embed/kdcTCpOH5zY"
+          },
+          {
+            "title": "S. Rachmaninoff: Trio élégiaque No. 1 in G minor",
+            "src": "https://www.youtube.com/embed/t4lml3JJAQI"
+          },
+          {
+            "title": "L. van Beethoven: Sonata Op. 109 in E Major (III)",
+            "src": "https://www.youtube.com/embed/SqSKNcpF4hQ"
+          }
+        ]
+      },
+      "translations": {
+        "en": {
+          "eyebrow": "Recordings",
+          "title": "Watch & Listen"
+        }
+      }
+    },
+    {
+      "id": "contact-section",
+      "type": "contact",
+      "visible": true,
+      "order": 6,
+      "config": {
+        "elementId": "contact",
+        "eyebrow": "Contact",
+        "title": "Collaborations & Online Piano Lessons",
+        "intro": "For performance engagements, media requests, masterclasses, online lessons, or collaborative projects, please get in touch.",
+        "formAction": "https://formsubmit.co/anastasija.gicevska@hotmail.com",
+        "subject": "New inquiry from anastasijagichevska.com",
+        "captcha": false,
+        "nameLabel": "Full Name",
+        "namePlaceholder": "Full Name",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Email",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Share repertoire, dates, or media requests.",
+        "submitLabel": "Send Message",
+        "socialLinks": [
+          {
+            "label": "Instagram",
+            "url": "https://www.instagram.com/agichevska"
+          },
+          {
+            "label": "YouTube",
+            "url": "https://www.youtube.com/@anastasijagichevska1901"
+          },
+          {
+            "label": "LinkedIn",
+            "url": "https://www.linkedin.com/in/anastasija-gichevska-866a3b245/"
+          }
+        ]
+      },
+      "translations": {
+        "en": {}
+      }
+    }
+  ],
+  "languages": [
+    {
+      "code": "en",
+      "label": "English",
+      "dir": "ltr",
+      "default": true
+    }
+  ],
+  "nav_links": [
+    {
+      "type": "external",
+      "label": "ABOUT",
+      "url": "#about",
+      "order": 0
+    },
+    {
+      "type": "external",
+      "label": "SCHEDULE",
+      "url": "#schedule",
+      "order": 1
+    },
+    {
+      "type": "external",
+      "label": "GALLERY",
+      "url": "#gallery",
+      "order": 2
+    },
+    {
+      "type": "external",
+      "label": "RECORDINGS",
+      "url": "#recordings",
+      "order": 3
+    }
+  ],
+  "site": {
+    "name": "Anastasija Gichevska",
+    "tagline": "Macedonian Pianist • Piano Accompanist • Piano Teacher",
+    "url": "http://localhost:8082",
+    "bookingUrl": "",
+    "contactEmail": "",
+    "favicon": "",
+    "logo": "",
+    "social": {
+      "twitter": "",
+      "linkedin": "",
+      "github": ""
+    }
+  },
+  "social_links": null,
+  "theme": {
+    "preset": "default",
+    "colors": {
+      "accent": "#111111",
+      "accent-hover": "#3d3d3d",
+      "accent-dark": "#000000",
+      "cta": "#111111",
+      "cta-hover": "#3d3d3d",
+      "nav-from": "#f4f1ec",
+      "nav-to": "#f4f1ec",
+      "bg": "#f4f1ec",
+      "bg-surface": "#ffffff",
+      "text": "#161616",
+      "muted": "#7a7263",
+      "border": "#c4bfb5",
+      "success": "#1f6b45",
+      "warning": "#8a6a2f",
+      "destructive": "#b42318"
+    },
+    "fonts": {
+      "body": "Raleway",
+      "heading": "Raleway",
+      "fallback": "system-ui, sans-serif"
+    },
+    "radius": {
+      "button": "9999px",
+      "card": "28px",
+      "input": "16px"
+    }
+  },
+  "ui_strings": {
+    "en": {
+      "contact_title": "Contact",
+      "contact_intro": "Fill in the form below and we'll get back to you.",
+      "contact_first_name": "First name",
+      "contact_last_name": "Last name",
+      "contact_company": "Company",
+      "contact_email": "Email",
+      "contact_phone": "Phone",
+      "contact_message": "Message",
+      "contact_submit": "Send message",
+      "contact_success": "Thank you for your message — we'll be in touch soon!",
+      "contact_error": "Something went wrong. Please try again.",
+      "unsubscribe_title": "Unsubscribe",
+      "unsubscribe_intro": "Enter your email address below to unsubscribe from the newsletter.",
+      "unsubscribe_email_placeholder": "Your email address",
+      "unsubscribe_submit": "Unsubscribe",
+      "unsubscribe_success": "You have been unsubscribed successfully.",
+      "articles_title": "Articles",
+      "articles_intro": "Articles, guides and news.",
+      "articles_all_filter": "All",
+      "articles_no_results": "No articles found for this tag.",
+      "articles_no_articles": "No articles published yet. Check back soon.",
+      "article_home": "Home",
+      "article_read_more": "Read more",
+      "article_back": "Back to Articles",
+      "reading_time_suffix": "min read"
+    }
+  }
+}

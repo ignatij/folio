@@ -205,6 +205,7 @@ export interface PageBlock {
 export type BlockType =
   | "hero"
   | "schedule"
+  | "past-performances"
   | "gallery"
   | "recordings"
   | "featured-articles"

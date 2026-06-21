@@ -22,6 +22,7 @@ import type { BlockType } from "../../api/types";
 export const BLOCK_LABELS: Record<BlockType, string> = {
   hero: "Hero",
   schedule: "Schedule",
+  "past-performances": "Past Performances",
   gallery: "Gallery",
   recordings: "Recordings",
   "featured-articles": "Featured Articles",
@@ -417,11 +418,47 @@ export function applyArticleTagDefaults(config: Record<string, unknown>): void {
 
 export function applyScheduleDefaults(config: Record<string, unknown>): void {
   config.items = [
-    { date: "Jan 15, 2027", title: "Sample Event", location: "City, Country" },
-    { date: "Feb 28, 2027", title: "Another Event", location: "Venue Name" },
-    { date: "Apr 10, 2027", title: "Featured Appearance", location: "Event Location" },
+    {
+      date: "Jan 15, 2027",
+      title: "Sample Event",
+      location: "City, Country",
+      detailUrl: "",
+    },
+    {
+      date: "Feb 28, 2027",
+      title: "Another Event",
+      location: "Venue Name",
+      detailUrl: "",
+    },
+    {
+      date: "Apr 10, 2027",
+      title: "Featured Appearance",
+      location: "Event Location",
+      detailUrl: "",
+    },
   ];
   config.elementId = null;
+  config.customStyle = null;
+}
+
+export function applyPastPerformancesDefaults(
+  config: Record<string, unknown>,
+): void {
+  config.items = [
+    {
+      date: "May 30, 2026",
+      title: "Solo Piano Concert",
+      location: "City, Country",
+      image: "",
+      url: "",
+      summary: "",
+      media: ["Photos", "YouTube"],
+      program: [],
+      images: [],
+      videos: [],
+    },
+  ];
+  config.elementId = "past-performances";
   config.customStyle = null;
 }
 
@@ -1212,6 +1249,7 @@ const PALETTE_GROUPS: { label: string; types: BlockType[] }[] = [
     types: [
       "hero",
       "schedule",
+      "past-performances",
       "gallery",
       "recordings",
       "featured-articles",

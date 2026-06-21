@@ -74,7 +74,7 @@
 
     // ── Make source images clickable ─────────────────────────────────────────
     imgs.forEach(function (img, i) {
-      img.style.cursor = "zoom-in";
+      img.style.cursor = "pointer";
       img.addEventListener("click", function () {
         open(i);
       });

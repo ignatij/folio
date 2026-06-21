@@ -26,6 +26,7 @@ import {
   applyArticleBodyDefaults,
   applySlideshowDefaults,
   applyScheduleDefaults,
+  applyPastPerformancesDefaults,
   applyGalleryDefaults,
   applyRecordingsDefaults,
 } from "../blockShared";
@@ -191,6 +192,7 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   if (
     type === "hero" ||
     type === "schedule" ||
+    type === "past-performances" ||
     type === "gallery" ||
     type === "recordings" ||
     type === "featured-articles" ||
@@ -207,6 +209,7 @@ function baseConfig(type: BlockType): Record<string, unknown> {
   if (type === "container") applyContainerDefaults(config);
   if (type === "slideshow") applySlideshowDefaults(config);
   if (type === "schedule") applyScheduleDefaults(config);
+  if (type === "past-performances") applyPastPerformancesDefaults(config);
   if (type === "gallery") applyGalleryDefaults(config);
   if (type === "recordings") applyRecordingsDefaults(config);
   if (type === "text") applyTextDefaults(config);

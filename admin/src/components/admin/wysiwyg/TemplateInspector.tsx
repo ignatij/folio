@@ -33,6 +33,19 @@ interface TemplateInspectorProps {
   socialSnapshot?: SocialLink[];
 }
 
+type PastPerformanceItem = {
+  date?: string;
+  title?: string;
+  location?: string;
+  image?: string;
+  url?: string;
+  summary?: string;
+  media?: string[];
+  program?: Array<{ label?: string; value?: string }>;
+  images?: Array<{ src?: string; alt?: string }>;
+  videos?: Array<{ title?: string; youtubeEmbedUrl?: string }>;
+};
+
 export function TemplateInspector({
   block,
   mode,
@@ -171,7 +184,7 @@ function BlockTypeFields({
         onConfigChange("items", next);
       const updateItem = (
         index: number,
-        key: "date" | "title" | "location",
+        key: "date" | "title" | "location" | "detailUrl",
         value: string,
       ) => {
         updateItems(
@@ -198,7 +211,12 @@ function BlockTypeFields({
                 onClick={() =>
                   updateItems([
                     ...items,
-                    { date: "", title: "New event", location: "" },
+                    {
+                      date: "",
+                      title: "New event",
+                      location: "",
+                      detailUrl: "",
+                    },
                   ])
                 }
                 className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
@@ -240,6 +258,11 @@ function BlockTypeFields({
                     label="Location"
                     value={item.location ?? ""}
                     onChange={(v) => updateItem(index, "location", v)}
+                  />
+                  <Field
+                    label="Details URL"
+                    value={item.detailUrl ?? ""}
+                    onChange={(v) => updateItem(index, "detailUrl", v)}
                   />
                 </div>
               ))}
@@ -477,6 +500,406 @@ function BlockTypeFields({
               ))}
             </div>
           </div>
+          <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
+            <ElementIdSection config={block.config} onChange={onConfigChange} />
+            <CustomStyleSection
+              config={block.config}
+              onChange={onConfigChange}
+            />
+          </div>
+        </>
+      );
+    }
+
+    case "past-performances": {
+      const items = Array.isArray(block.config.items)
+        ? (block.config.items as PastPerformanceItem[])
+        : [];
+      const updateItems = (next: PastPerformanceItem[]) =>
+        onConfigChange("items", next);
+      const updateItem = (
+        index: number,
+        patch: Partial<PastPerformanceItem>,
+      ) => {
+        updateItems(
+          items.map((item, i) => (i === index ? { ...item, ...patch } : item)),
+        );
+      };
+      const updateProgram = (
+        itemIndex: number,
+        programIndex: number,
+        key: "label" | "value",
+        value: string,
+      ) => {
+        const program = items[itemIndex]?.program ?? [];
+        updateItem(itemIndex, {
+          program: program.map((row, i) =>
+            i === programIndex ? { ...row, [key]: value } : row,
+          ),
+        });
+      };
+      const updateDetailImage = (
+        itemIndex: number,
+        imageIndex: number,
+        patch: { src?: string; alt?: string },
+      ) => {
+        const images = items[itemIndex]?.images ?? [];
+        updateItem(itemIndex, {
+          images: images.map((image, i) =>
+            i === imageIndex ? { ...image, ...patch } : image,
+          ),
+        });
+      };
+      const updateVideo = (
+        itemIndex: number,
+        videoIndex: number,
+        patch: { title?: string; youtubeEmbedUrl?: string },
+      ) => {
+        const videos = items[itemIndex]?.videos ?? [];
+        updateItem(itemIndex, {
+          videos: videos.map((video, i) =>
+            i === videoIndex ? { ...video, ...patch } : video,
+          ),
+        });
+      };
+
+      return (
+        <>
+          <Field
+            label="Eyebrow"
+            value={t("eyebrow")}
+            onChange={(v) => setT("eyebrow", v)}
+          />
+          <Field
+            label="Section title"
+            value={t("title")}
+            onChange={(v) => setT("title", v)}
+          />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-medium">Performances</label>
+              <button
+                type="button"
+                onClick={() =>
+                  updateItems([
+                    ...items,
+                    {
+                      date: "",
+                      title: "New Performance",
+                      location: "",
+                      image: "",
+                      url: "",
+                      summary: "",
+                      media: ["Photos", "YouTube"],
+                      program: [],
+                      images: [],
+                      videos: [],
+                    },
+                  ])
+                }
+                className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+              >
+                Add performance
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-(--color-border) p-3 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-(--color-muted)">
+                      Performance {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateItems(items.filter((_, i) => i !== index))
+                      }
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <Field
+                    label="Date"
+                    value={item.date ?? ""}
+                    onChange={(v) => updateItem(index, { date: v })}
+                  />
+                  <Field
+                    label="Title"
+                    value={item.title ?? ""}
+                    onChange={(v) => updateItem(index, { title: v })}
+                  />
+                  <Field
+                    label="Location"
+                    value={item.location ?? ""}
+                    onChange={(v) => updateItem(index, { location: v })}
+                  />
+                  <Field
+                    label="Detail URL"
+                    value={item.url ?? ""}
+                    onChange={(v) => updateItem(index, { url: v })}
+                  />
+                  <p className="text-[10px] text-(--color-muted)">
+                    Leave blank to auto-generate a past-performance URL from the
+                    title, date, and location.
+                  </p>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      Card / hero image
+                    </label>
+                    <ImagePickButton
+                      src={item.image}
+                      onPick={() => setMediaPicker(`past-main-${index}`)}
+                      onRemove={() => updateItem(index, { image: "" })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      Summary
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={item.summary ?? ""}
+                      onChange={(e) =>
+                        updateItem(index, { summary: e.target.value })
+                      }
+                      className="w-full px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg) resize-y"
+                    />
+                  </div>
+
+                  <Field
+                    label="Media labels"
+                    value={(item.media ?? []).join(", ")}
+                    onChange={(v) =>
+                      updateItem(index, {
+                        media: v
+                          .split(",")
+                          .map((label) => label.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                  />
+
+                  <div className="space-y-2 pt-2 border-t border-(--color-border)">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-medium">
+                        Repertoire
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateItem(index, {
+                            program: [
+                              ...(item.program ?? []),
+                              { label: "", value: "" },
+                            ],
+                          })
+                        }
+                        className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+                      >
+                        Add row
+                      </button>
+                    </div>
+                    {(item.program ?? []).map((row, rowIndex) => (
+                      <div key={rowIndex} className="grid grid-cols-2 gap-2">
+                        <input
+                          value={row.label ?? ""}
+                          onChange={(e) =>
+                            updateProgram(
+                              index,
+                              rowIndex,
+                              "label",
+                              e.target.value,
+                            )
+                          }
+                          placeholder="Composer / label"
+                          className="px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+                        />
+                        <div className="flex gap-1">
+                          <input
+                            value={row.value ?? ""}
+                            onChange={(e) =>
+                              updateProgram(
+                                index,
+                                rowIndex,
+                                "value",
+                                e.target.value,
+                              )
+                            }
+                            placeholder="Work / value"
+                            className="min-w-0 flex-1 px-2 py-1.5 border border-(--color-border) rounded text-sm bg-(--color-bg)"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateItem(index, {
+                                program: (item.program ?? []).filter(
+                                  (_, i) => i !== rowIndex,
+                                ),
+                              })
+                            }
+                            className="text-xs text-red-600"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-(--color-border)">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-medium">
+                        Detail photos
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateItem(index, {
+                            images: [
+                              ...(item.images ?? []),
+                              { src: "", alt: item.title ?? "" },
+                            ],
+                          })
+                        }
+                        className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+                      >
+                        Add photo
+                      </button>
+                    </div>
+                    {(item.images ?? []).map((image, imageIndex) => (
+                      <div
+                        key={imageIndex}
+                        className="rounded border border-(--color-border) p-2 space-y-2"
+                      >
+                        <ImagePickButton
+                          src={image.src}
+                          onPick={() =>
+                            setMediaPicker(`past-image-${index}-${imageIndex}`)
+                          }
+                          onRemove={() =>
+                            updateDetailImage(index, imageIndex, { src: "" })
+                          }
+                        />
+                        <Field
+                          label="Alt text"
+                          value={image.alt ?? ""}
+                          onChange={(v) =>
+                            updateDetailImage(index, imageIndex, { alt: v })
+                          }
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateItem(index, {
+                              images: (item.images ?? []).filter(
+                                (_, i) => i !== imageIndex,
+                              ),
+                            })
+                          }
+                          className="text-xs text-red-600 hover:underline"
+                        >
+                          Remove photo
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-(--color-border)">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-medium">
+                        YouTube videos
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateItem(index, {
+                            videos: [
+                              ...(item.videos ?? []),
+                              { title: "", youtubeEmbedUrl: "" },
+                            ],
+                          })
+                        }
+                        className="text-xs px-2 py-1 rounded border border-(--color-border) hover:bg-(--color-bg-surface)"
+                      >
+                        Add video
+                      </button>
+                    </div>
+                    {(item.videos ?? []).map((video, videoIndex) => (
+                      <div
+                        key={videoIndex}
+                        className="rounded border border-(--color-border) p-2 space-y-2"
+                      >
+                        <Field
+                          label="Title"
+                          value={video.title ?? ""}
+                          onChange={(v) =>
+                            updateVideo(index, videoIndex, { title: v })
+                          }
+                        />
+                        <Field
+                          label="YouTube embed URL"
+                          value={video.youtubeEmbedUrl ?? ""}
+                          onChange={(v) =>
+                            updateVideo(index, videoIndex, {
+                              youtubeEmbedUrl: v,
+                            })
+                          }
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateItem(index, {
+                              videos: (item.videos ?? []).filter(
+                                (_, i) => i !== videoIndex,
+                              ),
+                            })
+                          }
+                          className="text-xs text-red-600 hover:underline"
+                        >
+                          Remove video
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {mediaPicker?.startsWith("past-main-") && (
+            <MediaPickerModal
+              mode="image"
+              onSelect={(f) => {
+                const index = Number(mediaPicker.replace("past-main-", ""));
+                updateItem(index, { image: `/uploads/${f.filename}` });
+                setMediaPicker(null);
+              }}
+              onClose={() => setMediaPicker(null)}
+            />
+          )}
+          {mediaPicker?.startsWith("past-image-") && (
+            <MediaPickerModal
+              mode="image"
+              onSelect={(f) => {
+                const [, , itemIndexRaw, imageIndexRaw] =
+                  mediaPicker.split("-");
+                updateDetailImage(Number(itemIndexRaw), Number(imageIndexRaw), {
+                  src: `/uploads/${f.filename}`,
+                });
+                setMediaPicker(null);
+              }}
+              onClose={() => setMediaPicker(null)}
+            />
+          )}
+
           <div className="pt-2 border-t border-(--color-border) divide-y divide-(--color-border)">
             <ElementIdSection config={block.config} onChange={onConfigChange} />
             <CustomStyleSection

@@ -15,7 +15,12 @@
         <div class="flex-1">
           <p class="reference-schedule-title">{{ item.title | escape | replace("&amp;", "<span class=\"ampersand\">&amp;</span>") | safe }}</p>
         </div>
-        <p class="reference-schedule-location">{{ item.location }}</p>
+        <div class="reference-schedule-meta">
+          <p class="reference-schedule-location">{{ item.location }}</p>
+          {% if item.detailUrl %}
+            <a class="reference-schedule-detail" href="{{ item.detailUrl }}">Details</a>
+          {% endif %}
+        </div>
       </div>
     {% endfor %}
   </div>

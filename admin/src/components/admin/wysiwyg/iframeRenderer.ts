@@ -243,6 +243,8 @@ function blockToHtml(
   switch (block.type) {
     case "schedule":
       return scheduleToHtml(block, activeLang, mode);
+    case "past-performances":
+      return pastPerformancesToHtml(block, activeLang, mode);
     case "gallery":
       return galleryToHtml(block, activeLang, mode);
     case "recordings":
@@ -334,6 +336,65 @@ ${label}
 ${eyebrow ? `<div style="font-size:12px;letter-spacing:0.45em;text-transform:uppercase;color:var(--color-muted,#7a7263);margin-bottom:0.75rem;">${escHtml(eyebrow)}</div>` : ""}
 ${title ? `<h2 style="font-size:2.25rem;line-height:1.1;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text,#161616);margin:0 0 1.5rem;">${escHtml(title)}</h2>` : ""}
 <div style="background:rgba(255,255,255,0.82);border:1px solid var(--color-border,#d6cfc3);">${rows}</div>
+</section>`;
+}
+
+function pastPerformancesToHtml(
+  block: RenderBlock,
+  activeLang: string,
+  mode: "home" | "page" | "article",
+): string {
+  const c = block.config;
+  const eyebrow = getTranslatedText(block, activeLang, mode, "eyebrow");
+  const title = getTranslatedText(block, activeLang, mode, "title");
+  const items = Array.isArray(c.items)
+    ? (c.items as Array<Record<string, unknown>>)
+    : [];
+  const customStyle = (c.customStyle as string) || "";
+  const elementId = (c.elementId as string) || "";
+  const label = `<span class="wysiwyg-label">▤ Past Performances</span>`;
+  const cards = items.length
+    ? items
+        .map((item) => {
+          const image = (item.image as string) || "";
+          const media = Array.isArray(item.media)
+            ? (item.media as string[])
+            : [];
+          return `<article style="overflow:hidden;border:1px solid #c9c1b6;border-radius:32px;background:rgba(255,255,255,.78);">
+  ${
+    image
+      ? `<img src="${escAttr(image)}" alt="${escAttr((item.title as string) || "Past performance")}" style="width:100%;height:220px;object-fit:cover;display:block;" />`
+      : `<div class="block-placeholder" style="min-height:220px;border:none;border-radius:0;background:#f3f4f6;"><div class="bp-label">Performance image</div><div>Pick an uploaded image</div></div>`
+  }
+  <div style="display:grid;gap:.65rem;padding:1.25rem;">
+    <div style="font-size:.7rem;letter-spacing:.38em;text-transform:uppercase;color:#8b8375;">${escHtml((item.date as string) || "")}</div>
+    <div style="font-size:1.15rem;letter-spacing:.16em;color:#161616;">${escHtml((item.title as string) || "")}</div>
+    <div style="font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:#6f675a;">${escHtml((item.location as string) || "")}</div>
+    ${
+      item.summary
+        ? `<p style="font-size:.92rem;line-height:1.55;color:#3d3d3d;">${escHtml(item.summary as string)}</p>`
+        : ""
+    }
+    ${
+      media.length
+        ? `<div style="display:flex;flex-wrap:wrap;gap:.4rem;">${media
+            .map(
+              (m) =>
+                `<span style="border:1px solid #d4cec3;border-radius:999px;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:#6f675a;padding:.35rem .55rem;">${escHtml(m)}</span>`,
+            )
+            .join("")}</div>`
+        : ""
+    }
+  </div>
+</article>`;
+        })
+        .join("")
+    : `<div class="block-placeholder"><div class="bp-label">Past Performances</div><div>Add archive entries in the inspector</div></div>`;
+  return `<section data-wysiwyg-id="${escAttr(block.id)}" data-wysiwyg-type="past-performances"${elementId ? ` id="${escAttr(elementId)}"` : ""} style="max-width:64rem;margin:0 auto;padding:2.5rem 1.5rem;${escAttr(customStyle)}">
+${label}
+${eyebrow ? `<div style="font-size:12px;letter-spacing:0.45em;color:#7a7263;margin-bottom:0.75rem;">${escHtml(eyebrow)}</div>` : ""}
+${title ? `<h2 style="font-size:2.25rem;line-height:1.1;letter-spacing:0.28em;color:#1f1f1f;margin:0 0 1.5rem;">${escHtml(title)}</h2>` : ""}
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem;">${cards}</div>
 </section>`;
 }
 
@@ -1404,6 +1465,7 @@ function richTextToHtml(
 
 const TEMPLATE_ICONS: Partial<Record<BlockType, string>> = {
   hero: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
+  "past-performances": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>`,
   recordings: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3V9z"/></svg>`,
   "featured-articles": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>`,
   "latest-articles": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>`,
@@ -1416,6 +1478,7 @@ const TEMPLATE_ICONS: Partial<Record<BlockType, string>> = {
 
 const TEMPLATE_DISPLAY: Partial<Record<BlockType, string>> = {
   hero: "Hero Section",
+  "past-performances": "Past Performances",
   recordings: "Recordings",
   "featured-articles": "Featured Articles",
   "latest-articles": "Latest Articles",

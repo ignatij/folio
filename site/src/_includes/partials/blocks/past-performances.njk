@@ -1,0 +1,41 @@
+{% set items = b.config.items if b.config.items and b.config.items.length else [] %}
+{%- if _inContainer -%}
+<div class="w-full"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
+{%- else -%}
+<section class="reference-section fade-section space-y-10"{% if b.config.elementId %} id="{{ b.config.elementId }}"{% endif %}{% if b.config.customStyle %} style="{{ b.config.customStyle }}"{% endif %}>
+{%- endif -%}
+  <div class="space-y-2">
+    <p class="reference-eyebrow">{{ b.config.eyebrow or "Archive" }}</p>
+    <h2 class="reference-section-title">{{ b.config.title or "Past Performances" }}</h2>
+  </div>
+
+  <div class="reference-past-grid">
+    {% for item in items %}
+      <article class="reference-past-card">
+        {% if item.image %}
+          <a class="reference-past-image-link" href="{{ item.url or '#' }}" aria-label="{{ item.title or 'Open performance details' }}">
+            <img class="reference-past-image" src="{{ item.image }}" alt="{{ item.title or 'Past performance' }}" loading="lazy" />
+          </a>
+        {% endif %}
+        <span class="reference-past-body">
+          <span class="reference-past-date">{{ item.date }}</span>
+          <a class="reference-past-title" href="{{ item.url or '#' }}">{{ item.title }}</a>
+          <span class="reference-past-location">{{ item.location }}</span>
+          {% if item.summary %}
+            <span class="reference-past-summary">{{ item.summary }}</span>
+          {% endif %}
+          {% if item.media and item.media.length %}
+            <span class="reference-past-media">
+              {% for label in item.media %}
+                <span>{{ label }}</span>
+              {% endfor %}
+            </span>
+          {% endif %}
+          {% if item.url %}
+            <a class="reference-past-detail" href="{{ item.url }}">Details</a>
+          {% endif %}
+        </span>
+      </article>
+    {% endfor %}
+  </div>
+{%- if _inContainer -%}</div>{%- else -%}</section>{%- endif -%}

@@ -1,0 +1,134 @@
+---
+pagination:
+  data: performance_pages
+  size: 1
+  alias: performance
+permalink: "{{ performance.url }}index.html"
+---
+{% extends "layouts/base.njk" %}
+
+{% set lang = performance.lang or "en" %}
+{% set dir = "ltr" %}
+
+{% block title %}{{ performance.title }} · {{ site.name }}{% endblock %}
+{% block description %}{{ performance.intro or site.description }}{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}
+<footer class="reference-detail-shell pt-0 text-center text-xs uppercase tracking-[0.35em]" style="color:#867d70;">
+  © 2026 {{ site.name }} · All Rights Reserved
+</footer>
+{% endblock %}
+
+{% block content %}
+<div class="reference-detail-page">
+  <main class="reference-detail-shell">
+    <a class="reference-detail-back" href="{{ performance.backUrl or '/en/' }}">{{ performance.backLabel or "Back" }}</a>
+
+    {% set detailHeroImage = performance.heroImage or (performance.images[0].src if performance.images and performance.images.length else "") %}
+    {% if performance.kind === "past" and detailHeroImage %}
+      <section class="reference-detail-image-hero">
+        <img src="{{ detailHeroImage }}" alt="{{ performance.title }}" loading="eager" />
+        <div class="reference-detail-image-overlay"></div>
+        <div class="reference-detail-image-copy">
+          <p class="reference-detail-image-meta">{{ performance.date }}{% if performance.location %} · {{ performance.location }}{% endif %}</p>
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="reference-detail-hero">
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <p class="reference-eyebrow">{{ performance.eyebrow }}</p>
+          <h1 class="reference-detail-title">{{ performance.title }}</h1>
+        </div>
+        {% if performance.intro %}
+          <p class="reference-detail-intro">{{ performance.intro }}</p>
+        {% endif %}
+        {% if performance.kind === "upcoming" %}
+          <a class="reference-pill-button" href="#details">Details</a>
+        {% endif %}
+      </div>
+
+      {% if performance.facts and performance.facts.length %}
+        <div class="reference-detail-facts">
+          {% for fact in performance.facts %}
+            <div class="reference-detail-fact">
+              <div class="reference-detail-fact-label">{{ fact.label }}</div>
+              <div class="reference-detail-fact-value">{{ fact.value }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </section>
+
+    <div class="reference-detail-sections">
+      {% if performance.program and performance.program.length %}
+        <section class="reference-detail-two-col" id="details">
+          <div class="space-y-2">
+            <p class="reference-eyebrow">{{ "Program" if performance.kind === "past" else "Details" }}</p>
+            <h2 class="reference-section-title">{{ "Repertoire" if performance.kind === "past" else "Concert Information" }}</h2>
+          </div>
+          <div class="reference-detail-card">
+            <div class="reference-detail-program-list">
+              {% for item in performance.program %}
+                <div class="reference-detail-program-row">
+                  <div class="reference-detail-program-composer">{{ item.label }}</div>
+                  <div class="reference-detail-program-work">{{ item.value }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if performance.images and performance.images.length or performance.videos and performance.videos.length %}
+        <section class="reference-detail-two-col">
+          <div class="space-y-2">
+            <p class="reference-eyebrow">Media</p>
+            <h2 class="reference-section-title">Photos & Video</h2>
+          </div>
+          <div class="reference-detail-media-grid">
+            {% if performance.images and performance.images.length %}
+              <div class="reference-detail-media-card">
+                <div class="reference-detail-photo-grid">
+                  {% for image in performance.images %}
+                    <img class="reference-gallery-image" src="{{ image.src }}" alt="{{ image.alt or performance.title }}" loading="lazy" />
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            {% if performance.videos and performance.videos.length %}
+              {% for video in performance.videos %}
+                <div class="reference-detail-media-card">
+                  <div class="reference-detail-video">
+                    <iframe
+                      src="{{ video.youtubeEmbedUrl }}"
+                      title="{{ video.title or performance.title }}"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                  {% if video.title %}
+                    <p class="reference-card-title mt-4">{{ video.title }}</p>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </section>
+      {% endif %}
+
+      {% if performance.notice %}
+        <section class="reference-detail-notice">
+          <div class="space-y-2">
+            <p class="reference-eyebrow">Archive</p>
+            <h2 class="reference-section-title">After the Concert</h2>
+            <p class="reference-detail-intro">{{ performance.notice }}</p>
+          </div>
+        </section>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

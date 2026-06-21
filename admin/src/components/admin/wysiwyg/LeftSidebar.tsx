@@ -57,6 +57,7 @@ const PALETTE: {
     types: [
       "hero",
       "schedule",
+      "past-performances",
       "gallery",
       "recordings",
       "featured-articles",
@@ -70,6 +71,7 @@ const PALETTE: {
     icons: {
       hero: <HeroIcon />,
       schedule: <ScheduleIcon />,
+      "past-performances": <ScheduleIcon />,
       gallery: <GalleryIcon />,
       recordings: <RecordingsIcon />,
       "featured-articles": <ArticlesIcon />,
@@ -580,6 +582,7 @@ function BlockTypeIcon({
     case "hero":
       return <HeroIcon size={size} />;
     case "schedule":
+    case "past-performances":
       return <ScheduleIcon size={size} />;
     case "gallery":
       return <GalleryIcon size={size} />;

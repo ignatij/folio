@@ -41,6 +41,9 @@ permalink: "/{{ lang.code }}/index.html"
   {% elif block.type === "contact" %}
     {% set b = block %}
     {% include "partials/blocks/contact.njk" %}
+  {% elif block.type === "past-performances" %}
+    {% set b = block %}
+    {% include "partials/blocks/past-performances.njk" %}
   {% elif block.type === "gallery" %}
     {% set b = block %}
     {% include "partials/blocks/gallery.njk" %}
