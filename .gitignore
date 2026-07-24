@@ -33,3 +33,10 @@ Thumbs.db
 .playwright/
 .playwright-test/
 .playwright-mcp/
+
+
+# uploads of files locally to reconstruct photos
+uploads
+
+# dist
+dist
