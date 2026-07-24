@@ -9,18 +9,18 @@
 #   BACKEND_URL=http://localhost:8082
 
 # Redirect www → apex
-www.folio.mk {
-    redir https://folio.mk{uri} permanent
+www.anastasijagichevska.com {
+    redir https://anastasijagichevska.com{uri} permanent
 }
 
-folio.mk {
+anastasijagichevska.com {
     # ── API: proxy to Go backend ──────────────────────────────────────────
     handle /api/* {
         reverse_proxy localhost:8082
     }
 
     # ── Admin UI: proxy to Go backend ────────────────────────────────────
-    handle /admin/* {
+    handle /admin* {
         reverse_proxy localhost:8082
     }
 

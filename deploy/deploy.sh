@@ -27,6 +27,7 @@ echo "==> Building Go binary and admin UI..."
 cd "${REPO_DIR}"
 mkdir -p dist
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C backend -o ../dist/folio-server ./cmd/server/main.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C backend -o ../dist/create-admin ./cmd/create-admin/main.go
 cd "${REPO_DIR}/admin" && npm run build
 cd "${REPO_DIR}"
 
@@ -35,11 +36,17 @@ ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" \
   "mkdir -p ${REMOTE_DIR}/admin/dist ${REMOTE_DIR}/site/dist ${REMOTE_DIR}/uploads ${REMOTE_DIR}/data"
 
 echo "==> Uploading binary to ${REMOTE_USER}@${HOST}:${REMOTE_BINARY} ..."
-scp "${SSH_OPTS[@]}" dist/folio-server "${REMOTE_USER}@${HOST}:${REMOTE_BINARY}"
-ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "chmod +x ${REMOTE_BINARY}"
+scp "${SSH_OPTS[@]}" dist/folio-server "${REMOTE_USER}@${HOST}:/tmp/folio-server"
+scp "${SSH_OPTS[@]}" dist/create-admin "${REMOTE_USER}@${HOST}:/tmp/create-admin"
+ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" \
+  "mv /tmp/folio-server ${REMOTE_BINARY} && mv /tmp/create-admin ${REMOTE_DIR}/create-admin && chmod +x ${REMOTE_BINARY} ${REMOTE_DIR}/create-admin"
 
 echo "==> Uploading config files..."
 scp "${SSH_OPTS[@]}" config.yaml theme.json "${REMOTE_USER}@${HOST}:${REMOTE_DIR}/"
+
+echo "==> Uploading Caddy config..."
+scp "${SSH_OPTS[@]}" deploy/Caddyfile.server "${REMOTE_USER}@${HOST}:/etc/caddy/Caddyfile"
+ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "caddy fmt --overwrite /etc/caddy/Caddyfile && systemctl reload caddy"
 
 echo "==> Uploading admin UI..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "rm -rf ${REMOTE_DIR}/admin/dist && mkdir -p ${REMOTE_DIR}/admin/dist"

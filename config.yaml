@@ -7,7 +7,7 @@
 site:
   name: "Anastasija Gichevska"
   tagline: "Macedonian Pianist • Piano Accompanist • Piano Teacher"
-  url: "http://localhost:8081"
+  url: "https://anastasijagichevska.com"
   # Optional CTA / booking link shown in the call-to-action band.
   # Leave empty to hide the CTA band buttons.
   bookingUrl: ""

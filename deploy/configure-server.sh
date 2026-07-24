@@ -35,6 +35,12 @@ echo "==> Creating app directories..."
 mkdir -p /opt/folio/{admin/dist,site/dist,site/src,uploads,data}
 chown -R folio:folio /opt/folio
 
+echo "==> Installing base packages..."
+if command -v apt-get &>/dev/null; then
+    apt-get update
+    apt-get install -y ca-certificates curl gnupg
+fi
+
 echo "==> Installing Node.js (LTS)..."
 if ! command -v node &>/dev/null; then
     if command -v dnf &>/dev/null; then
@@ -50,6 +56,19 @@ if ! command -v node &>/dev/null; then
 fi
 echo "    node $(node --version), npm $(npm --version)"
 
+echo "==> Installing Caddy..."
+if ! command -v caddy &>/dev/null; then
+    if command -v apt-get &>/dev/null; then
+        apt-get install -y caddy
+    elif command -v dnf &>/dev/null; then
+        dnf install -y caddy
+    else
+        echo "ERROR: unsupported package manager (not dnf/apt)" >&2
+        exit 1
+    fi
+fi
+systemctl enable caddy
+
 echo "==> Writing /etc/folio.env..."
 cat > /etc/folio.env <<EOF
 PORT=8082
@@ -59,11 +78,13 @@ JWT_SECRET=${JWT_SECRET}
 SITE_BUILD_SCRIPT=/opt/folio/site/build.sh
 SITE_DIST=/opt/folio/site/dist
 BACKEND_URL=http://localhost:8082
+ADMIN_DIST=/opt/folio/admin/dist
+CONFIG_PATH=/opt/folio/config.yaml
 EOF
 chmod 600 /etc/folio.env
 
 echo "==> Installing systemd service..."
-cat > /etc/systemd/system/ <<'EOF'
+cat > /etc/systemd/system/folio.service <<'EOF'
 [Unit]
 Description=Folio Blog Server
 After=network.target
