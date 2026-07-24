@@ -38,7 +38,7 @@ chown -R folio:folio /opt/folio
 echo "==> Installing base packages..."
 if command -v apt-get &>/dev/null; then
     apt-get update
-    apt-get install -y ca-certificates curl gnupg
+    apt-get install -y ca-certificates curl gnupg webp
 fi
 
 echo "==> Installing Node.js (LTS)..."

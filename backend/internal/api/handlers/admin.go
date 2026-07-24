@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"log"
 	"net/http"
@@ -11,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"folio/internal/config"
@@ -18,6 +23,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+)
+
+const (
+	maxUploadSize      = 20 << 20 // 20 MB
+	maxImageDimension  = 1920
+	webpQuality        = 82
+	uploadSniffLength  = 512
+	optimizedImageMime = "image/webp"
 )
 
 // AdminHandler handles all admin CRUD operations.
@@ -69,6 +82,98 @@ func paginationParams(c echo.Context) (limit, offset, page int) {
 	}
 	offset = (page - 1) * limit
 	return
+}
+
+func optimizedDimensions(width, height int) (int, int) {
+	if width <= 0 || height <= 0 {
+		return width, height
+	}
+	if width <= maxImageDimension && height <= maxImageDimension {
+		return width, height
+	}
+	if width >= height {
+		return maxImageDimension, max(1, height*maxImageDimension/width)
+	}
+	return max(1, width*maxImageDimension/height), maxImageDimension
+}
+
+func optimizeImageUpload(src io.Reader, dstPath string) (int64, error) {
+	data, err := io.ReadAll(io.LimitReader(src, maxUploadSize+1))
+	if err != nil {
+		return 0, fmt.Errorf("read upload: %w", err)
+	}
+	if int64(len(data)) > maxUploadSize {
+		return 0, fmt.Errorf("file exceeds 20 MB limit")
+	}
+
+	sniff := data
+	if len(sniff) > uploadSniffLength {
+		sniff = sniff[:uploadSniffLength]
+	}
+	contentType := http.DetectContentType(sniff)
+	if contentType != "image/jpeg" && contentType != "image/png" {
+		return 0, fmt.Errorf("unsupported image type: use JPEG or PNG")
+	}
+
+	cfg, _, err := image.DecodeConfig(bytes.NewReader(data))
+	if err != nil {
+		return 0, fmt.Errorf("invalid image")
+	}
+	width, height := optimizedDimensions(cfg.Width, cfg.Height)
+
+	tmp, err := os.CreateTemp(filepath.Dir(dstPath), "upload-*")
+	if err != nil {
+		return 0, fmt.Errorf("create temp upload: %w", err)
+	}
+	tmpPath := tmp.Name()
+	defer os.Remove(tmpPath)
+
+	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		return 0, fmt.Errorf("write temp upload: %w", err)
+	}
+	if err := tmp.Close(); err != nil {
+		return 0, fmt.Errorf("close temp upload: %w", err)
+	}
+
+	args := []string{
+		"-quiet",
+		"-q", strconv.Itoa(webpQuality),
+		"-metadata", "none",
+	}
+	if width != cfg.Width || height != cfg.Height {
+		args = append(args, "-resize", strconv.Itoa(width), strconv.Itoa(height))
+	}
+	args = append(args, tmpPath, "-o", dstPath)
+
+	out, err := exec.Command("cwebp", args...).CombinedOutput()
+	if err != nil {
+		return 0, fmt.Errorf("optimize image with cwebp: %w: %s", err, out)
+	}
+
+	info, err := os.Stat(dstPath)
+	if err != nil {
+		return 0, fmt.Errorf("stat optimized image: %w", err)
+	}
+	return info.Size(), nil
+}
+
+func saveOriginalUpload(src io.Reader, dstPath string) (int64, error) {
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return 0, fmt.Errorf("create upload: %w", err)
+	}
+	defer dst.Close()
+
+	written, err := io.Copy(dst, io.LimitReader(src, maxUploadSize+1))
+	if err != nil {
+		return 0, fmt.Errorf("write upload: %w", err)
+	}
+	if written > maxUploadSize {
+		_ = os.Remove(dstPath)
+		return 0, fmt.Errorf("file exceeds 20 MB limit")
+	}
+	return written, nil
 }
 
 // ── Articles ──────────────────────────────────────────────────────────────────
@@ -290,8 +395,7 @@ func (h *AdminHandler) UploadMedia(c echo.Context) error {
 		return respondError(c, http.StatusBadRequest, "file is required")
 	}
 
-	const maxSize = 20 << 20 // 20 MB
-	if file.Size > maxSize {
+	if file.Size > maxUploadSize {
 		return respondError(c, http.StatusRequestEntityTooLarge, "file exceeds 20 MB limit")
 	}
 
@@ -301,28 +405,48 @@ func (h *AdminHandler) UploadMedia(c echo.Context) error {
 	}
 	defer src.Close()
 
-	ext := filepath.Ext(file.Filename)
-	filename := fmt.Sprintf("%s%s", uuid.NewString(), ext)
-	dst, err := os.Create(filepath.Join(h.uploadDir, filename))
-	if err != nil {
-		return respondError(c, http.StatusInternalServerError, "failed to save file")
-	}
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
-		return respondError(c, http.StatusInternalServerError, "failed to write file")
-	}
-
 	ct := file.Header.Get("Content-Type")
 	if ct == "" {
 		ct = "application/octet-stream"
 	}
 
+	filename := fmt.Sprintf("%s%s", uuid.NewString(), filepath.Ext(file.Filename))
+	mimeType := ct
+	var size int64
+
+	if strings.HasPrefix(ct, "image/") {
+		filename = fmt.Sprintf("%s.webp", uuid.NewString())
+		mimeType = optimizedImageMime
+		dstPath := filepath.Join(h.uploadDir, filename)
+		size, err = optimizeImageUpload(src, dstPath)
+		if err != nil {
+			if errors.Is(err, exec.ErrNotFound) {
+				return respondError(c, http.StatusInternalServerError, "image optimizer is not installed")
+			}
+			if strings.HasPrefix(err.Error(), "file exceeds") {
+				return respondError(c, http.StatusRequestEntityTooLarge, err.Error())
+			}
+			if strings.HasPrefix(err.Error(), "unsupported image type") || err.Error() == "invalid image" {
+				return respondError(c, http.StatusUnsupportedMediaType, err.Error())
+			}
+			return respondError(c, http.StatusInternalServerError, "failed to optimize image")
+		}
+	} else {
+		dstPath := filepath.Join(h.uploadDir, filename)
+		size, err = saveOriginalUpload(src, dstPath)
+		if err != nil {
+			if strings.HasPrefix(err.Error(), "file exceeds") {
+				return respondError(c, http.StatusRequestEntityTooLarge, err.Error())
+			}
+			return respondError(c, http.StatusInternalServerError, "failed to save file")
+		}
+	}
+
 	mf := models.MediaFile{
 		Filename:     filename,
 		OriginalName: file.Filename,
-		MimeType:     ct,
-		SizeBytes:    file.Size,
+		MimeType:     mimeType,
+		SizeBytes:    size,
 	}
 	id, err := h.repo.CreateMediaFile(c.Request().Context(), mf)
 	if err != nil {
