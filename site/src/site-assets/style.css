@@ -1499,7 +1499,7 @@ img {
 }
 
 @media (max-width: 640px) {
-    .reference-hero-copy {
+    .reference-hero-line {
         display: none;
     }
 
