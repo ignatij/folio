@@ -1499,6 +1499,10 @@ img {
 }
 
 @media (max-width: 640px) {
+    .reference-hero-copy {
+        display: none;
+    }
+
     .reference-next-card {
         left: 1.5rem;
         right: 1.5rem;

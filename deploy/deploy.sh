@@ -17,7 +17,7 @@ REMOTE_USER="root"
 REMOTE_DIR="/opt/folio"
 REMOTE_BINARY="${REMOTE_DIR}/folio-server"
 
-SSH_OPTS=(-o StrictHostKeyChecking=accept-new)
+SSH_OPTS=(-o "StrictHostKeyChecking=${STRICT_HOST_KEY_CHECKING:-accept-new}")
 [[ -n "$SSH_KEY_FILE" ]] && SSH_OPTS+=(-i "$SSH_KEY_FILE")
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

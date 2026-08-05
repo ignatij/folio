@@ -142,88 +142,50 @@ The `docker-compose.yml` wires together:
 - **site-builder** — Eleventy build (runs once at startup, then on each rebuild trigger)
 - **proxy** — Caddy reverse proxy (automatic HTTPS when `DOMAIN` is set)
 
----
+## Automatic deployment to a dedicated host
 
-## Static Cloudflare Pages deployment
+This repository can deploy the application to a configured Linux host after a
+push to `main`. The `Deploy to production host` workflow waits for the `CI`
+workflow to pass, then runs `deploy/deploy.sh` against the checked-out commit.
+It preserves the host's database and uploads in `/opt/folio`.
 
-This project can also be deployed as a fully static site on Cloudflare Pages.
-In this mode, Cloudflare only serves prebuilt HTML, CSS, JavaScript, images, and
-other static assets. The Go backend, admin panel, and SQLite database are used
-locally or temporarily in CI only; they are not deployed to Cloudflare.
+### One-time host setup
 
-### Content snapshot model
-
-Admin changes are first saved into the local SQLite database. For CI/static
-deployment, the current content must be exported into committed seed files:
-
-```text
-backend/cmd/server/seeds/home_sections.json
-backend/cmd/server/seeds/site_settings.snapshot.json
-backend/cmd/server/seeds/uploads/
-```
-
-The runtime upload folders should stay local:
-
-```text
-backend/uploads/
-uploads/
-```
-
-When CI runs, it starts a temporary local backend with an empty temporary DB.
-The backend seeds that DB from the committed JSON files, copies seeded uploads
-into a temporary upload directory, and Eleventy builds the static site from that
-temporary backend API. The final Cloudflare artifact is `site/dist`.
-
-### Manual static export
-
-Start the backend locally:
+Run the server bootstrap script once from a trusted machine. It creates the
+`folio` system service, `/opt/folio`, and its Caddy configuration:
 
 ```bash
-cd backend
-go run ./cmd/server/main.go
+DEPLOY_HOST=your-host JWT_SECRET=your-long-random-secret \
+  bash deploy/configure-server.sh
 ```
 
-Build the static site from another terminal:
+The deploy script connects as `root`, so add a dedicated SSH public key to
+`/root/.ssh/authorized_keys` on the host. The matching private key is used
+only by GitHub Actions.
+
+### GitHub Actions configuration
+
+In the GitHub repository, create these Actions values:
+
+| Type | Name | Value |
+|---|---|---|
+| Variable | `DEPLOY_HOST` | Server hostname or IP address |
+| Secret | `DEPLOY_SSH_PRIVATE_KEY` | Dedicated deployment SSH private key |
+| Secret | `DEPLOY_KNOWN_HOSTS` | Trusted host key line(s) for the server |
+
+Generate the known-host entry from a trusted machine after verifying the host
+fingerprint:
 
 ```bash
-cd site
-BACKEND_URL=http://localhost:8080 npm run build
+ssh-keyscan -H your-host
 ```
 
-Copy uploaded media into the static artifact:
+Add the output to `DEPLOY_KNOWN_HOSTS`. The workflow requires this value and
+uses strict host-key checking, so it will not silently trust a different host.
 
-```bash
-mkdir -p site/dist/uploads
-cp -R backend/uploads/. site/dist/uploads/
-```
-
-Deploy with Wrangler:
-
-```bash
-npx wrangler pages deploy site/dist --project-name YOUR_CLOUDFLARE_PAGES_PROJECT
-```
-
-### GitHub Actions deployment
-
-The workflow in `.github/workflows/cloudflare-pages.yml` performs the same
-static export in CI and deploys `site/dist` to Cloudflare Pages.
-
-Configure these GitHub repository settings:
-
-```text
-Secrets:
-  CLOUDFLARE_API_TOKEN
-  CLOUDFLARE_ACCOUNT_ID
-
-Variables:
-  CLOUDFLARE_PAGES_PROJECT_NAME
-```
-
-After changing content in the admin panel, export the desired local DB state
-back into the seed files and commit those files before pushing. CI deploys from
-the committed seed snapshot, not from your local `backend/blog.db`.
-
----
+The workflow uses the `production` GitHub environment. Create it under
+**Settings → Environments**. Add required reviewers there if production
+deployments should need approval; otherwise it will deploy automatically.
 
 ## Deploy with the ONCE app server (recommended)
 
