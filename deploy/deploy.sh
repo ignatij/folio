@@ -28,7 +28,7 @@ cd "${REPO_DIR}"
 mkdir -p dist
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C backend -o ../dist/folio-server ./cmd/server/main.go
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C backend -o ../dist/create-admin ./cmd/create-admin/main.go
-cd "${REPO_DIR}/admin" && npm run build
+cd "${REPO_DIR}/admin" && npm ci && npm run build
 cd "${REPO_DIR}"
 
 echo "==> Creating remote directories..."
