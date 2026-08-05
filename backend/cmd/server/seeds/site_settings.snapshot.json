@@ -141,6 +141,12 @@
       "label": "RECORDINGS",
       "url": "#recordings",
       "order": 3
+    },
+    {
+      "type": "external",
+      "label": "CONTACT",
+      "url": "#contact",
+      "order": 4
     }
   ],
   "home_sections": [

@@ -5,9 +5,11 @@
 const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8080";
 
 const FALLBACK = [
-  { type: "builtin", label: "Home", url: "/", order: 0 },
-  { type: "builtin", label: "Articles", url: "/articles/", order: 1 },
-  { type: "builtin", label: "Contact", url: "/contact/", order: 2 },
+  { type: "external", label: "ABOUT", url: "#about", order: 0 },
+  { type: "external", label: "SCHEDULE", url: "#schedule", order: 1 },
+  { type: "external", label: "GALLERY", url: "#gallery", order: 2 },
+  { type: "external", label: "RECORDINGS", url: "#recordings", order: 3 },
+  { type: "external", label: "CONTACT", url: "#contact", order: 4 },
 ];
 
 export default async function () {

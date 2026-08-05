@@ -69,7 +69,7 @@
                     {% if child.type === "builtin" or child.type === "page" %}
                       <a href="/{{ lang }}{{ child.url }}" class="block px-4 py-2 text-sm transition-colors" style="color:var(--color-text);" onmouseover="this.style.background='var(--color-border)'" onmouseout="this.style.background=''">{{ child.labels[lang] if (child.labels and child.labels[lang]) else child.label }}</a>
                     {% else %}
-                      <a href="{{ child.url }}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm transition-colors" style="color:var(--color-text);" onmouseover="this.style.background='var(--color-border)'" onmouseout="this.style.background=''">{{ child.labels[lang] if (child.labels and child.labels[lang]) else child.label }}</a>
+                      <a href="{{ child.url }}" {% if not child.url.startsWith("#") %}target="_blank" rel="noopener noreferrer"{% endif %} class="block px-4 py-2 text-sm transition-colors" style="color:var(--color-text);" onmouseover="this.style.background='var(--color-border)'" onmouseout="this.style.background=''">{{ child.labels[lang] if (child.labels and child.labels[lang]) else child.label }}</a>
                     {% endif %}
                   {% endif %}
                 {% endfor %}
@@ -80,7 +80,7 @@
           {% if link.type === "builtin" or link.type === "page" %}
             <a href="/{{ lang }}{{ link.url }}" style="color:{{ linkColor }};" class="transition-colors">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
           {% else %}
-            <a href="{{ link.url }}" style="color:{{ linkColor }};" class="transition-colors" target="_blank" rel="noopener noreferrer">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
+            <a href="{{ link.url }}" style="color:{{ linkColor }};" class="transition-colors" {% if not link.url.startsWith("#") %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
           {% endif %}
         {% endif %}
       {% endfor %}
@@ -129,7 +129,7 @@
                 {% elif child.type === "builtin" or child.type === "page" %}
                   <a href="/{{ lang }}{{ child.url }}" class="block py-0.5" style="color:{{ linkColor }};">{{ child.labels[lang] if (child.labels and child.labels[lang]) else child.label }}</a>
                 {% else %}
-                  <a href="{{ child.url }}" class="block py-0.5" style="color:{{ linkColor }};" target="_blank" rel="noopener noreferrer">{{ child.labels[lang] if (child.labels and child.labels[lang]) else child.label }}</a>
+                  <a href="{{ child.url }}" class="block py-0.5" style="color:{{ linkColor }};" {% if not child.url.startsWith("#") %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ child.labels[lang] if (child.labels and child.labels[lang]) else child.label }}</a>
                 {% endif %}
               {% endfor %}
             </div>
@@ -137,7 +137,7 @@
         {% elif link.type === "builtin" or link.type === "page" %}
           <a href="/{{ lang }}{{ link.url }}" class="block" style="color:{{ linkColor }};">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
         {% else %}
-          <a href="{{ link.url }}" class="block" style="color:{{ linkColor }};" target="_blank" rel="noopener noreferrer">{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
+          <a href="{{ link.url }}" class="block" style="color:{{ linkColor }};" {% if not link.url.startsWith("#") %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.labels[lang] if (link.labels and link.labels[lang]) else link.label }}</a>
         {% endif %}
       {% endfor %}
     </div>

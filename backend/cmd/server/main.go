@@ -113,11 +113,11 @@ func seedSettings(repo *models.Repository, cfg *config.Config, themePath string)
 
 	// Seed default nav_links / footer_links / social_links if absent.
 	if _, ok := all["nav_links"]; !ok {
-		defaultNav := `[{"type":"builtin","label":"Home","url":"/","order":0},{"type":"builtin","label":"Articles","url":"/articles/","order":1},{"type":"builtin","label":"Contact","url":"/contact/","order":2}]`
+		defaultNav := `[{"type":"external","label":"ABOUT","url":"#about","order":0},{"type":"external","label":"SCHEDULE","url":"#schedule","order":1},{"type":"external","label":"GALLERY","url":"#gallery","order":2},{"type":"external","label":"RECORDINGS","url":"#recordings","order":3},{"type":"external","label":"CONTACT","url":"#contact","order":4}]`
 		_ = repo.SetSetting(ctx, "nav_links", defaultNav)
 	}
 	if _, ok := all["footer_links"]; !ok {
-		defaultFooter := `[{"type":"builtin","label":"Home","url":"/","order":0},{"type":"builtin","label":"Articles","url":"/articles/","order":1},{"type":"builtin","label":"Contact","url":"/contact/","order":2}]`
+		defaultFooter := `[{"type":"external","label":"ABOUT","url":"#about","order":0},{"type":"external","label":"SCHEDULE","url":"#schedule","order":1},{"type":"external","label":"GALLERY","url":"#gallery","order":2},{"type":"external","label":"RECORDINGS","url":"#recordings","order":3},{"type":"external","label":"CONTACT","url":"#contact","order":4}]`
 		_ = repo.SetSetting(ctx, "footer_links", defaultFooter)
 	}
 	if _, ok := all["social_links"]; !ok {
