@@ -46,6 +46,7 @@
         matches = effectiveEnd !== null && effectiveEnd < now;
       if (matches && maxItems > 0 && visible >= maxItems) matches = false;
       item.hidden = !matches;
+      item.style.display = matches ? "" : "none";
       if (matches) visible += 1;
       grid.appendChild(item);
     });
