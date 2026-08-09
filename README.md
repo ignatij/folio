@@ -147,17 +147,46 @@ The `docker-compose.yml` wires together:
 This repository can deploy the application to a configured Linux host after a
 push to `main`. The `Deploy to production host` workflow waits for the `CI`
 workflow to pass, then runs `deploy/deploy.sh` against the checked-out commit.
-It preserves the host's database and uploads in `/opt/folio`.
+It preserves the host's database and uploads in `/opt/folio`. The repository
+deploys only its own Caddy site fragment, so other applications on the same
+host are not overwritten.
 
 ### One-time host setup
 
+The host must have a root Caddy configuration that imports independently
+deployed site fragments. Configure this once on the host:
+
+```caddy
+# /etc/caddy/Caddyfile
+import /etc/caddy/sites/*.caddy
+```
+
+For an existing single-site installation, preserve the active configuration
+as the pianist fragment before replacing the root file with the loader:
+
+```bash
+install -d -m 0755 /etc/caddy/sites
+cp /etc/caddy/Caddyfile /etc/caddy/sites/folio-pianist.caddy
+printf '%s\n' 'import /etc/caddy/sites/*.caddy' > /etc/caddy/Caddyfile
+caddy fmt --overwrite /etc/caddy/Caddyfile
+caddy fmt --overwrite /etc/caddy/sites/folio-pianist.caddy
+caddy validate --config /etc/caddy/Caddyfile
+systemctl reload caddy
+```
+
 Run the server bootstrap script once from a trusted machine. It creates the
-`folio` system service, `/opt/folio`, and its Caddy configuration:
+`folio` system service, `/opt/folio`, and `/etc/caddy/sites`, but it does not
+replace the host-level Caddy configuration:
 
 ```bash
 DEPLOY_HOST=your-host JWT_SECRET=your-long-random-secret \
   bash deploy/configure-server.sh
 ```
+
+Each deployment installs this repository's `deploy/Caddyfile.server` as
+`/etc/caddy/sites/folio-pianist.caddy`, validates the complete host
+configuration, and reloads Caddy. A failed validation restores the previous
+pianist fragment.
 
 The deploy script connects as `root`, so add a dedicated SSH public key to
 `/root/.ssh/authorized_keys` on the host. The matching private key is used

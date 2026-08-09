@@ -68,6 +68,12 @@ if ! command -v caddy &>/dev/null; then
     fi
 fi
 systemctl enable caddy
+mkdir -p /etc/caddy/sites
+
+if ! grep -Eq '^[[:space:]]*import[[:space:]]+/etc/caddy/sites/\*\.caddy([[:space:]]|$)' /etc/caddy/Caddyfile; then
+    echo "WARNING: /etc/caddy/Caddyfile must contain the following line before deployment:"
+    echo "  import /etc/caddy/sites/*.caddy"
+fi
 
 echo "==> Writing /etc/folio.env..."
 cat > /etc/folio.env <<EOF

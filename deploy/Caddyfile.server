@@ -1,4 +1,6 @@
-# Folio Blog — blocks to append to the server's /etc/caddy/Caddyfile
+# Pianist Folio site configuration.
+# This repository deploys the file as /etc/caddy/sites/folio-pianist.caddy.
+# The host-level /etc/caddy/Caddyfile must import /etc/caddy/sites/*.caddy.
 #
 # Required: the `folio` service must be running and /etc/folio.env must set:
 #   PORT=8082
