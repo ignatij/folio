@@ -73,6 +73,7 @@ export default function (eleventyConfig) {
   // ── Passthrough copies ──────────────────────────────────────────────────────
   eleventyConfig.addPassthroughCopy("src/fonts");
   eleventyConfig.addPassthroughCopy("src/site-assets");
+  eleventyConfig.addPassthroughCopy("src/cv.pdf");
 
   // ── Nunjucks environment ────────────────────────────────────────────────────
   eleventyConfig.setNunjucksEnvironmentOptions({ throwOnUndefined: false });
