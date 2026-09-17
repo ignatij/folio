@@ -2,10 +2,13 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   // ── Contact form ──────────────────────────────────────────────────────────
-  const form = document.getElementById("contact-form");
-  if (form) {
-    const successMsg = document.getElementById("contact-success");
-    const errorMsg = document.getElementById("contact-error");
+  document.querySelectorAll("[data-contact-form], #contact-form").forEach((form) => {
+    const successMsg = document.getElementById(
+      form.dataset.successId || "contact-success",
+    );
+    const errorMsg = document.getElementById(
+      form.dataset.errorId || "contact-error",
+    );
     const errorText =
       form.dataset.error || "Something went wrong. Please try again.";
 
@@ -38,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
-  }
+  });
 
   // ── Newsletter subscribe blocks (multiple on a page) ──────────────────────
   document.querySelectorAll(".newsletter-subscribe-form").forEach((form) => {

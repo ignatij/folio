@@ -1365,6 +1365,23 @@ img {
     gap: 1.25rem;
 }
 
+.reference-contact-status {
+    margin-bottom: 1.25rem;
+    border: 1px solid currentColor;
+    border-radius: 1rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.reference-contact-success {
+    color: #39734d;
+}
+
+.reference-contact-error {
+    color: #b42318;
+}
+
 .reference-contact-field {
     display: grid;
     gap: 0.625rem;

@@ -24,25 +24,29 @@
         {% endif %}
       </div>
 
-      <form class="reference-contact-form" action="{{ cc.formAction }}" method="POST">
-        {% if cc.subject %}
-          <input type="hidden" name="_subject" value="{{ cc.subject }}">
-        {% endif %}
-        <input type="hidden" name="_captcha" value="{{ 'true' if cc.captcha else 'false' }}">
-        <div class="reference-contact-field">
-          <label class="reference-contact-label" for="{{ formId }}-name">{{ cc.nameLabel or "Full Name" }}</label>
-          <input class="reference-contact-input" id="{{ formId }}-name" type="text" name="name" placeholder="{{ cc.namePlaceholder or 'Full Name' }}" required>
+      <div>
+        <div id="{{ formId }}-success" class="reference-contact-status reference-contact-success hidden" role="status">
+          {{ cc.successMessage or "Thank you for your message — we'll be in touch soon!" }}
         </div>
-        <div class="reference-contact-field">
-          <label class="reference-contact-label" for="{{ formId }}-email">{{ cc.emailLabel or "Email" }}</label>
-          <input class="reference-contact-input" id="{{ formId }}-email" type="email" name="email" placeholder="{{ cc.emailPlaceholder or 'Email' }}" required>
-        </div>
-        <div class="reference-contact-field">
-          <label class="reference-contact-label" for="{{ formId }}-message">{{ cc.messageLabel or "Message" }}</label>
-          <textarea class="reference-contact-input reference-contact-textarea" id="{{ formId }}-message" name="message" placeholder="{{ cc.messagePlaceholder or 'Message' }}" required></textarea>
-        </div>
-        <button class="reference-contact-submit" type="submit">{{ cc.submitLabel or "Send Message" }}</button>
-      </form>
+        <form class="reference-contact-form" action="/api/v1/contact" method="POST"
+              data-contact-form data-success-id="{{ formId }}-success" data-error-id="{{ formId }}-error"
+              data-error="{{ cc.errorMessage or 'Something went wrong. Please try again.' }}">
+          <div class="reference-contact-field">
+            <label class="reference-contact-label" for="{{ formId }}-name">{{ cc.nameLabel or "Full Name" }}</label>
+            <input class="reference-contact-input" id="{{ formId }}-name" type="text" name="first_name" autocomplete="name" placeholder="{{ cc.namePlaceholder or 'Full Name' }}" required>
+          </div>
+          <div class="reference-contact-field">
+            <label class="reference-contact-label" for="{{ formId }}-email">{{ cc.emailLabel or "Email" }}</label>
+            <input class="reference-contact-input" id="{{ formId }}-email" type="email" name="email" autocomplete="email" placeholder="{{ cc.emailPlaceholder or 'Email' }}" required>
+          </div>
+          <div class="reference-contact-field">
+            <label class="reference-contact-label" for="{{ formId }}-message">{{ cc.messageLabel or "Message" }}</label>
+            <textarea class="reference-contact-input reference-contact-textarea" id="{{ formId }}-message" name="message" placeholder="{{ cc.messagePlaceholder or 'Message' }}" required></textarea>
+          </div>
+          <div id="{{ formId }}-error" class="reference-contact-status reference-contact-error hidden" role="alert"></div>
+          <button class="reference-contact-submit" type="submit">{{ cc.submitLabel or "Send Message" }}</button>
+        </form>
+      </div>
     </div>
 {%- if _inContainer -%}</div>{%- else -%}
   </div>

@@ -24,13 +24,13 @@ func NewContactHandler(repo *models.Repository, emailSvc services.EmailSender, c
 }
 
 type contactRequest struct {
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
-	Email          string `json:"email"`
-	Company        string `json:"company"`
-	Phone          string `json:"phone"`
-	Message        string `json:"message"`
-	PrivacyConsent string `json:"privacy_consent"`
+	FirstName      string `json:"first_name" form:"first_name"`
+	LastName       string `json:"last_name" form:"last_name"`
+	Email          string `json:"email" form:"email"`
+	Company        string `json:"company" form:"company"`
+	Phone          string `json:"phone" form:"phone"`
+	Message        string `json:"message" form:"message"`
+	PrivacyConsent string `json:"privacy_consent" form:"privacy_consent"`
 }
 
 // SubmitContact — POST /api/v1/contact
