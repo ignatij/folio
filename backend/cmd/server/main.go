@@ -350,6 +350,7 @@ func main() {
 	admin.DELETE("/media/:id", adminH.DeleteMedia)
 
 	admin.GET("/contacts", adminH.ListContacts)
+	admin.DELETE("/contacts/:id", adminH.DeleteContact)
 	admin.GET("/newsletter", adminH.ListNewsletter)
 
 	admin.GET("/settings", settingsH.GetSettings)

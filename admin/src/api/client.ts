@@ -121,6 +121,8 @@ export const adminApi = {
   // Contacts
   listContacts: (page = 1) =>
     request<PaginatedContacts>(`/admin/contacts?page=${page}`, { auth: true }),
+  deleteContact: (id: number) =>
+    request<void>(`/admin/contacts/${id}`, { method: "DELETE", auth: true }),
 
   // Newsletter
   listSubscribers: (page = 1) =>

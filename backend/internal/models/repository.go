@@ -437,6 +437,20 @@ func (r *Repository) ListContactSubmissions(ctx context.Context, limit, offset i
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
 
+// DeleteContactSubmission permanently removes a contact submission.
+// The boolean reports whether a row with the requested ID existed.
+func (r *Repository) DeleteContactSubmission(ctx context.Context, id int64) (bool, error) {
+	result, err := r.db.ExecContext(ctx, `DELETE FROM contact_submissions WHERE id = ?`, id)
+	if err != nil {
+		return false, err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return rows > 0, nil
+}
+
 func (r *Repository) CreateNewsletterSubscriber(ctx context.Context, email, ipHash string) error {
 	_, err := r.db.ExecContext(ctx,
 		`INSERT OR IGNORE INTO newsletter_subscribers (email, ip_hash) VALUES (?, ?)`,

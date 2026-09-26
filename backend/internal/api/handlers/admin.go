@@ -496,6 +496,22 @@ func (h *AdminHandler) ListContacts(c echo.Context) error {
 // ── Newsletter ────────────────────────────────────────────────────────────────
 
 // ListNewsletter — GET /admin/newsletter
+// DeleteContact — DELETE /admin/contacts/:id
+func (h *AdminHandler) DeleteContact(c echo.Context) error {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil || id <= 0 {
+		return respondError(c, http.StatusBadRequest, "invalid contact id")
+	}
+	deleted, err := h.repo.DeleteContactSubmission(c.Request().Context(), id)
+	if err != nil {
+		return respondError(c, http.StatusInternalServerError, "failed to delete contact")
+	}
+	if !deleted {
+		return respondError(c, http.StatusNotFound, "contact submission not found")
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 func (h *AdminHandler) ListNewsletter(c echo.Context) error {
 	limit, offset, page := paginationParams(c)
 	items, total, err := h.repo.ListNewsletterSubscribers(c.Request().Context(), limit, offset)
