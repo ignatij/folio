@@ -1537,3 +1537,11 @@ img {
         letter-spacing: 0.24em;
     }
 }
+/* Bot trap: available to form-filling scripts but not to people or assistive tech. */
+.contact-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

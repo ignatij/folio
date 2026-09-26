@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,10 +18,15 @@ type ContactHandler struct {
 	repo         *models.Repository
 	emailSvc     services.EmailSender
 	contactEmail string
+	turnstile    interface {
+		Verify(context.Context, string) error
+	}
 }
 
-func NewContactHandler(repo *models.Repository, emailSvc services.EmailSender, contactEmail string) *ContactHandler {
-	return &ContactHandler{repo: repo, emailSvc: emailSvc, contactEmail: contactEmail}
+func NewContactHandler(repo *models.Repository, emailSvc services.EmailSender, contactEmail string, turnstile interface {
+	Verify(context.Context, string) error
+}) *ContactHandler {
+	return &ContactHandler{repo: repo, emailSvc: emailSvc, contactEmail: contactEmail, turnstile: turnstile}
 }
 
 type contactRequest struct {
@@ -31,6 +37,8 @@ type contactRequest struct {
 	Phone          string `json:"phone" form:"phone"`
 	Message        string `json:"message" form:"message"`
 	PrivacyConsent string `json:"privacy_consent" form:"privacy_consent"`
+	Website        string `json:"website" form:"website"`
+	TurnstileToken string `json:"cf-turnstile-response" form:"cf-turnstile-response"`
 }
 
 // SubmitContact — POST /api/v1/contact
@@ -38,6 +46,11 @@ func (h *ContactHandler) SubmitContact(c echo.Context) error {
 	var req contactRequest
 	if err := c.Bind(&req); err != nil {
 		return respondError(c, http.StatusBadRequest, "invalid request body")
+	}
+	if strings.TrimSpace(req.Website) != "" {
+		// Honeypot fields are invisible to people. Pretend the submission
+		// succeeded so simple form-filling bots do not learn to avoid it.
+		return c.JSON(http.StatusCreated, map[string]bool{"ok": true})
 	}
 
 	req.FirstName = strings.TrimSpace(req.FirstName)
@@ -53,6 +66,14 @@ func (h *ContactHandler) SubmitContact(c echo.Context) error {
 	}
 	if req.Message == "" {
 		return respondError(c, http.StatusBadRequest, "message is required")
+	}
+	if h.turnstile == nil {
+		log.Printf("[contact] rejected submission: Turnstile is not configured")
+		return respondError(c, http.StatusServiceUnavailable, "contact form is temporarily unavailable")
+	}
+	if err := h.turnstile.Verify(c.Request().Context(), req.TurnstileToken); err != nil {
+		log.Printf("[contact] Turnstile verification failed: %v", err)
+		return respondError(c, http.StatusBadRequest, "human verification failed; please try again")
 	}
 
 	cs := models.ContactSubmission{

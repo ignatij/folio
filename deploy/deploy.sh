@@ -12,6 +12,8 @@
 set -euo pipefail
 
 HOST="${DEPLOY_HOST:?Set DEPLOY_HOST to the VM IP or hostname}"
+TURNSTILE_SITE_KEY="${TURNSTILE_SITE_KEY:?Set TURNSTILE_SITE_KEY}"
+TURNSTILE_SECRET_KEY="${TURNSTILE_SECRET_KEY:?Set TURNSTILE_SECRET_KEY}"
 SSH_KEY_FILE="${SSH_KEY_FILE:-}"
 REMOTE_USER="root"
 REMOTE_DIR="/opt/folio"
@@ -37,6 +39,28 @@ cd "${REPO_DIR}"
 echo "==> Creating remote directories..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" \
   "mkdir -p ${REMOTE_DIR}/admin/dist ${REMOTE_DIR}/site/dist ${REMOTE_DIR}/uploads ${REMOTE_DIR}/data"
+
+echo "==> Installing Turnstile credentials..."
+TURNSTILE_TEMP_FILE="$(mktemp)"
+trap 'rm -f "${TURNSTILE_TEMP_FILE}"' EXIT
+{
+  printf 'TURNSTILE_SITE_KEY=%s\n' "${TURNSTILE_SITE_KEY}"
+  printf 'TURNSTILE_SECRET_KEY=%s\n' "${TURNSTILE_SECRET_KEY}"
+} > "${TURNSTILE_TEMP_FILE}"
+chmod 600 "${TURNSTILE_TEMP_FILE}"
+scp "${SSH_OPTS[@]}" "${TURNSTILE_TEMP_FILE}" "${REMOTE_USER}@${HOST}:/tmp/folio-turnstile.env.new"
+ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" 'bash -s' <<'REMOTE'
+set -euo pipefail
+ENV_FILE=/etc/folio.env
+TEMP_FILE=/tmp/folio-turnstile.env.new
+trap 'rm -f "${TEMP_FILE}"' EXIT
+chmod 600 "${TEMP_FILE}"
+sed -i '/^TURNSTILE_SITE_KEY=/d; /^TURNSTILE_SECRET_KEY=/d' "${ENV_FILE}"
+cat "${TEMP_FILE}" >> "${ENV_FILE}"
+chmod 600 "${ENV_FILE}"
+REMOTE
+rm -f "${TURNSTILE_TEMP_FILE}"
+trap - EXIT
 
 echo "==> Uploading binary to ${REMOTE_USER}@${HOST}:${REMOTE_BINARY} ..."
 scp "${SSH_OPTS[@]}" dist/folio-server "${REMOTE_USER}@${HOST}:/tmp/folio-server"
@@ -112,7 +136,7 @@ ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "chown -R folio:folio ${REMOTE_DIR
 
 echo "==> Installing site dependencies and building on server..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" \
-  "chmod +x ${REMOTE_DIR}/site/build.sh && cd ${REMOTE_DIR}/site && npm ci && SITE_DIST=${REMOTE_DIR}/site/dist BACKEND_URL=http://localhost:8082 bash build.sh"
+  "set -a && . /etc/folio.env && set +a && chmod +x ${REMOTE_DIR}/site/build.sh && cd ${REMOTE_DIR}/site && npm ci && SITE_DIST=${REMOTE_DIR}/site/dist BACKEND_URL=http://localhost:8082 bash build.sh"
 
 echo "==> Restarting service..."
 ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "systemctl restart folio"

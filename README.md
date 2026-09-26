@@ -200,6 +200,8 @@ In the GitHub repository, create these Actions values:
 |---|---|---|
 | Variable | `DEPLOY_HOST` | Server hostname or IP address |
 | Secret | `DEPLOY_SSH_PRIVATE_KEY` | Dedicated deployment SSH private key |
+| Secret | `TURNSTILE_SITE_KEY` | Public Turnstile widget key used during the site build |
+| Secret | `TURNSTILE_SECRET_KEY` | Private Turnstile verification key installed on the server |
 | Secret | `DEPLOY_KNOWN_HOSTS` | Trusted host key line(s) for the server |
 
 Generate the known-host entry from a trusted machine after verifying the host
@@ -384,6 +386,8 @@ Or edit `theme.json` directly, or use Settings → Theme in the admin. Key token
 | Variable | Default | Description |
 |---|---|---|
 | `JWT_SECRET` | *(required)* | Secret for signing admin tokens (min 32 chars) |
+| `TURNSTILE_SITE_KEY` | — | Public Cloudflare Turnstile key rendered on contact forms |
+| `TURNSTILE_SECRET_KEY` | — | Private Cloudflare Turnstile key used to verify contact submissions |
 | `DB_PATH` | `./blog.db` | SQLite database path |
 | `PORT` | `8080` | Backend listen port |
 | `UPLOAD_DIR` | `./uploads` | Uploaded media directory |

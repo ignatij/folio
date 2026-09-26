@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (!form.reportValidity()) return;
       if (errorMsg) {
         errorMsg.textContent = "";
         errorMsg.classList.add("hidden");

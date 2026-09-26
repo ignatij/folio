@@ -198,6 +198,7 @@ func main() {
 	adminDistDir := getEnv("ADMIN_DIST", "./admin/dist")
 	siteDistDir := getEnv("SITE_DIST", "./site/dist")
 	contactEmail := getEnv("CONTACT_EMAIL", cfg.ContactEmail)
+	turnstileSecret := os.Getenv("TURNSTILE_SECRET_KEY")
 
 	tenantID := os.Getenv("MS_GRAPH_TENANT_ID")
 	clientID := os.Getenv("MS_GRAPH_CLIENT_ID")
@@ -254,7 +255,12 @@ func main() {
 	authH := handlers.NewAuthHandler(repo, jwtSecret)
 	publicH := handlers.NewPublicHandler(repo, cfg)
 	adminH := handlers.NewAdminHandler(repo, cfg, uploadDir)
-	contactH := handlers.NewContactHandler(repo, emailSvc, contactEmail)
+	contactH := handlers.NewContactHandler(repo, emailSvc, contactEmail, nil)
+	if turnstileSecret != "" {
+		contactH = handlers.NewContactHandler(repo, emailSvc, contactEmail, services.NewTurnstileVerifier(turnstileSecret))
+	} else {
+		log.Printf("WARNING: TURNSTILE_SECRET_KEY is unset; contact submissions will be rejected")
+	}
 	newsletterH := handlers.NewNewsletterHandler(repo)
 	settingsH := handlers.NewSettingsHandler(repo, emailProvider, emailConfigured, emailSvc)
 	pagesH := handlers.NewPagesHandler(repo, cfg)

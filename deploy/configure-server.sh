@@ -3,7 +3,8 @@
 # Run this from your LOCAL machine — it SSHes into the server and configures it.
 #
 # Usage:
-#   DEPLOY_HOST=<host> JWT_SECRET=<secret> bash deploy/configure-server.sh
+#   DEPLOY_HOST=<host> JWT_SECRET=<secret> TURNSTILE_SITE_KEY=<key> \
+#     TURNSTILE_SECRET_KEY=<secret> bash deploy/configure-server.sh
 #
 # Optional:
 #   SSH_KEY_FILE=~/.ssh/my_key bash deploy/configure-server.sh
@@ -11,10 +12,14 @@
 # Required env vars:
 #   DEPLOY_HOST  — VM IP or hostname
 #   JWT_SECRET   — secret key for JWT signing
+#   TURNSTILE_SITE_KEY   — public contact-form widget key
+#   TURNSTILE_SECRET_KEY — private contact-form verification key
 set -euo pipefail
 
 HOST="${DEPLOY_HOST:?Set DEPLOY_HOST to the VM IP or hostname}"
 JWT_SECRET="${JWT_SECRET:?Set JWT_SECRET before running this script}"
+TURNSTILE_SITE_KEY="${TURNSTILE_SITE_KEY:?Set TURNSTILE_SITE_KEY before running this script}"
+TURNSTILE_SECRET_KEY="${TURNSTILE_SECRET_KEY:?Set TURNSTILE_SECRET_KEY before running this script}"
 SSH_KEY_FILE="${SSH_KEY_FILE:-}"
 REMOTE_USER="root"
 
@@ -23,7 +28,7 @@ SSH_OPTS=(-o StrictHostKeyChecking=accept-new)
 
 echo "==> Configuring ${REMOTE_USER}@${HOST}..."
 
-ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "JWT_SECRET='${JWT_SECRET}' bash -s" <<'REMOTE'
+ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${HOST}" "JWT_SECRET='${JWT_SECRET}' TURNSTILE_SITE_KEY='${TURNSTILE_SITE_KEY}' TURNSTILE_SECRET_KEY='${TURNSTILE_SECRET_KEY}' bash -s" <<'REMOTE'
 set -euo pipefail
 
 echo "==> Creating system user 'folio'..."
@@ -81,6 +86,8 @@ PORT=8082
 UPLOAD_DIR=/opt/folio/uploads
 DB_PATH=/opt/folio/data/blog.db
 JWT_SECRET=${JWT_SECRET}
+TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
 SITE_BUILD_SCRIPT=/opt/folio/site/build.sh
 SITE_DIST=/opt/folio/site/dist
 BACKEND_URL=http://localhost:8082

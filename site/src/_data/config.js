@@ -16,5 +16,8 @@ export default async function () {
     );
   }
 
-  return { languages };
+  return {
+    languages,
+    turnstileSiteKey: process.env.TURNSTILE_SITE_KEY ?? "",
+  };
 }

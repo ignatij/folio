@@ -53,6 +53,13 @@ permalink: "/{{ lang.code }}/contact/index.html"
       <label class="block text-sm font-medium mb-1" style="color: var(--color-text);">{{ i18n[lang].contact_message }} <span style="color: var(--color-accent);">*</span></label>
       <textarea name="message" required rows="5" class="rounded px-3 py-2 w-full focus:outline-none text-sm resize-y" style="border: 1px solid var(--color-border); background: var(--color-bg-surface); color: var(--color-text);"></textarea>
     </div>
+    <div class="contact-honeypot" aria-hidden="true">
+      <label for="contact-website">Website</label>
+      <input id="contact-website" type="text" name="website" tabindex="-1" autocomplete="off" />
+    </div>
+    {% if config.turnstileSiteKey %}
+      <div class="cf-turnstile" data-sitekey="{{ config.turnstileSiteKey }}" data-action="contact" data-size="flexible"></div>
+    {% endif %}
     <div id="contact-error" class="hidden text-sm" style="color: var(--color-destructive, #e02424);"></div>
     <button type="submit" class="w-full py-3 font-semibold transition-colors text-sm text-white" style="background: var(--color-accent); border-radius: var(--radius-button);">
       {{ i18n[lang].contact_submit }}
