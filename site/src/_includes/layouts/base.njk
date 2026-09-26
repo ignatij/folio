@@ -9,8 +9,8 @@
     {% if site.favicon %}
       <link rel="icon" href="{{ site.favicon }}" />
     {% endif %}
-    <link rel="stylesheet" href="/site-assets/tailwind.css" />
-    <link rel="stylesheet" href="/site-assets/style.css" />
+    <link rel="stylesheet" href="/site-assets/tailwind.css?v=turnstile-2" />
+    <link rel="stylesheet" href="/site-assets/style.css?v=turnstile-2" />
     {% block head %}{% endblock %}
   </head>
   <body class="min-h-screen flex flex-col">
@@ -27,7 +27,7 @@
     {% endblock %}
 
     <script src="/site-assets/nav.js" defer></script>
-    <script src="/site-assets/forms.js" defer></script>
+    <script src="/site-assets/forms.js?v=turnstile-2" defer></script>
     {% if config.turnstileSiteKey %}
       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     {% endif %}

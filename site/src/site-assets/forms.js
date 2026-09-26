@@ -1,5 +1,26 @@
 // Contact form submission
 
+function setTurnstileMessage(message) {
+  document.querySelectorAll("[data-contact-form], #contact-form").forEach((form) => {
+    const errorMsg = document.getElementById(
+      form.dataset.errorId || "contact-error",
+    );
+    if (!errorMsg) return;
+    errorMsg.textContent = message;
+    errorMsg.classList.toggle("hidden", !message);
+  });
+}
+
+window.folioTurnstileSuccess = () => setTurnstileMessage("");
+window.folioTurnstileExpired = () =>
+  setTurnstileMessage("Human verification expired. Please wait for it to refresh.");
+window.folioTurnstileError = (code) => {
+  console.error("Turnstile error:", code);
+  setTurnstileMessage(
+    `Human verification could not load (error ${code}). Please refresh the page.`,
+  );
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   // ── Contact form ──────────────────────────────────────────────────────────
   document.querySelectorAll("[data-contact-form], #contact-form").forEach((form) => {
@@ -18,6 +39,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (errorMsg) {
         errorMsg.textContent = "";
         errorMsg.classList.add("hidden");
+      }
+
+      const turnstileWidget = form.querySelector(".cf-turnstile");
+      const turnstileToken = form.querySelector(
+        '[name="cf-turnstile-response"]',
+      )?.value;
+      if (turnstileWidget && !turnstileToken) {
+        if (errorMsg) {
+          errorMsg.textContent =
+            "Please wait for human verification to complete, then try again.";
+          errorMsg.classList.remove("hidden");
+        }
+        return;
       }
 
       const data = Object.fromEntries(new FormData(form).entries());

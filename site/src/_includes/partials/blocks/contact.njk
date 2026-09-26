@@ -43,12 +43,14 @@
             <label class="reference-contact-label" for="{{ formId }}-message">{{ cc.messageLabel or "Message" }}</label>
             <textarea class="reference-contact-input reference-contact-textarea" id="{{ formId }}-message" name="message" placeholder="{{ cc.messagePlaceholder or 'Message' }}" required></textarea>
           </div>
-          <div class="contact-honeypot" aria-hidden="true">
+          <div class="contact-honeypot" aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
             <label for="{{ formId }}-website">Website</label>
             <input id="{{ formId }}-website" type="text" name="website" tabindex="-1" autocomplete="off">
           </div>
           {% if config.turnstileSiteKey %}
-            <div class="cf-turnstile" data-sitekey="{{ config.turnstileSiteKey }}" data-action="contact" data-size="flexible"></div>
+            <div class="cf-turnstile" data-sitekey="{{ config.turnstileSiteKey }}" data-action="contact" data-size="flexible"
+                 data-callback="folioTurnstileSuccess" data-error-callback="folioTurnstileError"
+                 data-expired-callback="folioTurnstileExpired" data-refresh-expired="auto"></div>
           {% endif %}
           <div id="{{ formId }}-error" class="reference-contact-status reference-contact-error hidden" role="alert"></div>
           <button class="reference-contact-submit" type="submit">{{ cc.submitLabel or "Send Message" }}</button>
